@@ -1,0 +1,6 @@
+framework module Pods_Rooted {
+  umbrella header "Pods-Rooted-umbrella.h"
+
+  export *
+  module * { export * }
+}

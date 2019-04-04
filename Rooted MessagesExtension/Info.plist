@@ -27,5 +27,11 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.message-payload-provider</string>
 	</dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Rooted needs access to your calendar to add created invites to it.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Need your location to search for and add locations to invites.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Need your location to search for and add locations to invites.</string>
 </dict>
 </plist>

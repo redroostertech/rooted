@@ -1,0 +1,6 @@
+framework module Pods_Rooted_MessagesExtension {
+  umbrella header "Pods-Rooted MessagesExtension-umbrella.h"
+
+  export *
+  module * { export * }
+}

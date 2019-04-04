@@ -1,0 +1,6 @@
+framework module iMessageDataKit {
+  umbrella header "iMessageDataKit-umbrella.h"
+
+  export *
+  module * { export * }
+}
