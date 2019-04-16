@@ -23,6 +23,10 @@ class MessagesViewController: MSMessagesAppViewController {
     @IBOutlet var resetButton: SSSpinnerButton!
     @IBOutlet var cancelButton: UIButton!
 
+    var eventKitManager = EventKitManager()
+    var coreDataManager = CoreDataManager()
+    var invitesManager = MyInvitesManager()
+
     var isReOcurring: Bool = false
     var isPremium: Bool = false
     let eventStore = EKEventStore()
@@ -43,194 +47,128 @@ class MessagesViewController: MSMessagesAppViewController {
             locationField.text = selectedLocation?.0.name
         }
     }
-
-    lazy var applicationDocumentsDirectory: URL? = {
-        // The directory the application uses to store the Core Data store file. This code uses a directory named "com.yourdomain.YourAwesomeApp" in the application's documents Application Support directory.
-        return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.rrtech.rooted.Rooted") ?? nil
-    }()
-
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Invites")
-        var persistentStoreDescriptions: NSPersistentStoreDescription
-
-        let description = NSPersistentStoreDescription()
-        description.shouldInferMappingModelAutomatically = true
-        description.shouldMigrateStoreAutomatically = true
-        description.url = applicationDocumentsDirectory ?? nil
-
-        container.persistentStoreDescriptions = [NSPersistentStoreDescription(url: applicationDocumentsDirectory!.appendingPathComponent("Rooted.sqlite"))]
-
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            } else {
-                print("Successfully connected to store.")
-            }
-        })
-        return container
-    }()
     var selectedMessage: MSMessage?
     var locationManager: CLLocationManager?
 
     var invites: [NSManagedObject] = []
 
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.applyPrimaryGradient()
-        setUpTextFields()
-        setUpButtons()
-        setUpLabels()
-        getCalendarPermissions()
+        setupUI()
         locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.desiredAccuracy = kCLLocationAccuracyBest
     }
 
-    func setUpLabels() {
-        premiumFeaturesLabel.isHidden = true
-        setAsReocurringLabel.isHidden = true
-    }
-
-    func setUpTextFields() {
-        titleField.delegate = self
-        titleField.addLeftPadding(withWidth: kTextFieldIndent)
-        locationField.delegate = self
-        locationField.addLeftPadding(withWidth: kTextFieldIndent)
-        startDateAndTimeField.delegate = self
-        startDateAndTimeField.addLeftPadding(withWidth: kTextFieldIndent)
-        endDateAndTimeField.delegate = self
-        endDateAndTimeField.addLeftPadding(withWidth: kTextFieldIndent)
-    }
-
-    func setUpButtons() {
-        setAsReOcurringButton.layer.cornerRadius = setAsReOcurringButton.frame.height / 2
-        setAsReOcurringButton.clipsToBounds = true
-        setAsReOcurringButton.spinnerColor = UIColor.gradientColor1
-        setAsReOcurringButton.isHidden = true
-        sendToFriendsButton.layer.cornerRadius = sendToFriendsButton.frame.height / 2
-        sendToFriendsButton.clipsToBounds = true
-        sendToFriendsButton.spinnerColor = UIColor.gradientColor1
-    }
-
-    func getCalendarPermissions() {
-        switch EKEventStore.authorizationStatus(for: .event) {
-        case .authorized:
-            self.sendToFriendsButton.isEnabled = true
-        case .denied:
-            sendToFriendsButton.isEnabled = false
-        case .notDetermined:
-            eventStore.requestAccess(to: .event, completion: { (granted: Bool, error: Error?) -> Void in
-                if granted {
-                    self.sendToFriendsButton.isEnabled = true
-                } else {
-                    self.sendToFriendsButton.isEnabled = false
-                }
-            })
-        default: print("Case default")
-        }
-    }
-
-    func createRootedCalendar() {
-        let newCalendar = EKCalendar(for: .event, eventStore: eventStore)
-        newCalendar.title = MessagesViewController.calendarIdentifier
-        let sourcesInEventStore = eventStore.sources
-        newCalendar.source = sourcesInEventStore.filter{
-            (source: EKSource) -> Bool in
-            source.sourceType == EKSourceType.local
-        }.first
-        do {
-            try eventStore.saveCalendar(newCalendar, commit: true)
-            UserDefaults.standard.set(newCalendar.calendarIdentifier, forKey: "EventTrackerPrimaryCalendar")
-        } catch {
-            print(error)
-            print("Error saving calendar")
-        }
-    }
-
-    @IBAction func sendToFriends(_ sender: UIButton) {
-        sendToFriendsButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
-            if let title = self.titleField.text, let startDate = self.startDate, let endDate = self.endDate {
-                self.insertEvent(store: self.eventStore, title: title, startDate: startDate, endDate: endDate, location: self.selectedLocation, locationName: self.locationField.text ?? "")
-                let message = MSMessage()
-                let layout = MSMessageTemplateLayout()
-                layout.caption = title
-                layout.subcaption = self.locationField.text ?? ""
-                message.layout = layout
-                message.md.set(value: title, forKey: "title")
-                message.md.set(value: self.locationField.text ?? "", forKey: "subcaption")
-                message.md.set(value: startDate.toString(), forKey: "startDate")
-                message.md.set(value: endDate.toString(), forKey: "endDate")
-                if let loc = self.selectedLocation {
-                    message.md.set(value: loc.0.name ?? "", forKey: "locationName")
-                    message.md.set(value: loc.1.coordinate.latitude, forKey: "locationLat")
-                    message.md.set(value: loc.1.coordinate.longitude, forKey: "locationLon")
-                    message.md.set(value: loc.1.subThoroughfare ?? "", forKey: "locationStreet")
-                    message.md.set(value: loc.1.thoroughfare ?? "Address Unavailable", forKey: "locationAddress")
-                    message.md.set(value: loc.1.locality ?? "", forKey: "locationCity")
-                    message.md.set(value: loc.1.administrativeArea ?? "", forKey: "locationState")
-                    message.md.set(value: loc.1.countryCode ?? "", forKey: "locationCountry")
-                    message.md.set(value: loc.1.postalCode ?? "", forKey: "locationZip")
-                    message.md.set(value: loc.1.region?.identifier ?? "", forKey: "locationRegion")
-                }
-                if self.activeConversation == nil {
-                    self.activeConvo?.insert(message) { (error) in
-                        if let err = error {
-                            self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail,backToDefaults: true, complete: {
-                                print("There was an error \(err.localizedDescription)")
-                            })
-                        } else {
-                            self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: true, complete: {
-                                self.sendToFriendsButton.setTitle("", for: .normal)
-                                self.sendToFriendsButton.isHidden = true
-                                self.cancelButton.setTitle("DONE", for: .normal)
-                                self.save(endDate: endDate,
-                                          locationAddress: message.md.string(forKey: "locationAddress") ?? "",
-                                          locationCity: message.md.string(forKey: "locationCity") ?? "",
-                                          locationCountry: message.md.string(forKey: "locationCountry") ?? "",
-                                          locationLat: message.md.double(forKey: "locationLat") ?? 0.0,
-                                          locationLon: message.md.double(forKey: "locationLon") ?? 0.0,
-                                          locationName: message.md.string(forKey: "locationName") ?? "",
-                                          locationState: message.md.string(forKey: "locationState") ?? "",
-                                          locationStreet: message.md.string(forKey: "locationStreet") ?? "",
-                                          locationZip: message.md.string(forKey: "locationZip") ?? "",
-                                          startDate: startDate,
-                                          title: title)
-                            })
-                        }
-                    }
-                } else {
-                    self.activeConversation!.insert(message) { (error) in
-                        if let err = error {
-                            self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-                                print("There was an error \(err.localizedDescription)")
-                            })
-                        } else {
-                            self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: true, complete: {
-                                self.sendToFriendsButton.setTitle("", for: .normal)
-                                self.sendToFriendsButton.isHidden = true
-                                self.cancelButton.setTitle("DONE", for: .normal)
-                            })
-                        }
-                    }
-                }
+    override func viewWillAppear(_ animated: Bool) {
+        eventKitManager.getCalendarPermissions { (success) in
+            if success {
+                self.sendToFriendsButton.isEnabled = true
             } else {
-                self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-                    let alert = UIAlertController(title: "Incomplete Form", message: "Please fill out the form", preferredStyle: .alert)
-                    let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) in
-                        alert.dismiss(animated: true, completion: nil)
-                    })
-                    alert.addAction(ok)
-                    self.present(alert, animated: true, completion: nil)
+                self.sendToFriendsButton.isEnabled = false
+                self.showError(title: "Calendar Permissions", message: "In order to use Rooted, we need to have permission to access your calendar. Please go to your settings and enable this feature.")
+            }
+        }
+    }
+
+    // MARK: - Class functions
+    func send(message: MSMessage, toConversation conversation: MSConversation?, _ completion: @escaping (Bool) -> Void) {
+        conversation?.insert(message) { (error) in
+            if let err = error {
+                self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail,backToDefaults: true, complete: {
+                    print("There was an error \(err.localizedDescription)")
+                    completion(false)
+                })
+            } else {
+                self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: true, complete: {
+                    completion(true)
                 })
             }
+        }
+    }
+
+    func saveInviteToCoreData(endDate: Date, startDate: Date, title: String, message: MSMessage) {
+        self.invitesManager.saveInvite(endDate: endDate,
+                                       locationAddress: message.md.string(forKey: "locationAddress") ?? "",
+                                       locationCity: message.md.string(forKey: "locationCity") ?? "",
+                                       locationCountry: message.md.string(forKey: "locationCountry") ?? "",
+                                       locationLat: message.md.double(forKey: "locationLat") ?? 0.0,
+                                       locationLon: message.md.double(forKey: "locationLon") ?? 0.0,
+                                       locationName: message.md.string(forKey: "locationName") ?? "",
+                                       locationState: message.md.string(forKey: "locationState") ?? "",
+                                       locationStreet: message.md.string(forKey: "locationStreet") ?? "",
+                                       locationZip: message.md.string(forKey: "locationZip") ?? "",
+                                       startDate: startDate,
+                                       title: title, {
+                                        (success, error) in
+                                        DispatchQueue.main.async {
+                                            if self.presentationStyle == .expanded {
+                                                self.requestPresentationStyle(.compact)
+                                            }
+                                        }
         })
     }
 
-    @IBAction func resetForm(_ sender: UIButton) {
-        resetView()
+    func sendToFriendsAction() {
+        sendToFriendsButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
+            guard let title = self.titleField.text,
+                let startDate = self.startDate,
+                let endDate = self.endDate else {
+                    self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
+                        self.showError(title: "Incomplete Form", message: "Please fill out the form")
+                    })
+                    return
+            }
+            self.eventKitManager.insertEvent(title: title,
+                                             startDate: startDate,
+                                             endDate: endDate,
+                                             location: self.selectedLocation,
+                                             locationName: self.locationField.text ?? "", {
+                                                (success, error) in
+                                                if let err = error {
+                                                    DispatchQueue.main.async {
+                                                        if self.presentationStyle == .expanded {
+                                                            self.requestPresentationStyle(.compact)
+                                                        }
+                                                    }
+                                                } else {
+                                                    let message = MSMessage()
+                                                    let layout = MSMessageTemplateLayout()
+                                                    layout.caption = title
+                                                    layout.subcaption = self.locationField.text ?? ""
+                                                    message.layout = layout
+                                                    message.md.set(value: title, forKey: "title")
+                                                    message.md.set(value: self.locationField.text ?? "", forKey: "subcaption")
+                                                    message.md.set(value: startDate.toString(), forKey: "startDate")
+                                                    message.md.set(value: endDate.toString(), forKey: "endDate")
+                                                    if let loc = self.selectedLocation {
+                                                        message.md.set(value: loc.0.name ?? "", forKey: "locationName")
+                                                        message.md.set(value: loc.1.coordinate.latitude, forKey: "locationLat")
+                                                        message.md.set(value: loc.1.coordinate.longitude, forKey: "locationLon")
+                                                        message.md.set(value: loc.1.subThoroughfare ?? "", forKey: "locationStreet")
+                                                        message.md.set(value: loc.1.thoroughfare ?? "Address Unavailable", forKey: "locationAddress")
+                                                        message.md.set(value: loc.1.locality ?? "", forKey: "locationCity")
+                                                        message.md.set(value: loc.1.administrativeArea ?? "", forKey: "locationState")
+                                                        message.md.set(value: loc.1.countryCode ?? "", forKey: "locationCountry")
+                                                        message.md.set(value: loc.1.postalCode ?? "", forKey: "locationZip")
+                                                        message.md.set(value: loc.1.region?.identifier ?? "", forKey: "locationRegion")
+                                                    }
+
+                                                    self.send(message: message, toConversation: self.activeConvo ?? self.activeConversation, { (success) in
+                                                        if success {
+                                                            self.sendToFriendsButton.setTitle("", for: .normal)
+                                                            self.sendToFriendsButton.isHidden = true
+                                                            self.cancelButton.setTitle("DONE", for: .normal)
+                                                            self.saveInviteToCoreData(endDate: endDate, startDate: startDate, title: title, message: message)
+                                                        }
+                                                    })
+                                                }
+            })
+        })
     }
 
-    @IBAction func setPremium(_ sender: UIButton) {
+    func setPremiumAction() {
         if !isPremium {
             setAsReOcurringButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
                 self.setAsReOcurringButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: false, complete: {
@@ -244,34 +182,46 @@ class MessagesViewController: MSMessagesAppViewController {
         }
     }
 
-    func insertEvent(store: EKEventStore, title: String, startDate: Date, endDate: Date, location: (MKMapItem, MKPlacemark)?, locationName name: String) {
-        let calendars = store.calendars(for: .event)
-        var done = false
-        for calendar in calendars {
-            if calendar.type == MessagesViewController.calendarType && done == false {
-                let event = EKEvent(eventStore: store)
-                event.calendar = calendar
-                event.title = title
-                event.startDate = startDate
-                event.endDate = endDate
-                event.addAlarm(EKAlarm(relativeOffset: -10800))
-                if let loc = location {
-                    event.location = name
-                    event.structuredLocation = EKStructuredLocation(mapItem: loc.0)
-                }
-                do {
-                    try store.save(event, span: .thisEvent)
-                    done = true
-                } catch {
-                    print(error.localizedDescription)
-                    print("Error saving event in calendar")
-                }
-            }
-        }
-        DispatchQueue.main.async {
-            if self.presentationStyle == .expanded {
-                self.requestPresentationStyle(.compact)
-            }
+    func resetView() {
+        titleField.text = ""
+        timeSelectorType = nil
+        startDate = nil
+        endDate = nil
+        selectedLocation = nil
+    }
+
+    func save(endDate: Date,
+              locationAddress: String,
+              locationCity: String,
+              locationCountry: String,
+              locationLat: Double,
+              locationLon: Double,
+              locationName: String,
+              locationState: String,
+              locationStreet: String,
+              locationZip: String,
+              startDate: Date,
+              title: String) {
+
+        invitesManager.saveInvite(endDate: endDate,
+                                  locationAddress: locationAddress,
+                                  locationCity: locationCity,
+                                  locationCountry: locationCountry,
+                                  locationLat: locationLat,
+                                  locationLon: locationLon,
+                                  locationName: locationName,
+                                  locationState: locationState,
+                                  locationStreet: locationStreet,
+                                  locationZip: locationZip,
+                                  startDate: startDate,
+                                  title: title) { (success, error) in
+
+                                    if let err = error {
+                                        print("Could not save. \(err.localizedDescription)")
+                                        self.showError(title: "Error", message: "There was an error trying to save invite. Please try again.")
+                                    } else {
+
+                                    }
         }
     }
 
@@ -331,60 +281,59 @@ class MessagesViewController: MSMessagesAppViewController {
         }
     }
 
-    func resetView() {
-        titleField.text = ""
-        timeSelectorType = nil
-        startDate = nil
-        endDate = nil
-        selectedLocation = nil
+
+    // MARK: - UI actions
+    @IBAction func sendToFriends(_ sender: UIButton) {
+        sendToFriendsAction()
     }
 
-    func save(endDate: Date,
-              locationAddress: String,
-              locationCity: String,
-              locationCountry: String,
-              locationLat: Double,
-              locationLon: Double,
-              locationName: String,
-              locationState: String,
-              locationStreet: String,
-              locationZip: String,
-              startDate: Date,
-              title: String) {
-        let managedContext = persistentContainer.viewContext
-        guard let entity = NSEntityDescription.entity(forEntityName: "Invite", in: managedContext) else { return }
-        let invite = NSManagedObject(entity: entity, insertInto: managedContext)
-        invite.setValuesForKeys([
-            "endDate": endDate,
-            "locationAddress": locationAddress,
-            "locationCity": locationCity,
-            "locationCountry": locationCountry,
-            "locationLat": locationLat,
-            "locationLon": locationLon,
-            "locationName": locationName,
-            "locationState": locationState,
-            "locationStreet": locationStreet,
-            "locationZip": locationZip,
-            "startDate": startDate,
-            "title": title,
-        ])
-        do {
-            try managedContext.save()
-            invites.append(invite)
-        } catch let error {
-            print("Could not save. \(error.localizedDescription)")
-            let alert = UIAlertController(title: "Error", message: "There was an error please try again.", preferredStyle: .alert)
-            let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) in
-                alert.dismiss(animated: true, completion: nil)
-            })
-            alert.addAction(ok)
-            self.present(alert, animated: true, completion: nil)
-        }
+    @IBAction func resetForm(_ sender: UIButton) {
+        resetView()
     }
-    
+
+    @IBAction func setPremium(_ sender: UIButton) {
+        setPremiumAction()
+    }
+
     @IBAction func cancelAction(_ sender: UIButton) {
         NotificationCenter.default.post(name: Notification.Name(rawValue: "MyInvitesVC.reload"), object: nil, userInfo: [:])
         dismiss(animated: true, completion: nil)
+    }
+}
+
+// MARK: - UI updates
+extension MessagesViewController {
+    func setupUI() {
+        view.applyPrimaryGradient()
+        setUpTextFields()
+        setUpButtons()
+        setUpLabels()
+    }
+
+    func setUpLabels() {
+        premiumFeaturesLabel.isHidden = true
+        setAsReocurringLabel.isHidden = true
+    }
+
+    func setUpTextFields() {
+        titleField.delegate = self
+        titleField.addLeftPadding(withWidth: kTextFieldIndent)
+        locationField.delegate = self
+        locationField.addLeftPadding(withWidth: kTextFieldIndent)
+        startDateAndTimeField.delegate = self
+        startDateAndTimeField.addLeftPadding(withWidth: kTextFieldIndent)
+        endDateAndTimeField.delegate = self
+        endDateAndTimeField.addLeftPadding(withWidth: kTextFieldIndent)
+    }
+
+    func setUpButtons() {
+        setAsReOcurringButton.layer.cornerRadius = setAsReOcurringButton.frame.height / 2
+        setAsReOcurringButton.clipsToBounds = true
+        setAsReOcurringButton.spinnerColor = UIColor.gradientColor1
+        setAsReOcurringButton.isHidden = true
+        sendToFriendsButton.layer.cornerRadius = sendToFriendsButton.frame.height / 2
+        sendToFriendsButton.clipsToBounds = true
+        sendToFriendsButton.spinnerColor = UIColor.gradientColor1
     }
 }
 
@@ -408,6 +357,7 @@ extension MessagesViewController {
     }
 }
 
+// MARK: - UITextField delegate
 extension MessagesViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -439,6 +389,7 @@ extension MessagesViewController: UITextFieldDelegate {
     }
 }
 
+// MARK: - TimeSelector delegate
 extension MessagesViewController: TimeSelectorDelegate {
     func selectDate(_ selectorVC: TimeSelectorVC, selectedDate date: Date, selectorType type: TimeSelectorType) {
         if type == .start {
@@ -451,41 +402,16 @@ extension MessagesViewController: TimeSelectorDelegate {
     }
 }
 
+// MARK: - LocationSearch delegate
 extension MessagesViewController: LocationSearchDelegate {
     func selectLocation(_ searchVC: LocationSearchVC, selectedLocation location: (MKMapItem, MKPlacemark)) {
         selectedLocation = location
     }
 }
 
+// MARK: - CLLocationManager delegate
 extension MessagesViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.view.endEditing(true)
-    }
-}
-
-extension MessagesViewController {
-    static var calendarIdentifier: String {
-        return "Calendar"
-    }
-    static var calendarType: EKCalendarType {
-        return EKCalendarType.calDAV
-    }
-}
-
-// MARK: - Core Data Stack
-extension MessagesViewController {
-    // MARK: - Core Data Saving support
-    func saveContext () {
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
-        }
     }
 }

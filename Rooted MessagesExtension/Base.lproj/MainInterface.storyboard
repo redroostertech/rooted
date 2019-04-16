@@ -580,17 +580,31 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kVh-a1-Mzs">
-                                <rect key="frame" x="40" y="236" width="240" height="153"/>
+                                <rect key="frame" x="16" y="236" width="288" height="134"/>
                                 <string key="text">Rooted is a quick, simple and intuitive way for people to send calendar invites directly via SMS or group chat. The possibilities are truly endless, and the best part is that you won’t need to use a third party app to send invites! </string>
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
                                 <color key="textColor" red="0.30196078430000001" green="0.30196078430000001" blue="0.30196078430000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dP6-yo-ktJ">
-                                <rect key="frame" x="85" y="413" width="150" height="42"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZzR-O2-mGs">
+                                <rect key="frame" x="60" y="394" width="200" height="42"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="150" id="Iui-ZD-YyB"/>
+                                    <constraint firstAttribute="height" constant="42" id="66o-iT-l8E"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                <state key="normal" title="CLOSE">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="grantAccessAction:" destination="360-OS-VU0" eventType="touchUpInside" id="E7h-si-6HC"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dP6-yo-ktJ">
+                                <rect key="frame" x="60" y="452" width="200" height="42"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="Iui-ZD-YyB"/>
                                     <constraint firstAttribute="height" constant="42" id="ZJZ-57-RRH"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
@@ -609,12 +623,16 @@
                             <constraint firstItem="yBE-yM-1yh" firstAttribute="leading" secondItem="Pgc-5t-bTo" secondAttribute="leading" id="5xt-lM-UuD"/>
                             <constraint firstItem="dP6-yo-ktJ" firstAttribute="centerX" secondItem="UOD-Tc-kwt" secondAttribute="centerX" id="7NL-MM-mML"/>
                             <constraint firstItem="Pgc-5t-bTo" firstAttribute="leading" secondItem="vMA-SE-GK3" secondAttribute="leading" constant="40" id="Ghw-R1-fne"/>
+                            <constraint firstItem="ZzR-O2-mGs" firstAttribute="top" secondItem="kVh-a1-Mzs" secondAttribute="bottom" constant="24" id="R5r-AU-Lyw"/>
+                            <constraint firstItem="kVh-a1-Mzs" firstAttribute="leading" secondItem="vMA-SE-GK3" secondAttribute="leading" constant="16" id="Yq1-kH-ibR"/>
+                            <constraint firstItem="dP6-yo-ktJ" firstAttribute="top" secondItem="ZzR-O2-mGs" secondAttribute="bottom" constant="16" id="Yra-jd-vfg"/>
                             <constraint firstItem="yBE-yM-1yh" firstAttribute="top" secondItem="Pgc-5t-bTo" secondAttribute="bottom" constant="24" id="aQ9-qL-cs4"/>
+                            <constraint firstAttribute="trailing" secondItem="kVh-a1-Mzs" secondAttribute="trailing" constant="16" id="aXe-Zq-WD5"/>
                             <constraint firstItem="yBE-yM-1yh" firstAttribute="trailing" secondItem="Pgc-5t-bTo" secondAttribute="trailing" id="dJj-FT-vFj"/>
-                            <constraint firstItem="dP6-yo-ktJ" firstAttribute="top" secondItem="kVh-a1-Mzs" secondAttribute="bottom" constant="24" id="l98-X9-q7O"/>
+                            <constraint firstItem="ZzR-O2-mGs" firstAttribute="leading" secondItem="dP6-yo-ktJ" secondAttribute="leading" id="dw4-ub-NTK"/>
+                            <constraint firstItem="ZzR-O2-mGs" firstAttribute="trailing" secondItem="dP6-yo-ktJ" secondAttribute="trailing" id="hmu-98-TUX"/>
                             <constraint firstItem="kVh-a1-Mzs" firstAttribute="top" secondItem="yBE-yM-1yh" secondAttribute="bottom" constant="24" id="lNf-1r-CGZ"/>
-                            <constraint firstItem="kVh-a1-Mzs" firstAttribute="leading" secondItem="Pgc-5t-bTo" secondAttribute="leading" id="miS-hr-70q"/>
-                            <constraint firstItem="kVh-a1-Mzs" firstAttribute="trailing" secondItem="Pgc-5t-bTo" secondAttribute="trailing" id="xNh-h6-Sww"/>
+                            <constraint firstItem="dP6-yo-ktJ" firstAttribute="centerX" secondItem="UOD-Tc-kwt" secondAttribute="centerX" id="wcD-d1-hnd"/>
                             <constraint firstItem="vMA-SE-GK3" firstAttribute="trailing" secondItem="Pgc-5t-bTo" secondAttribute="trailing" constant="40" id="zh7-qD-4ko"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="vMA-SE-GK3"/>
@@ -622,6 +640,7 @@
                     <size key="freeformSize" width="320" height="528"/>
                     <connections>
                         <outlet property="closeButton" destination="dP6-yo-ktJ" id="GTa-kV-fQy"/>
+                        <outlet property="grantAccessButton" destination="ZzR-O2-mGs" id="xAY-78-WLf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pDv-gk-pu0" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -693,10 +712,10 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Rooted" width="2207" height="1524"/>
-        <image name="plus" width="32" height="32"/>
+        <image name="Rooted" width="529.67999267578125" height="365.760009765625"/>
+        <image name="plus" width="100.17391204833984" height="100.17391204833984"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="nrG-d7-pOM"/>
+        <segue reference="4BS-HB-U3P"/>
     </inferredMetricsTieBreakers>
 </document>

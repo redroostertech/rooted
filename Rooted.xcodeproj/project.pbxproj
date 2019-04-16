@@ -24,6 +24,10 @@
 		BA0D0EF4224A6B7600209993 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0D0EED224A6AD300209993 /* UIView+Extensions.swift */; };
 		BA0D0EF5224A6B7600209993 /* UIColors+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0D0EEF224A6AE300209993 /* UIColors+Extensions.swift */; };
 		BA0D0EF8224ADCE200209993 /* Invites.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BA0D0EF6224ADCE200209993 /* Invites.xcdatamodeld */; };
+		BA1314DA225BFCB90089EDE0 /* MyInvitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1314D9225BFCB90089EDE0 /* MyInvitesManager.swift */; };
+		BA1314DC225BFCE50089EDE0 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1314DB225BFCE50089EDE0 /* CoreDataManager.swift */; };
+		BA1314DE225C07370089EDE0 /* EventKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1314DD225C07370089EDE0 /* EventKitManager.swift */; };
+		BA1314E0225C08610089EDE0 /* MSMessages+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1314DF225C08610089EDE0 /* MSMessages+Extensions.swift */; };
 		BA41F4CB224CECE4006AD793 /* LaunchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA41F4CA224CECE4006AD793 /* LaunchVC.swift */; };
 		BA98DD4E224EC2AD0070BC39 /* MyInvitesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA98DD4D224EC2AD0070BC39 /* MyInvitesVC.swift */; };
 		BA98DD8F225101210070BC39 /* MyInviteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA98DD8D225101210070BC39 /* MyInviteCell.swift */; };
@@ -82,6 +86,10 @@
 		BA0D0EED224A6AD300209993 /* UIView+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		BA0D0EEF224A6AE300209993 /* UIColors+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColors+Extensions.swift"; sourceTree = "<group>"; };
 		BA0D0EF7224ADCE200209993 /* Invites.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Invites.xcdatamodel; sourceTree = "<group>"; };
+		BA1314D9225BFCB90089EDE0 /* MyInvitesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInvitesManager.swift; sourceTree = "<group>"; };
+		BA1314DB225BFCE50089EDE0 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		BA1314DD225C07370089EDE0 /* EventKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitManager.swift; sourceTree = "<group>"; };
+		BA1314DF225C08610089EDE0 /* MSMessages+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MSMessages+Extensions.swift"; sourceTree = "<group>"; };
 		BA41F4CA224CECE4006AD793 /* LaunchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchVC.swift; sourceTree = "<group>"; };
 		BA98DD4D224EC2AD0070BC39 /* MyInvitesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInvitesVC.swift; sourceTree = "<group>"; };
 		BA98DD8C224ED26F0070BC39 /* Rooted MessagesExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Rooted MessagesExtension.entitlements"; sourceTree = "<group>"; };
@@ -166,6 +174,10 @@
 			children = (
 				BA98DD8C224ED26F0070BC39 /* Rooted MessagesExtension.entitlements */,
 				BA068C072245AD7D00A0EE9B /* MainInterface.storyboard */,
+				BA98DD4D224EC2AD0070BC39 /* MyInvitesVC.swift */,
+				BA1314DD225C07370089EDE0 /* EventKitManager.swift */,
+				BA1314D9225BFCB90089EDE0 /* MyInvitesManager.swift */,
+				BA1314DB225BFCE50089EDE0 /* CoreDataManager.swift */,
 				BA98DD8D225101210070BC39 /* MyInviteCell.swift */,
 				BA98DD8E225101210070BC39 /* MyInviteCell.xib */,
 				BA98DD91225255B90070BC39 /* InfoVC.swift */,
@@ -183,7 +195,7 @@
 				BA068C182245C3CC00A0EE9B /* TextField+Extensions.swift */,
 				BA0D0EED224A6AD300209993 /* UIView+Extensions.swift */,
 				BA0D0EEF224A6AE300209993 /* UIColors+Extensions.swift */,
-				BA98DD4D224EC2AD0070BC39 /* MyInvitesVC.swift */,
+				BA1314DF225C08610089EDE0 /* MSMessages+Extensions.swift */,
 			);
 			path = "Rooted MessagesExtension";
 			sourceTree = "<group>";
@@ -372,16 +384,20 @@
 				BA068C1B2245C48100A0EE9B /* TimeSelectorVC.swift in Sources */,
 				BA0D0EF5224A6B7600209993 /* UIColors+Extensions.swift in Sources */,
 				BA0D0EF8224ADCE200209993 /* Invites.xcdatamodeld in Sources */,
+				BA1314DA225BFCB90089EDE0 /* MyInvitesManager.swift in Sources */,
+				BA1314DE225C07370089EDE0 /* EventKitManager.swift in Sources */,
 				BA068C062245AD7D00A0EE9B /* MessagesViewController.swift in Sources */,
 				BA98DD92225255B90070BC39 /* InfoVC.swift in Sources */,
 				BA41F4CB224CECE4006AD793 /* LaunchVC.swift in Sources */,
 				BA068C1F2247BE2F00A0EE9B /* LocationSearchVC.swift in Sources */,
 				BA0D0EF1224A6B7600209993 /* Date+Extensions.swift in Sources */,
 				BA0D0EF2224A6B7600209993 /* String+Extension.swift in Sources */,
+				BA1314E0225C08610089EDE0 /* MSMessages+Extensions.swift in Sources */,
 				BA0D0EDC2248019B00209993 /* InviteDetailsVC.swift in Sources */,
 				BA98DD4E224EC2AD0070BC39 /* MyInvitesVC.swift in Sources */,
 				BA0D0EF4224A6B7600209993 /* UIView+Extensions.swift in Sources */,
 				BA0D0EF3224A6B7600209993 /* TextField+Extensions.swift in Sources */,
+				BA1314DC225BFCE50089EDE0 /* CoreDataManager.swift in Sources */,
 				BA98DD8F225101210070BC39 /* MyInviteCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

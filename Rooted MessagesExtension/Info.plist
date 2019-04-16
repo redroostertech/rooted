@@ -17,9 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.3</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Rooted needs access to your calendar to add created invites to it.</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionMainStoryboard</key>
@@ -27,11 +29,9 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.message-payload-provider</string>
 	</dict>
-	<key>NSCalendarsUsageDescription</key>
-	<string>Rooted needs access to your calendar to add created invites to it.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Need your location to search for and add locations to invites.</string>
+	<string>Rooted needs access to your location to search for and add locations to invites.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Need your location to search for and add locations to invites.</string>
+	<string>Rooted needs access to your location to search for and add locations to invites.</string>
 </dict>
 </plist>

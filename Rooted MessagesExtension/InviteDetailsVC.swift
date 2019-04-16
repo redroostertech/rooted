@@ -71,25 +71,19 @@ class InviteDetailsVC: MSMessagesAppViewController {
     }
 
     @IBAction func acceptInvite(_ sender: UIButton) {
-        acceptInviteButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
-            if
-                let eventStore = self.eventStore,
-                let title = self.titleText,
-                let startDate = self.startDate,
-                let endDate = self.endDate,
-                let locationName = self.selectedLocationName {
-                self.insertEvent(store: eventStore, title: title, startDate: startDate, endDate: endDate, location: self.selectedLocationNew, locationName: locationName)
-            } else {
-                self.acceptInviteButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail,backToDefaults: true, complete: {
-                        let alert = UIAlertController(title: "Error", message: "Something went wrong. Please try again.", preferredStyle: .alert)
-                        let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) in
-                            alert.dismiss(animated: true, completion: nil)
-                        })
-                        alert.addAction(ok)
-                        self.present(alert, animated: true, completion: nil)
-                })
-            }
-        })
+        switch EKEventStore.authorizationStatus(for: .event) {
+        case .authorized:
+            accept()
+        case .denied, .notDetermined:
+            self.eventStore?.requestAccess(to: .event, completion: { (granted: Bool, error: Error?) -> Void in
+                if granted {
+                    self.accept()
+                } else {
+                    
+                }
+            })
+        default: print("Case default")
+        }
     }
 
     @IBAction func declineInvite(_ sender: UIButton) {
@@ -100,11 +94,33 @@ class InviteDetailsVC: MSMessagesAppViewController {
         self.dismiss(animated: true, completion: nil)
     }
 
+    func accept() {
+        acceptInviteButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
+            if
+                let eventStore = self.eventStore,
+                let title = self.titleText,
+                let startDate = self.startDate,
+                let endDate = self.endDate,
+                let locationName = self.selectedLocationName {
+                self.insertEvent(store: eventStore, title: title, startDate: startDate, endDate: endDate, location: self.selectedLocationNew, locationName: locationName)
+            } else {
+                self.acceptInviteButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail,backToDefaults: true, complete: {
+                    let alert = UIAlertController(title: "Error", message: "Something went wrong. Please try again.", preferredStyle: .alert)
+                    let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) in
+                        alert.dismiss(animated: true, completion: nil)
+                    })
+                    alert.addAction(ok)
+                    self.present(alert, animated: true, completion: nil)
+                })
+            }
+        })
+    }
+
     func insertEvent(store: EKEventStore, title: String, startDate: Date, endDate: Date, location: (MKMapItem, MKPlacemark)?, locationName name: String) {
         let calendars = store.calendars(for: .event)
         var done = false
         for calendar in calendars {
-            if calendar.type == MessagesViewController.calendarType && done == false {
+            if calendar.type == EventKitManager.calendarType && done == false {
 
                 let event = EKEvent(eventStore: store)
                 event.calendar = calendar
