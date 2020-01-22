@@ -34,6 +34,13 @@
 		BA98DD90225101210070BC39 /* MyInviteCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = BA98DD8E225101210070BC39 /* MyInviteCell.xib */; };
 		BA98DD92225255B90070BC39 /* InfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA98DD91225255B90070BC39 /* InfoVC.swift */; };
 		D345C9EC2BD7E9F3EF146C92 /* Pods_Rooted_MessagesExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 145C7F30C9C2DFCD3A237AF6 /* Pods_Rooted_MessagesExtension.framework */; };
+		D75711EA23D811E000BDD6A0 /* StepCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E423D811DF00BDD6A0 /* StepCollectionViewFlowLayout.swift */; };
+		D75711EB23D811E000BDD6A0 /* DateTimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E523D811E000BDD6A0 /* DateTimePicker.swift */; };
+		D75711EC23D811E000BDD6A0 /* FullDateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E623D811E000BDD6A0 /* FullDateCollectionViewCell.swift */; };
+		D75711ED23D811E000BDD6A0 /* DateTimePicker+CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E723D811E000BDD6A0 /* DateTimePicker+CollectionView.swift */; };
+		D75711EE23D811E000BDD6A0 /* DateTimePicker+UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E823D811E000BDD6A0 /* DateTimePicker+UITableView.swift */; };
+		D75711EF23D811E000BDD6A0 /* DateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E923D811E000BDD6A0 /* DateCollectionViewCell.swift */; };
+		D75711FA23D8832200BDD6A0 /* RProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711F923D8832200BDD6A0 /* RProgressHUD.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +103,13 @@
 		BA98DD8D225101210070BC39 /* MyInviteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInviteCell.swift; sourceTree = "<group>"; };
 		BA98DD8E225101210070BC39 /* MyInviteCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MyInviteCell.xib; sourceTree = "<group>"; };
 		BA98DD91225255B90070BC39 /* InfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoVC.swift; sourceTree = "<group>"; };
+		D75711E423D811DF00BDD6A0 /* StepCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StepCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
+		D75711E523D811E000BDD6A0 /* DateTimePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateTimePicker.swift; sourceTree = "<group>"; };
+		D75711E623D811E000BDD6A0 /* FullDateCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FullDateCollectionViewCell.swift; sourceTree = "<group>"; };
+		D75711E723D811E000BDD6A0 /* DateTimePicker+CollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DateTimePicker+CollectionView.swift"; sourceTree = "<group>"; };
+		D75711E823D811E000BDD6A0 /* DateTimePicker+UITableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DateTimePicker+UITableView.swift"; sourceTree = "<group>"; };
+		D75711E923D811E000BDD6A0 /* DateCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateCollectionViewCell.swift; sourceTree = "<group>"; };
+		D75711F923D8832200BDD6A0 /* RProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RProgressHUD.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,23 +187,49 @@
 			isa = PBXGroup;
 			children = (
 				BA98DD8C224ED26F0070BC39 /* Rooted MessagesExtension.entitlements */,
-				BA068C072245AD7D00A0EE9B /* MainInterface.storyboard */,
+				D75711F323D8817200BDD6A0 /* Resources */,
+				D75711F623D8818900BDD6A0 /* Managers */,
 				BA98DD4D224EC2AD0070BC39 /* MyInvitesVC.swift */,
-				BA1314DD225C07370089EDE0 /* EventKitManager.swift */,
-				BA1314D9225BFCB90089EDE0 /* MyInvitesManager.swift */,
-				BA1314DB225BFCE50089EDE0 /* CoreDataManager.swift */,
-				BA98DD8D225101210070BC39 /* MyInviteCell.swift */,
-				BA98DD8E225101210070BC39 /* MyInviteCell.xib */,
 				BA98DD91225255B90070BC39 /* InfoVC.swift */,
 				BA41F4CA224CECE4006AD793 /* LaunchVC.swift */,
-				BA0D0EF6224ADCE200209993 /* Invites.xcdatamodeld */,
 				BA068C052245AD7D00A0EE9B /* MessagesViewController.swift */,
 				BA0D0EDB2248019B00209993 /* InviteDetailsVC.swift */,
 				BA068C1E2247BE2F00A0EE9B /* LocationSearchVC.swift */,
 				BA068C1A2245C48100A0EE9B /* TimeSelectorVC.swift */,
-				BA068C0A2245AD7D00A0EE9B /* Assets.xcassets */,
+				D75711F723D8819B00BDD6A0 /* Cells */,
+				BA0D0EF6224ADCE200209993 /* Invites.xcdatamodeld */,
 				BA068C0C2245AD7D00A0EE9B /* Info.plist */,
-				BA0D0EEB224A583A00209993 /* Multicolore.otf */,
+				D75711F223D8815C00BDD6A0 /* Utilities+Extensions */,
+				D75711F123D8813600BDD6A0 /* Controls */,
+			);
+			path = "Rooted MessagesExtension";
+			sourceTree = "<group>";
+		};
+		D75711F023D811E600BDD6A0 /* DateTimePicker */ = {
+			isa = PBXGroup;
+			children = (
+				D75711E923D811E000BDD6A0 /* DateCollectionViewCell.swift */,
+				D75711E523D811E000BDD6A0 /* DateTimePicker.swift */,
+				D75711E723D811E000BDD6A0 /* DateTimePicker+CollectionView.swift */,
+				D75711E823D811E000BDD6A0 /* DateTimePicker+UITableView.swift */,
+				D75711E623D811E000BDD6A0 /* FullDateCollectionViewCell.swift */,
+				D75711E423D811DF00BDD6A0 /* StepCollectionViewFlowLayout.swift */,
+			);
+			path = DateTimePicker;
+			sourceTree = "<group>";
+		};
+		D75711F123D8813600BDD6A0 /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				D75711F023D811E600BDD6A0 /* DateTimePicker */,
+				D75711F923D8832200BDD6A0 /* RProgressHUD.swift */,
+			);
+			path = Controls;
+			sourceTree = "<group>";
+		};
+		D75711F223D8815C00BDD6A0 /* Utilities+Extensions */ = {
+			isa = PBXGroup;
+			children = (
 				BA068C162245C31F00A0EE9B /* Date+Extensions.swift */,
 				BA068C1C2245E43300A0EE9B /* String+Extension.swift */,
 				BA068C182245C3CC00A0EE9B /* TextField+Extensions.swift */,
@@ -197,7 +237,60 @@
 				BA0D0EEF224A6AE300209993 /* UIColors+Extensions.swift */,
 				BA1314DF225C08610089EDE0 /* MSMessages+Extensions.swift */,
 			);
-			path = "Rooted MessagesExtension";
+			path = "Utilities+Extensions";
+			sourceTree = "<group>";
+		};
+		D75711F323D8817200BDD6A0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D75711F823D881B500BDD6A0 /* Fonts */,
+				D75711F423D8817800BDD6A0 /* Storyboards */,
+				D75711F523D8817F00BDD6A0 /* Assets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D75711F423D8817800BDD6A0 /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				BA068C072245AD7D00A0EE9B /* MainInterface.storyboard */,
+			);
+			path = Storyboards;
+			sourceTree = "<group>";
+		};
+		D75711F523D8817F00BDD6A0 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				BA068C0A2245AD7D00A0EE9B /* Assets.xcassets */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		D75711F623D8818900BDD6A0 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				BA1314DD225C07370089EDE0 /* EventKitManager.swift */,
+				BA1314D9225BFCB90089EDE0 /* MyInvitesManager.swift */,
+				BA1314DB225BFCE50089EDE0 /* CoreDataManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		D75711F723D8819B00BDD6A0 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				BA98DD8D225101210070BC39 /* MyInviteCell.swift */,
+				BA98DD8E225101210070BC39 /* MyInviteCell.xib */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		D75711F823D881B500BDD6A0 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				BA0D0EEB224A583A00209993 /* Multicolore.otf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -356,22 +449,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Rooted/Pods-Rooted-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/SSSpinnerButton/SSSpinnerButton.framework",
-				"${BUILT_PRODUCTS_DIR}/iMessageDataKit/iMessageDataKit.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-Rooted/Pods-Rooted-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSSpinnerButton.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/iMessageDataKit.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-Rooted/Pods-Rooted-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Rooted/Pods-Rooted-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Rooted/Pods-Rooted-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -383,21 +469,28 @@
 			files = (
 				BA068C1B2245C48100A0EE9B /* TimeSelectorVC.swift in Sources */,
 				BA0D0EF5224A6B7600209993 /* UIColors+Extensions.swift in Sources */,
+				D75711EB23D811E000BDD6A0 /* DateTimePicker.swift in Sources */,
 				BA0D0EF8224ADCE200209993 /* Invites.xcdatamodeld in Sources */,
+				D75711FA23D8832200BDD6A0 /* RProgressHUD.swift in Sources */,
+				D75711EF23D811E000BDD6A0 /* DateCollectionViewCell.swift in Sources */,
 				BA1314DA225BFCB90089EDE0 /* MyInvitesManager.swift in Sources */,
 				BA1314DE225C07370089EDE0 /* EventKitManager.swift in Sources */,
 				BA068C062245AD7D00A0EE9B /* MessagesViewController.swift in Sources */,
 				BA98DD92225255B90070BC39 /* InfoVC.swift in Sources */,
+				D75711EC23D811E000BDD6A0 /* FullDateCollectionViewCell.swift in Sources */,
 				BA41F4CB224CECE4006AD793 /* LaunchVC.swift in Sources */,
 				BA068C1F2247BE2F00A0EE9B /* LocationSearchVC.swift in Sources */,
 				BA0D0EF1224A6B7600209993 /* Date+Extensions.swift in Sources */,
 				BA0D0EF2224A6B7600209993 /* String+Extension.swift in Sources */,
+				D75711ED23D811E000BDD6A0 /* DateTimePicker+CollectionView.swift in Sources */,
 				BA1314E0225C08610089EDE0 /* MSMessages+Extensions.swift in Sources */,
 				BA0D0EDC2248019B00209993 /* InviteDetailsVC.swift in Sources */,
 				BA98DD4E224EC2AD0070BC39 /* MyInvitesVC.swift in Sources */,
 				BA0D0EF4224A6B7600209993 /* UIView+Extensions.swift in Sources */,
+				D75711EA23D811E000BDD6A0 /* StepCollectionViewFlowLayout.swift in Sources */,
 				BA0D0EF3224A6B7600209993 /* TextField+Extensions.swift in Sources */,
 				BA1314DC225BFCE50089EDE0 /* CoreDataManager.swift in Sources */,
+				D75711EE23D811E000BDD6A0 /* DateTimePicker+UITableView.swift in Sources */,
 				BA98DD8F225101210070BC39 /* MyInviteCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

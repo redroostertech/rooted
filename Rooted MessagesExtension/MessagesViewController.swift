@@ -10,56 +10,60 @@ import CoreData
 let kButtonRadius: CGFloat = 15.0
 let kTextFieldIndent: CGFloat = 16.0
 
-class MessagesViewController: MSMessagesAppViewController {
+class MessagesViewController: MSMessagesAppViewController, DateTimePickerDelegate {
 
-    @IBOutlet var titleField: UITextField!
-    @IBOutlet var locationField: UITextField!
-    @IBOutlet var startDateAndTimeField: UITextField!
-    @IBOutlet var endDateAndTimeField: UITextField!
-    @IBOutlet var premiumFeaturesLabel: UILabel!
-    @IBOutlet var setAsReOcurringButton: SSSpinnerButton!
-    @IBOutlet var setAsReocurringLabel: UILabel!
-    @IBOutlet var sendToFriendsButton: SSSpinnerButton!
-    @IBOutlet var resetButton: SSSpinnerButton!
-    @IBOutlet var cancelButton: UIButton!
+  @IBOutlet var titleField: UITextField!
+  @IBOutlet var locationField: UITextField!
+  @IBOutlet var startDateAndTimeField: UITextField!
+  @IBOutlet var endDateAndTimeField: UITextField!
+  @IBOutlet var premiumFeaturesLabel: UILabel!
+  @IBOutlet var setAsReOcurringButton: SSSpinnerButton!
+  @IBOutlet var setAsReocurringLabel: UILabel!
+  @IBOutlet var sendToFriendsButton: SSSpinnerButton!
+  @IBOutlet var resetButton: SSSpinnerButton!
+  @IBOutlet var cancelButton: UIButton!
 
-    var eventKitManager = EventKitManager()
-    var coreDataManager = CoreDataManager()
-    var invitesManager = MyInvitesManager()
+  var eventKitManager = EventKitManager()
+  var coreDataManager = CoreDataManager()
+  var invitesManager = MyInvitesManager()
 
-    var isReOcurring: Bool = false
-    var isPremium: Bool = false
-    let eventStore = EKEventStore()
-    var activeConvo: MSConversation?
-    var timeSelectorType: TimeSelectorType?
-    var startDate: Date? {
-        didSet {
-            startDateAndTimeField.text = startDate?.toString(CustomDateFormat.normal)
-        }
-    }
-    var endDate: Date? {
-        didSet {
-            endDateAndTimeField.text = endDate?.toString(CustomDateFormat.normal)
-        }
-    }
-    var selectedLocation: (MKMapItem, MKPlacemark)? {
-        didSet {
-            locationField.text = selectedLocation?.0.name
-        }
-    }
-    var selectedMessage: MSMessage?
-    var locationManager: CLLocationManager?
+  var isReOcurring: Bool = false
+  var isPremium: Bool = false
+  let eventStore = EKEventStore()
+  var activeConvo: MSConversation?
+  var timeSelectorType: TimeSelectorType?
+  var startDate: Date? {
+      didSet {
+          startDateAndTimeField.text = startDate?.toString(CustomDateFormat.normal)
+      }
+  }
+  var endDate: Date? {
+      didSet {
+          endDateAndTimeField.text = endDate?.toString(CustomDateFormat.normal)
+      }
+  }
+  var selectedLocation: (MKMapItem, MKPlacemark)? {
+      didSet {
+          locationField.text = selectedLocation?.0.name
+      }
+  }
+  var selectedMessage: MSMessage?
+  var locationManager: CLLocationManager?
 
-    var invites: [NSManagedObject] = []
+  var invites: [NSManagedObject] = []
 
-    // MARK: - Lifecycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
-        locationManager = CLLocationManager()
-        locationManager?.delegate = self
-        locationManager?.desiredAccuracy = kCLLocationAccuracyBest
-    }
+  var isCalendarShowing: Bool = false
+  var datePicker: DateTimePicker!
+
+  // MARK: - Lifecycle
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    setupDatePicker()
+    setupUI()
+    locationManager = CLLocationManager()
+    locationManager?.delegate = self
+    locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+  }
 
     override func viewWillAppear(_ animated: Bool) {
         eventKitManager.getCalendarPermissions { (success) in
@@ -281,9 +285,26 @@ class MessagesViewController: MSMessagesAppViewController {
         }
     }
 
-
     // MARK: - UI actions
-    @IBAction func sendToFriends(_ sender: UIButton) {
+  @IBAction func showCalendar(_ sender: Any) {
+    if isCalendarShowing {
+      isCalendarShowing = false
+      datePicker.removeFromSuperview()
+    } else {
+      isCalendarShowing = true
+      datePicker.frame = CGRect(x: 0,
+                                y: self.view.frame.maxY - datePicker.frame.size.height,
+                                width: datePicker.frame.size.width,
+                                height: datePicker.frame.size.height)
+      self.view.addSubview(datePicker)
+    }
+  }
+
+  func dateTimePicker(_ picker: DateTimePicker, didSelectDate: Date) {
+    title = picker.selectedDateString
+  }
+
+  @IBAction func sendToFriends(_ sender: UIButton) {
         sendToFriendsAction()
     }
 
@@ -335,6 +356,41 @@ extension MessagesViewController {
         sendToFriendsButton.clipsToBounds = true
         sendToFriendsButton.spinnerColor = UIColor.gradientColor1
     }
+
+  func setupDatePicker() {
+    let max = Date().addingTimeInterval(60 * 60 * 24 * 7)
+    let picker = DateTimePicker.create(minimumDate: Date(), maximumDate: max)
+
+    // Set the container view as without it, view will not be able to render
+    picker.containerView = self.view
+
+    picker.timeInterval = DateTimePicker.MinuteInterval.thirty
+    picker.locale = Locale(identifier: "en_US")
+
+    picker.todayButtonTitle = "Today"
+    picker.is12HourFormat = true
+    picker.dateFormat = "MMMM yyyy"
+    picker.includeMonth = true
+    picker.highlightColor = UIColor(red: 255.0/255.0, green: 138.0/255.0, blue: 138.0/255.0, alpha: 1)
+    picker.doneButtonTitle = "Done"
+    picker.doneBackgroundColor = UIColor(red: 255.0/255.0, green: 138.0/255.0, blue: 138.0/255.0, alpha: 1)
+    picker.customFontSetting = DateTimePicker.CustomFontSetting(selectedDateLabelFont: .boldSystemFont(ofSize: 20))
+    picker.normalColor = UIColor.white
+    picker.darkColor = UIColor.black
+    picker.contentViewBackgroundColor = UIColor.white
+    picker.completionHandler = { date in
+      self.isCalendarShowing = false
+      let formatter = DateFormatter()
+      formatter.dateFormat = "hh:mm aa dd/MM/YYYY"
+      self.title = formatter.string(from: date)
+    }
+    picker.delegate = self
+    picker.dismissHandler = {
+      self.isCalendarShowing = false
+      picker.removeFromSuperview()
+    }
+    datePicker = picker
+  }
 }
 
 // MARK: - Conversation Handling
