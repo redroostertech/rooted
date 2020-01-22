@@ -17,7 +17,7 @@ public class RProgressHUD {
     guard let appWindow = view else { return }
 
     let spinnerView = UIView.init(frame: appWindow.bounds)
-    spinnerView.backgroundColor = UIColor(red: 203/255, green: 208/255, blue: 217/255, alpha: 0.75)
+    spinnerView.backgroundColor = UIColor.gradientColor1.withAlphaComponent(0.75)
     let ai = UIActivityIndicatorView.init(style: .whiteLarge)
     ai.startAnimating()
     ai.center = spinnerView.center

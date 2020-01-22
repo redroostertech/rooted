@@ -409,8 +409,7 @@ public protocol DateTimePickerDelegate: class {
         dateTitleLabel.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
         dateTitleLabel.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
         
-//        let isRTL = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
-        let isRTL = true
+        let isRTL = false
 
         cancelButton = UIButton(type: .system)
         cancelButton.setTitle(cancelButtonTitle, for: .normal)
