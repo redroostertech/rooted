@@ -15,8 +15,6 @@ target 'Rooted MessagesExtension' do
 
   # Pods for Rooted MessagesExtension
   pod 'iMessageDataKit'
-  #pod 'WWCalendarTimeSelector'
   pod 'SSSpinnerButton'
-  #pod 'ADDatePicker'
   
 end

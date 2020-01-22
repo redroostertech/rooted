@@ -7,7 +7,7 @@ DEPENDENCIES:
   - SSSpinnerButton
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - iMessageDataKit
     - SSSpinnerButton
 
@@ -15,6 +15,6 @@ SPEC CHECKSUMS:
   iMessageDataKit: dda0d8a248828dcd6561a2fad214ef24922717f4
   SSSpinnerButton: d19a72144c7241f4c65f25b2debe1bb9e8274acc
 
-PODFILE CHECKSUM: 55550b7e2e30e4fe88c5d4e49ea8f6e340c6010b
+PODFILE CHECKSUM: a1dd95e40ea0d7990b9fc7131f280121a395b002
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.8.4
