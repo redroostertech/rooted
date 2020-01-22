@@ -14,7 +14,6 @@
 		BA068C062245AD7D00A0EE9B /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA068C052245AD7D00A0EE9B /* MessagesViewController.swift */; };
 		BA068C092245AD7D00A0EE9B /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BA068C072245AD7D00A0EE9B /* MainInterface.storyboard */; };
 		BA068C0B2245AD7D00A0EE9B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BA068C0A2245AD7D00A0EE9B /* Assets.xcassets */; };
-		BA068C1B2245C48100A0EE9B /* TimeSelectorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA068C1A2245C48100A0EE9B /* TimeSelectorVC.swift */; };
 		BA068C1F2247BE2F00A0EE9B /* LocationSearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA068C1E2247BE2F00A0EE9B /* LocationSearchVC.swift */; };
 		BA0D0EDC2248019B00209993 /* InviteDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0D0EDB2248019B00209993 /* InviteDetailsVC.swift */; };
 		BA0D0EEC224A583A00209993 /* Multicolore.otf in Resources */ = {isa = PBXBuildFile; fileRef = BA0D0EEB224A583A00209993 /* Multicolore.otf */; };
@@ -85,7 +84,6 @@
 		BA068C0C2245AD7D00A0EE9B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BA068C162245C31F00A0EE9B /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		BA068C182245C3CC00A0EE9B /* TextField+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Extensions.swift"; sourceTree = "<group>"; };
-		BA068C1A2245C48100A0EE9B /* TimeSelectorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSelectorVC.swift; sourceTree = "<group>"; };
 		BA068C1C2245E43300A0EE9B /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		BA068C1E2247BE2F00A0EE9B /* LocationSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchVC.swift; sourceTree = "<group>"; };
 		BA0D0EDB2248019B00209993 /* InviteDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteDetailsVC.swift; sourceTree = "<group>"; };
@@ -195,7 +193,6 @@
 				BA068C052245AD7D00A0EE9B /* MessagesViewController.swift */,
 				BA0D0EDB2248019B00209993 /* InviteDetailsVC.swift */,
 				BA068C1E2247BE2F00A0EE9B /* LocationSearchVC.swift */,
-				BA068C1A2245C48100A0EE9B /* TimeSelectorVC.swift */,
 				D75711F723D8819B00BDD6A0 /* Cells */,
 				BA0D0EF6224ADCE200209993 /* Invites.xcdatamodeld */,
 				BA068C0C2245AD7D00A0EE9B /* Info.plist */,
@@ -467,7 +464,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BA068C1B2245C48100A0EE9B /* TimeSelectorVC.swift in Sources */,
 				BA0D0EF5224A6B7600209993 /* UIColors+Extensions.swift in Sources */,
 				D75711EB23D811E000BDD6A0 /* DateTimePicker.swift in Sources */,
 				BA0D0EF8224ADCE200209993 /* Invites.xcdatamodeld in Sources */,
