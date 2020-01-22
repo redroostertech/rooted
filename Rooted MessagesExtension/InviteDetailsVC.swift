@@ -101,6 +101,8 @@ class InviteDetailsVC: MSMessagesAppViewController {
                 let title = self.titleText,
                 let startDate = self.startDate,
                 let endDate = self.endDate,
+
+                // TODO: - Error is thrown if there's not location. Fix this
                 let locationName = self.selectedLocationName {
                 self.insertEvent(store: eventStore, title: title, startDate: startDate, endDate: endDate, location: self.selectedLocationNew, locationName: locationName)
             } else {
