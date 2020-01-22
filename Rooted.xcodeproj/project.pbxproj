@@ -34,7 +34,6 @@
 		BA98DD90225101210070BC39 /* MyInviteCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = BA98DD8E225101210070BC39 /* MyInviteCell.xib */; };
 		BA98DD92225255B90070BC39 /* InfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA98DD91225255B90070BC39 /* InfoVC.swift */; };
 		D345C9EC2BD7E9F3EF146C92 /* Pods_Rooted_MessagesExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 145C7F30C9C2DFCD3A237AF6 /* Pods_Rooted_MessagesExtension.framework */; };
-		D71F064E23D8D5F80039F572 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D71F064D23D8D5F70039F572 /* GoogleService-Info.plist */; };
 		D75711EA23D811E000BDD6A0 /* StepCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E423D811DF00BDD6A0 /* StepCollectionViewFlowLayout.swift */; };
 		D75711EB23D811E000BDD6A0 /* DateTimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E523D811E000BDD6A0 /* DateTimePicker.swift */; };
 		D75711EC23D811E000BDD6A0 /* FullDateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E623D811E000BDD6A0 /* FullDateCollectionViewCell.swift */; };
@@ -104,7 +103,6 @@
 		BA98DD8D225101210070BC39 /* MyInviteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInviteCell.swift; sourceTree = "<group>"; };
 		BA98DD8E225101210070BC39 /* MyInviteCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MyInviteCell.xib; sourceTree = "<group>"; };
 		BA98DD91225255B90070BC39 /* InfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoVC.swift; sourceTree = "<group>"; };
-		D71F064D23D8D5F70039F572 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D75711E423D811DF00BDD6A0 /* StepCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StepCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		D75711E523D811E000BDD6A0 /* DateTimePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateTimePicker.swift; sourceTree = "<group>"; };
 		D75711E623D811E000BDD6A0 /* FullDateCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FullDateCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -245,7 +243,6 @@
 		D75711F323D8817200BDD6A0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				D71F064D23D8D5F70039F572 /* GoogleService-Info.plist */,
 				D75711F823D881B500BDD6A0 /* Fonts */,
 				D75711F423D8817800BDD6A0 /* Storyboards */,
 				D75711F523D8817F00BDD6A0 /* Assets */,
@@ -394,7 +391,6 @@
 			files = (
 				BA0D0EEC224A583A00209993 /* Multicolore.otf in Resources */,
 				BA068C0B2245AD7D00A0EE9B /* Assets.xcassets in Resources */,
-				D71F064E23D8D5F80039F572 /* GoogleService-Info.plist in Resources */,
 				BA98DD90225101210070BC39 /* MyInviteCell.xib in Resources */,
 				BA068C092245AD7D00A0EE9B /* MainInterface.storyboard in Resources */,
 			);
