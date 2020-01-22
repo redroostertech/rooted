@@ -10,18 +10,20 @@ import CoreData
 let kButtonRadius: CGFloat = 15.0
 let kTextFieldIndent: CGFloat = 16.0
 
-class MessagesViewController: MSMessagesAppViewController, DateTimePickerDelegate {
+private var dateFormatString = "M/dd/yyyy h:mm aa"
 
-  @IBOutlet var titleField: UITextField!
-  @IBOutlet var locationField: UITextField!
-  @IBOutlet var startDateAndTimeField: UITextField!
-  @IBOutlet var endDateAndTimeField: UITextField!
-  @IBOutlet var premiumFeaturesLabel: UILabel!
-  @IBOutlet var setAsReOcurringButton: SSSpinnerButton!
-  @IBOutlet var setAsReocurringLabel: UILabel!
-  @IBOutlet var sendToFriendsButton: SSSpinnerButton!
-  @IBOutlet var resetButton: SSSpinnerButton!
-  @IBOutlet var cancelButton: UIButton!
+class MessagesViewController: MSMessagesAppViewController {
+
+  @IBOutlet private weak var titleField: UITextField!
+  @IBOutlet private weak var locationField: UITextField!
+  @IBOutlet private weak var startDateAndTimeButton: UIButton!
+  @IBOutlet private weak var endDateAndTimeButton: UIButton!
+  @IBOutlet private weak var premiumFeaturesLabel: UILabel!
+  @IBOutlet private weak var setAsReOcurringButton: SSSpinnerButton!
+  @IBOutlet private weak var setAsReocurringLabel: UILabel!
+  @IBOutlet private weak var sendToFriendsButton: SSSpinnerButton!
+  @IBOutlet private weak var resetButton: SSSpinnerButton!
+  @IBOutlet private weak var cancelButton: UIButton!
 
   var eventKitManager = EventKitManager()
   var coreDataManager = CoreDataManager()
@@ -31,15 +33,14 @@ class MessagesViewController: MSMessagesAppViewController, DateTimePickerDelegat
   var isPremium: Bool = false
   let eventStore = EKEventStore()
   var activeConvo: MSConversation?
-  var timeSelectorType: TimeSelectorType?
   var startDate: Date? {
       didSet {
-          startDateAndTimeField.text = startDate?.toString(CustomDateFormat.normal)
+        startDateAndTimeButton.setTitle(startDate?.toString(format: dateFormatString), for: .normal)
       }
   }
   var endDate: Date? {
       didSet {
-          endDateAndTimeField.text = endDate?.toString(CustomDateFormat.normal)
+        endDateAndTimeButton.setTitle(endDate?.toString(format: dateFormatString), for: .normal)
       }
   }
   var selectedLocation: (MKMapItem, MKPlacemark)? {
@@ -53,12 +54,13 @@ class MessagesViewController: MSMessagesAppViewController, DateTimePickerDelegat
   var invites: [NSManagedObject] = []
 
   var isCalendarShowing: Bool = false
-  var datePicker: DateTimePicker!
+  var startDatePicker: DateTimePicker!
+  var endDatePicker: DateTimePicker!
 
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupDatePicker()
+    setupDatePickers()
     setupUI()
     locationManager = CLLocationManager()
     locationManager?.delegate = self
@@ -188,7 +190,6 @@ class MessagesViewController: MSMessagesAppViewController, DateTimePickerDelegat
 
     func resetView() {
         titleField.text = ""
-        timeSelectorType = nil
         startDate = nil
         endDate = nil
         selectedLocation = nil
@@ -230,14 +231,6 @@ class MessagesViewController: MSMessagesAppViewController, DateTimePickerDelegat
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "goSelectTime" {
-            let destination = segue.destination as! TimeSelectorVC
-            destination.delegate = self
-            destination.timeSelectorType = self.timeSelectorType
-            if let proxyDate = startDate {
-                destination.proxyDate = proxyDate
-            }
-        }
         if segue.identifier == "goSelectLocation" {
             let destination = segue.destination as! LocationSearchVC
             destination.locSearchDelegate = self
@@ -285,23 +278,66 @@ class MessagesViewController: MSMessagesAppViewController, DateTimePickerDelegat
         }
     }
 
+  private var isStartCalendarShowing: Bool = false
+  private var isEndCalendarShowing: Bool = false
+
     // MARK: - UI actions
-  @IBAction func showCalendar(_ sender: Any) {
-    if isCalendarShowing {
-      isCalendarShowing = false
-      datePicker.removeFromSuperview()
+  @IBAction func showStartCalendar(_ sender: UIButton) {
+    // If both are empty
+    if !isStartCalendarShowing {
+
+      isStartCalendarShowing = true
+
+      isEndCalendarShowing = false
+      if endDatePicker != nil {
+        endDatePicker.removeFromSuperview()
+      }
+
+      let yOrigin = self.view.frame.maxY - startDatePicker.frame.size.height
+      let width = startDatePicker.frame.size.width
+      let height = startDatePicker.frame.size.height
+      startDatePicker.frame = CGRect(x: 0, y: yOrigin, width: width, height: height)
+      self.view.addSubview(startDatePicker)
+
     } else {
-      isCalendarShowing = true
-      datePicker.frame = CGRect(x: 0,
-                                y: self.view.frame.maxY - datePicker.frame.size.height,
-                                width: datePicker.frame.size.width,
-                                height: datePicker.frame.size.height)
-      self.view.addSubview(datePicker)
+
+      isStartCalendarShowing = false
+      startDatePicker.removeFromSuperview()
+
     }
+
   }
 
-  func dateTimePicker(_ picker: DateTimePicker, didSelectDate: Date) {
-    title = picker.selectedDateString
+  @IBAction func showEndCalendar(_ sender: UIButton) {
+    if let proxyDate = startDate {
+      self.setupEndDatePicker(withDate: proxyDate)
+    } else {
+      self.setupEndDatePicker(withDate: Date())
+    }
+
+    // If both are empty
+    if !isEndCalendarShowing {
+
+      isEndCalendarShowing = true
+
+      isStartCalendarShowing = false
+      if startDatePicker != nil {
+        startDatePicker.removeFromSuperview()
+      }
+
+      let yOrigin = self.view.frame.maxY - endDatePicker.frame.size.height
+      let width = endDatePicker.frame.size.width
+      let height = endDatePicker.frame.size.height
+      endDatePicker.frame = CGRect(x: 0, y: yOrigin, width: width, height: height)
+      self.view.addSubview(endDatePicker)
+
+    } else {
+
+      isEndCalendarShowing = false
+      endDatePicker.removeFromSuperview()
+
+    }
+
   }
 
   @IBAction func sendToFriends(_ sender: UIButton) {
@@ -324,72 +360,121 @@ class MessagesViewController: MSMessagesAppViewController, DateTimePickerDelegat
 
 // MARK: - UI updates
 extension MessagesViewController {
-    func setupUI() {
-        view.applyPrimaryGradient()
-        setUpTextFields()
-        setUpButtons()
-        setUpLabels()
-    }
+  func setupUI() {
+    view.applyPrimaryGradient()
+    setUpTextFields()
+    setUpButtons()
+    setUpLabels()
+  }
 
-    func setUpLabels() {
-        premiumFeaturesLabel.isHidden = true
-        setAsReocurringLabel.isHidden = true
-    }
+  func setUpLabels() {
+    premiumFeaturesLabel.isHidden = true
+    setAsReocurringLabel.isHidden = true
+  }
 
-    func setUpTextFields() {
-        titleField.delegate = self
-        titleField.addLeftPadding(withWidth: kTextFieldIndent)
-        locationField.delegate = self
-        locationField.addLeftPadding(withWidth: kTextFieldIndent)
-        startDateAndTimeField.delegate = self
-        startDateAndTimeField.addLeftPadding(withWidth: kTextFieldIndent)
-        endDateAndTimeField.delegate = self
-        endDateAndTimeField.addLeftPadding(withWidth: kTextFieldIndent)
-    }
+  func setUpTextFields() {
+    titleField.delegate = self
+    titleField.addLeftPadding(withWidth: kTextFieldIndent)
+    locationField.delegate = self
+    locationField.addLeftPadding(withWidth: kTextFieldIndent)
+  }
 
-    func setUpButtons() {
-        setAsReOcurringButton.layer.cornerRadius = setAsReOcurringButton.frame.height / 2
-        setAsReOcurringButton.clipsToBounds = true
-        setAsReOcurringButton.spinnerColor = UIColor.gradientColor1
-        setAsReOcurringButton.isHidden = true
-        sendToFriendsButton.layer.cornerRadius = sendToFriendsButton.frame.height / 2
-        sendToFriendsButton.clipsToBounds = true
-        sendToFriendsButton.spinnerColor = UIColor.gradientColor1
-    }
+  func setUpButtons() {
+    setAsReOcurringButton.layer.cornerRadius = setAsReOcurringButton.frame.height / 2
+    setAsReOcurringButton.clipsToBounds = true
+    setAsReOcurringButton.spinnerColor = UIColor.gradientColor1
+    setAsReOcurringButton.isHidden = true
+    sendToFriendsButton.layer.cornerRadius = sendToFriendsButton.frame.height / 2
+    sendToFriendsButton.clipsToBounds = true
+    sendToFriendsButton.spinnerColor = UIColor.gradientColor1
+  }
 
-  func setupDatePicker() {
+  func setupDatePickers() {
+    setupStartDatePicker()
+  }
+
+  func setupStartDatePicker() {
     let max = Date().addingTimeInterval(60 * 60 * 24 * 7)
     let picker = DateTimePicker.create(minimumDate: Date(), maximumDate: max)
+
+    picker.identifier = "start"
 
     // Set the container view as without it, view will not be able to render
     picker.containerView = self.view
 
     picker.timeInterval = DateTimePicker.MinuteInterval.thirty
-    picker.locale = Locale(identifier: "en_US")
+    picker.locale = .autoupdatingCurrent
 
     picker.todayButtonTitle = "Today"
     picker.is12HourFormat = true
-    picker.dateFormat = "MMMM yyyy"
+    picker.dateFormat = dateFormatString
     picker.includeMonth = true
-    picker.highlightColor = UIColor(red: 255.0/255.0, green: 138.0/255.0, blue: 138.0/255.0, alpha: 1)
+    picker.highlightColor = .gradientColor1
     picker.doneButtonTitle = "Done"
-    picker.doneBackgroundColor = UIColor(red: 255.0/255.0, green: 138.0/255.0, blue: 138.0/255.0, alpha: 1)
+    picker.doneBackgroundColor = .gradientColor1
     picker.customFontSetting = DateTimePicker.CustomFontSetting(selectedDateLabelFont: .boldSystemFont(ofSize: 20))
     picker.normalColor = UIColor.white
     picker.darkColor = UIColor.black
     picker.contentViewBackgroundColor = UIColor.white
     picker.completionHandler = { date in
       self.isCalendarShowing = false
-      let formatter = DateFormatter()
-      formatter.dateFormat = "hh:mm aa dd/MM/YYYY"
-      self.title = formatter.string(from: date)
     }
     picker.delegate = self
     picker.dismissHandler = {
       self.isCalendarShowing = false
       picker.removeFromSuperview()
     }
-    datePicker = picker
+    startDatePicker = picker
+  }
+
+  func setupEndDatePicker(withDate date: Date) {
+    let max = date.addingTimeInterval(60 * 60 * 24 * 7)
+    let picker = DateTimePicker.create(minimumDate: date, maximumDate: max)
+
+    picker.identifier = "end"
+
+    // Set the container view as without it, view will not be able to render
+    picker.containerView = self.view
+
+    picker.timeInterval = DateTimePicker.MinuteInterval.thirty
+    picker.locale = .autoupdatingCurrent
+
+    picker.todayButtonTitle = "Today"
+    picker.is12HourFormat = true
+    picker.dateFormat = dateFormatString
+    picker.includeMonth = true
+    picker.highlightColor = .gradientColor1
+    picker.doneButtonTitle = "Done"
+    picker.doneBackgroundColor = .gradientColor1
+    picker.customFontSetting = DateTimePicker.CustomFontSetting(selectedDateLabelFont: .boldSystemFont(ofSize: 20))
+    picker.normalColor = UIColor.white
+    picker.darkColor = UIColor.black
+    picker.contentViewBackgroundColor = UIColor.white
+    picker.completionHandler = { date in
+      self.isCalendarShowing = false
+    }
+    picker.delegate = self
+    picker.dismissHandler = {
+      self.isCalendarShowing = false
+      picker.removeFromSuperview()
+    }
+    endDatePicker = picker
+  }
+}
+
+// MARK: - DateTimePickerDelegate
+extension MessagesViewController: DateTimePickerDelegate {
+  func dateTimePicker(_ picker: DateTimePicker, didSelectDate: Date) {
+
+    if let identifier = picker.identifier {
+      if identifier == "start" {
+        self.startDate = didSelectDate
+      }
+      if identifier == "end" {
+        self.endDate = didSelectDate
+      }
+    }
+
   }
 }
 
@@ -426,14 +511,6 @@ extension MessagesViewController: UITextFieldDelegate {
                 self.requestPresentationStyle(.expanded)
             }
         }
-        if textField == startDateAndTimeField {
-            timeSelectorType = .start
-            performSegue(withIdentifier: "goSelectTime", sender: self)
-        }
-        if textField == endDateAndTimeField {
-            timeSelectorType = .end
-            performSegue(withIdentifier: "goSelectTime", sender: self)
-        }
         if textField == locationField {
             if CLLocationManager.authorizationStatus() == .denied || CLLocationManager.authorizationStatus() == .notDetermined {
                 self.locationManager?.requestWhenInUseAuthorization()
@@ -442,19 +519,6 @@ extension MessagesViewController: UITextFieldDelegate {
             }
         }
         return true
-    }
-}
-
-// MARK: - TimeSelector delegate
-extension MessagesViewController: TimeSelectorDelegate {
-    func selectDate(_ selectorVC: TimeSelectorVC, selectedDate date: Date, selectorType type: TimeSelectorType) {
-        if type == .start {
-            startDate = date
-        }
-
-        if type == .end {
-            endDate = date
-        }
     }
 }
 
