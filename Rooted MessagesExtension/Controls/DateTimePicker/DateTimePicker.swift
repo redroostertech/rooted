@@ -71,6 +71,8 @@ public protocol DateTimePickerDelegate: class {
         }
     }
 
+    public var identifier: String?
+  
     /// custom normal color, default to white
     public var normalColor = UIColor.white
     
