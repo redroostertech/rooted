@@ -30,7 +30,7 @@ extension UIColor {
                        green: 88/255,
                        blue: 67/255,
                        alpha: 1.0)
-    }
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
     
     public convenience init?(hexString: String) {
         let r, g, b, a: CGFloat

@@ -54,9 +54,3 @@ class MyInviteCell: UITableViewCell {
   }
 
 }
-
-extension MyInviteCell {
-  static var identifier: String {
-    return String(describing: MyInviteCell.self)
-  }
-}

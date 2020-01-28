@@ -10,6 +10,10 @@ import UIKit
 
 extension UIView {
 
+  static var identifier: String {
+    return String(describing: self)
+  }
+
     func loadNib(nibName: String) -> UIView {
         let bundle = Bundle(for: type(of: self))
         //let nibName = type(of: self).description().components(separatedBy: ".").last!
