@@ -124,7 +124,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="is9-QR-DY0" customClass="SSSpinnerButton" customModule="SSSpinnerButton">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="is9-QR-DY0" customClass="SSSpinnerButton" customModule="SSSpinnerButton">
                                 <rect key="frame" x="16" y="318" width="32" height="32"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -135,7 +135,7 @@
                                     <action selector="setPremium:" destination="ObA-dk-sSI" eventType="touchUpInside" id="dJK-aa-xiD"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Set as reocurring" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hBn-S4-d1O">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set as reocurring" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hBn-S4-d1O">
                                 <rect key="frame" x="56" y="318" width="100" height="32"/>
                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -260,6 +260,7 @@
                             <constraint firstItem="hBn-S4-d1O" firstAttribute="bottom" secondItem="is9-QR-DY0" secondAttribute="bottom" id="Law-Qw-ltX"/>
                             <constraint firstItem="OC6-Vu-pKE" firstAttribute="top" secondItem="DzY-1o-dfl" secondAttribute="bottom" constant="8" id="LpZ-w2-eah"/>
                             <constraint firstItem="HcN-px-mug" firstAttribute="bottom" secondItem="a3Q-xh-K1d" secondAttribute="bottom" id="MlM-y8-lBh"/>
+                            <constraint firstItem="is9-QR-DY0" firstAttribute="leading" secondItem="dE2-VZ-z2w" secondAttribute="leading" id="N97-7r-vih"/>
                             <constraint firstItem="OC6-Vu-pKE" firstAttribute="trailing" secondItem="DzY-1o-dfl" secondAttribute="trailing" id="Pan-lt-pDD"/>
                             <constraint firstItem="PWO-j4-zhu" firstAttribute="leading" secondItem="nyh-Zk-DQU" secondAttribute="leading" id="T74-Re-gUN"/>
                             <constraint firstItem="VAE-Gs-Ual" firstAttribute="leading" secondItem="LDy-ih-0nr" secondAttribute="leading" constant="16" id="TT7-jI-btz"/>
