@@ -69,6 +69,7 @@ class MyInvitesManager: NSObject {
     }
   }
 
+  // MARK: - CRUD operations
   func deleteInvite(_ invite: InviteObject, atIndex index: Int) {
     self.invitesDelegate?.willDeleteInvite(self)
     invites.remove(at: index)
@@ -83,62 +84,42 @@ class MyInvitesManager: NSObject {
 
   func refreshInvites() {
     self.invitesDelegate?.willRefreshInvites(self)
+    invites.removeAll()
     retrieveInvites { (results, error) in
       if let err = error {
         self.invitesDelegate?.didFailRefreshingInvites(self, error: err)
       } else {
-        guard let res = results else {
-          fatalError("There was an error. Error message: There were no results.")
-          return
-        }
+        guard let res = results else { return }
         invites.append(contentsOf: res)
         self.invitesDelegate?.didRefreshInvites(self)
       }
     }
   }
 
-  // MARK: - CoreData manager
-
-    func saveInvite(endDate: Date,
-                    locationAddress: String,
-                    locationCity: String,
-                    locationCountry: String,
-                    locationLat: Double,
-                    locationLon: Double,
-                    locationName: String,
-                    locationState: String,
-                    locationStreet: String,
-                    locationZip: String,
-                    startDate: Date,
-                    title: String,
-                    _ completion: (Bool, Error?) -> Void) {
-        guard let invite = self.invite else {
-            completion(false, nil)
-            return
-        }
-        invite.setValuesForKeys([
-            "endDate": endDate,
-            "locationAddress": locationAddress,
-            "locationCity": locationCity,
-            "locationCountry": locationCountry,
-            "locationLat": locationLat,
-            "locationLon": locationLon,
-            "locationName": locationName,
-            "locationState": locationState,
-            "locationStreet": locationStreet,
-            "locationZip": locationZip,
-            "startDate": startDate,
-            "title": title,
-            ])
-
-        do {
-            try coreDataManager.managedContext.save()
-            invites.append(invite)
-            completion(true, nil)
-        } catch let error {
-            completion(false, error)
-        }
+  func save(title: String, endDate: Date, startDate: Date, location: RLocation?, _ completion: (Bool, Error?) -> Void) {
+    guard let invite = self.invite else {
+      completion(false, nil)
+      return
     }
+
+    invite.setValuesForKeys([
+      kMessageEndDateKey: endDate,
+      kMessageStartDateKey: startDate,
+      kMessageTitleKey: title,
+    ])
+
+    if let loc = location?.toJSON().convertToJsonString() {
+      invite.setValue(loc, forKey: kMessageLocationStringKey)
+    }
+
+    do {
+      try coreDataManager.managedContext.save()
+      invites.append(invite)
+      completion(true, nil)
+    } catch let error {
+      completion(false, error)
+    }
+  }
 }
 
 // MARK: - UITableView delegate and datasource

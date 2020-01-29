@@ -63,6 +63,7 @@
             "meeting_name": "Sample meeting",
             "meeting_description": "Meetings that are today",
             "meeting_location": {
+                "name": "",
                 "address_1": "",
                 "address_2": "",
                 "address_3": "",

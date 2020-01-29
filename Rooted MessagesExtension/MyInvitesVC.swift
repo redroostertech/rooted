@@ -8,6 +8,9 @@ import NotificationCenter
 private var activeConvo: MSConversation?
 private var selectedMessage: MSMessage?
 
+public let kDeleteTitle = "Delete Invite"
+public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
+
 class MyInvitesVC: MSMessagesAppViewController {
 
   @IBOutlet private var invitesTable: UITableView!
@@ -62,7 +65,7 @@ class MyInvitesVC: MSMessagesAppViewController {
   }
 
   private func showCalendarError() {
-    self.showError(title: "Calendar Permissions", message: "In order to use Rooted, we need to have permission to access your calendar. To update settings, please go to\nSETTINGS > PRIVACY > CALENDAR > ROOTED")
+    self.showError(title: kCalendarPermissions, message: kCalendarAccess)
   }
 
   // MARK: - Class methods
@@ -75,38 +78,22 @@ class MyInvitesVC: MSMessagesAppViewController {
           }
       }
       if segue.identifier == "goToInviteDetails" {
-          guard let destination = segue.destination as? InviteDetailsVC else { return }
-          guard let selectedMessage = selectedMessage else { return }
-          guard
-              let title = selectedMessage.md.string(forKey: "title"),
-              let startDate = selectedMessage.md.string(forKey: "startDate")?.toDate(),
-              let endDate = selectedMessage.md.string(forKey: "endDate")?.toDate() else { return }
+        guard let selectedMessage = selectedMessage else { return }
+        guard
+          let title = selectedMessage.md.string(forKey: kMessageTitleKey),
+          let startDate = selectedMessage.md.string(forKey: kMessageStartDateKey)?.toDate(),
+          let endDate = selectedMessage.md.string(forKey: kMessageEndDateKey)?.toDate(), let destination = segue.destination as? InviteDetailsVC  else { return }
 
-          destination.eventStore = eventKitManager.eventStore
-          destination.titleText = title
-          destination.startDate = startDate
-          destination.endDate = endDate
+        destination.titleText = title
+        destination.startDate = startDate
+        destination.endDate = endDate
 
-          if
-              let locationName = selectedMessage.md.string(forKey: "locationName"),
-              let locationLat = selectedMessage.md.double(forKey: "locationLat"),
-              let locationLon = selectedMessage.md.double(forKey: "locationLon"),
-              let latDegrees = CLLocationDegrees(exactly: locationLat),
-              let lonDegrees = CLLocationDegrees(exactly: locationLon) {
-              let coordinate = CLLocationCoordinate2D(latitude: latDegrees, longitude: lonDegrees)
-              let placemark = MKPlacemark(coordinate: coordinate, addressDictionary: [
-                  "subThoroughfare": selectedMessage.md.string(forKey: "locationStreet") ?? "",
-                  "thoroughfare": selectedMessage.md.string(forKey: "locationAddress") ?? "",
-                  "locality": selectedMessage.md.string(forKey: "locationCity") ?? "",
-                  "administrativeArea": selectedMessage.md.string(forKey: "locationState") ?? "",
-                  "countryCode": selectedMessage.md.string(forKey: "locationCountry") ?? "",
-                  "postalCode" : selectedMessage.md.string(forKey: "locationZip") ?? ""
-                  ])
-              let mapItem = MKMapItem(placemark: placemark)
-              mapItem.name = locationName
-              destination.selectedLocation = (mapItem, placemark)
-              destination.selectedLocationName = locationName
-          }
+        if
+          // See if the location string will map to the RLocation object
+          let locationString = selectedMessage.md.string(forKey: kMessageLocationStringKey), let rLocation = RLocation(JSONString: locationString) {
+            destination.rLocation = rLocation
+        }
+        destination.viewDidLoad()
       }
   }
 
@@ -169,6 +156,8 @@ extension MyInvitesVC {
   }
 }
 
+public let captionString = "%@ on %@"
+
 // MARK: - MyInviteCell delegate
 extension MyInvitesVC: MyInviteCellDelegate {
   func share(_ cell: UITableViewCell, invite: InviteObject?) {
@@ -176,26 +165,25 @@ extension MyInvitesVC: MyInviteCellDelegate {
         self.showError(title: "Error", message: "There was an error trying to share the invite into the current chat. Please try again.")
         return
     }
+
     let message = MSMessage()
+    var subcaption = ""
 
     let layout = MSMessageTemplateLayout()
-    layout.caption = subject.value(forKey: "title") as? String ?? ""
-    layout.subcaption = subject.value(forKey: "locationName") as? String ?? ""
-    message.layout = layout
+    layout.caption = String(format: captionString, arguments: [subject.value(forKey: kMessageTitleKey) as? String ?? "", (subject.value(forKey: kMessageStartDateKey) as? Date ?? Date()).toString(.rooted)])
 
-    message.md.set(value: subject.value(forKey: "title") as? String ?? "", forKey: "title")
-    message.md.set(value: subject.value(forKey: "locationName") as? String ?? "", forKey: "subcaption")
-    message.md.set(value: (subject.value(forKey: "startDate") as? Date ?? Date()).toString(), forKey: "startDate")
-    message.md.set(value: (subject.value(forKey: "endDate") as? Date ?? Date()).toString(), forKey: "endDate")
-    message.md.set(value: subject.value(forKey: "locationName") as? String ?? "", forKey: "locationName")
-    message.md.set(value: subject.value(forKey: "locationLat") as? Double ?? 0.0, forKey: "locationLat")
-    message.md.set(value: subject.value(forKey: "locationLon") as? Double ?? 0.0, forKey: "locationLon")
-    message.md.set(value: subject.value(forKey: "locationStreet") as? String ?? "", forKey: "locationStreet")
-    message.md.set(value: subject.value(forKey: "locationAddress") as? String ?? "", forKey: "locationAddress")
-    message.md.set(value: subject.value(forKey: "locationCity") as? String ?? "", forKey: "locationCity")
-    message.md.set(value: subject.value(forKey: "locationState") as? String ?? "", forKey: "locationState")
-    message.md.set(value: subject.value(forKey: "locationCountry") as? String ?? "", forKey: "locationCountry")
-    message.md.set(value: subject.value(forKey: "locationZip") as? String ?? "", forKey: "locationZip")
+    message.md.set(value: subject.value(forKey: kMessageTitleKey) as? String ?? "", forKey: kMessageTitleKey)
+    message.md.set(value: (subject.value(forKey: kMessageStartDateKey) as? Date ?? Date()).toString(), forKey: kMessageStartDateKey)
+    message.md.set(value: (subject.value(forKey: kMessageEndDateKey) as? Date ?? Date()).toString(), forKey: kMessageEndDateKey)
+
+    if let locationString = subject.value(forKey: kMessageLocationStringKey) as? String, let loc = RLocation(JSONString: locationString) {
+      subcaption += loc.readableWhereString
+      message.md.set(value: loc.readableWhereString, forKey: kMessageSubCaptionKey)
+      message.md.set(value: locationString, forKey: kMessageLocationStringKey)
+    }
+
+    layout.subcaption = subcaption
+    message.layout = layout
 
     if self.activeConversation == nil {
       activeConvo?.insert(message) { (error) in
@@ -222,13 +210,15 @@ extension MyInvitesVC: MyInviteCellDelegate {
     }
   }
 
+
+
   func trash(_ cell: UITableViewCell, invite: InviteObject?) {
     guard let subject = invite else {
       self.showError(title: "Error", message: "There was an error trying to delete the object. Please try again.")
       return
     }
 
-    let alert = UIAlertController(title: "Trash", message: "You are about to delete an invite. Doing so will delete it forever. Are you sure?", preferredStyle: .alert)
+    let alert = UIAlertController(title: kDeleteTitle, message: kDeleteMessage, preferredStyle: .alert)
     let yes = UIAlertAction(title: "Yes", style: .default, handler: { action in
       self.myInvitesManager.deleteInvite(subject, atIndex: cell.tag)
     })

@@ -140,6 +140,12 @@ extension String {
         return String(unicodeScalars
             .flatMap { pattern ~= $0 ? Character($0) : nil })
     }
+
+  func convertToDictionary() -> [String: Any]? {
+    let jsonData = self.data(using: .utf8)!
+    let dictionary = try? JSONSerialization.jsonObject(with: jsonData, options: .mutableLeaves)
+    return dictionary as? [String : Any]
+  }
 }
 
 //  MARK:- Validation
