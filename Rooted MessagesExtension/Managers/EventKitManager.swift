@@ -45,25 +45,29 @@ class EventKitManager: NSObject {
         }
     }
 
-    func insertEvent(title: String, startDate: Date, endDate: Date, location: (MKMapItem, MKPlacemark)?, locationName name: String, _ completion: @escaping (Bool, Error?) -> Void) {
+    func insertEvent(title: String, startDate: Date, endDate: Date, location: RLocation?, _ completion: @escaping (Bool, Error?) -> Void) {
         let calendars = eventStore.calendars(for: .event)
         var done = false
         for calendar in calendars {
             if calendar.type == EventKitManager.calendarType && done == false {
+
                 let event = EKEvent(eventStore: eventStore)
                 event.calendar = calendar
                 event.title = title
                 event.startDate = startDate
                 event.endDate = endDate
                 event.addAlarm(EKAlarm(relativeOffset: -10800))
-                if let loc = location {
+                event.addAlarm(EKAlarm(relativeOffset: -86400))
+
+                if let loc = location, let name = loc.name, let mapItem = loc.mapItem {
                     event.location = name
-                    event.structuredLocation = EKStructuredLocation(mapItem: loc.0)
+                    event.structuredLocation = EKStructuredLocation(mapItem: mapItem)
                 }
+
                 do {
                     try eventStore.save(event, span: .thisEvent)
                     done = true
-                    completion(true, nil)
+                    completion(done, nil)
                 } catch {
                     print(error.localizedDescription)
                     print("Error saving event in calendar")
