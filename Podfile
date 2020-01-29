@@ -27,6 +27,7 @@ target 'Rooted' do
   pod 'Firebase/Firestore'
   pod 'Firebase/Storage'
   pod 'FirebaseUI/Storage'
+  pod 'Firebase/Analytics'
 
   pod 'RRoostSDK', :git => 'https://github.com/redroostertech/RRoostSDK.git'
   pod 'RSKGrowingTextView'
@@ -49,6 +50,8 @@ target 'Rooted MessagesExtension' do
   pod 'Firebase/Firestore'
   pod 'Firebase/Storage'
   pod 'FirebaseUI/Storage'
+  pod 'Firebase/Analytics'
+  pod 'Alamofire'
   pod 'ObjectMapper', '~> 3.1'
   pod 'SwiftyCodeView'
 

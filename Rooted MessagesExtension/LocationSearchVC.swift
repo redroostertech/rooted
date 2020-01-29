@@ -6,7 +6,7 @@ protocol LocationSearchDelegate: class {
   func selectLocation(_ searchVC: LocationSearchVC, location: RLocation?)
 }
 
-class LocationSearchVC: MSMessagesAppViewController {
+class LocationSearchVC: BaseAppViewController {
 
   @IBOutlet private var backButton: UIButton!
   @IBOutlet private weak var searchResultsTableView: UITableView!

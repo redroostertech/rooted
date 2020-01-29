@@ -6,7 +6,7 @@ import iMessageDataKit
 import SSSpinnerButton
 import CoreLocation
 
-class InviteDetailsVC: MSMessagesAppViewController {
+class InviteDetailsVC: BaseAppViewController {
 
   @IBOutlet private var timeLabel: UILabel!
   @IBOutlet private var titleLabel: UILabel!
