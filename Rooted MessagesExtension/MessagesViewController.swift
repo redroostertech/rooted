@@ -29,7 +29,11 @@ let kTextFieldIndent: CGFloat = 16.0
 
 private var dateFormatString = "M/dd/yyyy h:mm aa"
 
-class MessagesViewController: MSMessagesAppViewController {
+class BaseAppViewController: MSMessagesAppViewController {
+  var appInitializer = AppInitializer.main
+}
+
+class MessagesViewController: BaseAppViewController {
 
   @IBOutlet private weak var titleField: UITextField!
   @IBOutlet private weak var locationSelectionLabel: UILabel!

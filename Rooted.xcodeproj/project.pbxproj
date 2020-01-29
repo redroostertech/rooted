@@ -86,6 +86,8 @@
 		D75711EF23D811E000BDD6A0 /* DateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E923D811E000BDD6A0 /* DateCollectionViewCell.swift */; };
 		D75711FA23D8832200BDD6A0 /* RProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711F923D8832200BDD6A0 /* RProgressHUD.swift */; };
 		D787A26423E1C4D8001795D3 /* Dictionary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D787A26323E1C4D8001795D3 /* Dictionary+Extensions.swift */; };
+		D787A26823E1EB41001795D3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D787A26723E1EB41001795D3 /* GoogleService-Info.plist */; };
+		D787A26A23E1EC2F001795D3 /* AppInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D787A26923E1EC2F001795D3 /* AppInitializer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -197,6 +199,8 @@
 		D75711E923D811E000BDD6A0 /* DateCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateCollectionViewCell.swift; sourceTree = "<group>"; };
 		D75711F923D8832200BDD6A0 /* RProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RProgressHUD.swift; sourceTree = "<group>"; };
 		D787A26323E1C4D8001795D3 /* Dictionary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extensions.swift"; sourceTree = "<group>"; };
+		D787A26723E1EB41001795D3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		D787A26923E1EC2F001795D3 /* AppInitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInitializer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -279,13 +283,14 @@
 		BA068C042245AD7D00A0EE9B /* Rooted MessagesExtension */ = {
 			isa = PBXGroup;
 			children = (
+				D787A26723E1EB41001795D3 /* GoogleService-Info.plist */,
 				BA98DD8C224ED26F0070BC39 /* Rooted MessagesExtension.entitlements */,
 				D75711F323D8817200BDD6A0 /* Resources */,
 				D75711F623D8818900BDD6A0 /* Managers */,
+				BA068C052245AD7D00A0EE9B /* MessagesViewController.swift */,
 				BA98DD4D224EC2AD0070BC39 /* MyInvitesVC.swift */,
 				BA98DD91225255B90070BC39 /* InfoVC.swift */,
 				BA41F4CA224CECE4006AD793 /* LaunchVC.swift */,
-				BA068C052245AD7D00A0EE9B /* MessagesViewController.swift */,
 				BA0D0EDB2248019B00209993 /* InviteDetailsVC.swift */,
 				BA068C1E2247BE2F00A0EE9B /* LocationSearchVC.swift */,
 				D75711F723D8819B00BDD6A0 /* Cells */,
@@ -293,6 +298,7 @@
 				BA068C0C2245AD7D00A0EE9B /* Info.plist */,
 				D75711F223D8815C00BDD6A0 /* Utilities+Extensions */,
 				D75711F123D8813600BDD6A0 /* Controls */,
+				D787A26923E1EC2F001795D3 /* AppInitializer.swift */,
 			);
 			path = "Rooted MessagesExtension";
 			sourceTree = "<group>";
@@ -596,6 +602,7 @@
 			files = (
 				D71F073423DCAAAE0039F572 /* RootedJson.json in Resources */,
 				BA0D0EEC224A583A00209993 /* Multicolore.otf in Resources */,
+				D787A26823E1EB41001795D3 /* GoogleService-Info.plist in Resources */,
 				D71F073623DCAAAE0039F572 /* Rooted_Meetings_Response.json in Resources */,
 				D71F072823DCAAAE0039F572 /* LoadingViewVC.xib in Resources */,
 				BA068C0B2245AD7D00A0EE9B /* Assets.xcassets in Resources */,
@@ -734,6 +741,7 @@
 				D71F06EE23DCAAAE0039F572 /* AccountType.swift in Sources */,
 				D75711EE23D811E000BDD6A0 /* DateTimePicker+UITableView.swift in Sources */,
 				BA98DD8F225101210070BC39 /* MyInviteCell.swift in Sources */,
+				D787A26A23E1EC2F001795D3 /* AppInitializer.swift in Sources */,
 				D71F072C23DCAAAE0039F572 /* Constants.swift in Sources */,
 				D71F06DB23DCAAAE0039F572 /* Option.swift in Sources */,
 				D71F06E723DCAAAE0039F572 /* RLocation.swift in Sources */,

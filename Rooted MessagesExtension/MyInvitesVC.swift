@@ -11,7 +11,7 @@ private var selectedMessage: MSMessage?
 public let kDeleteTitle = "Delete Invite"
 public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
 
-class MyInvitesVC: MSMessagesAppViewController {
+class MyInvitesVC: BaseAppViewController {
 
   @IBOutlet private var invitesTable: UITableView!
   @IBOutlet private var addButton: UIButton!

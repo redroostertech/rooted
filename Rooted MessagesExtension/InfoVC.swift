@@ -1,7 +1,7 @@
 import UIKit
 import Messages
 
-class InfoVC: MSMessagesAppViewController {
+class InfoVC: BaseAppViewController {
     @IBOutlet var closeButton: UIButton!
     @IBOutlet var grantAccessButton: UIButton!
     override func viewDidLoad() {
