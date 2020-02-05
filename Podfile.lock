@@ -159,47 +159,12 @@ PODS:
     - abseil/base/config
     - abseil/meta/type_traits
   - Alamofire (4.9.1)
-  - Bolts (1.9.0):
-    - Bolts/AppLinks (= 1.9.0)
-    - Bolts/Tasks (= 1.9.0)
-  - Bolts/AppLinks (1.9.0):
-    - Bolts/Tasks
-  - Bolts/Tasks (1.9.0)
   - BoringSSL-GRPC (0.0.3):
     - BoringSSL-GRPC/Implementation (= 0.0.3)
     - BoringSSL-GRPC/Interface (= 0.0.3)
   - BoringSSL-GRPC/Implementation (0.0.3):
     - BoringSSL-GRPC/Interface (= 0.0.3)
   - BoringSSL-GRPC/Interface (0.0.3)
-  - Cachable (1.2.1)
-  - CalendarKit (0.12.0):
-    - DateToolsSwift
-    - Neon
-  - ChameleonFramework/Default (2.1.0)
-  - ChameleonFramework/Swift (2.1.0):
-    - ChameleonFramework/Default
-  - CVCalendar (1.6.2)
-  - DateToolsSwift (4.0.0)
-  - EmptyDataSet-Swift (5.0.0)
-  - FacebookCore (0.5.0):
-    - Bolts (~> 1.9)
-    - FBSDKCoreKit (~> 4.37)
-  - FacebookLogin (0.5.0):
-    - Bolts (~> 1.9)
-    - FacebookCore (~> 0.5)
-    - FBSDKCoreKit (~> 4.37)
-    - FBSDKLoginKit (~> 4.37)
-  - FacebookShare (0.5.0):
-    - Bolts (~> 1.9)
-    - FacebookCore (~> 0.5)
-    - FBSDKCoreKit (~> 4.37)
-    - FBSDKShareKit (~> 4.37)
-  - FBSDKCoreKit (4.44.1):
-    - Bolts (~> 1.9)
-  - FBSDKLoginKit (4.44.1):
-    - FBSDKCoreKit
-  - FBSDKShareKit (4.44.1):
-    - FBSDKCoreKit
   - Firebase/Analytics (6.14.0):
     - Firebase/Core
   - Firebase/Auth (6.14.0):
@@ -268,7 +233,6 @@ PODS:
   - FirebaseUI/Storage (8.4.1):
     - Firebase/Storage (~> 6.0)
     - SDWebImage (~> 5.0)
-  - GlidingCollection (2.1.0)
   - GoogleAppMeasurement (6.1.7):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
@@ -315,66 +279,32 @@ PODS:
   - gRPC-Core/Interface (1.21.0)
   - GTMSessionFetcher/Core (1.3.1)
   - iMessageDataKit (0.1.0)
-  - IQKeyboardManagerSwift (6.5.4)
-  - JKCalendar (1.1.4):
-    - JKInfinitePageView (~> 1.1.0)
-  - JKInfinitePageView (1.1.0)
   - leveldb-library (1.22)
-  - libPhoneNumber-iOS (0.9.15)
   - nanopb (0.3.9011):
     - nanopb/decode (= 0.3.9011)
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
-  - Neon (0.4.0)
   - ObjectMapper (3.5.1)
-  - PhoneNumberKit (2.6.0):
-    - PhoneNumberKit/PhoneNumberKitCore (= 2.6.0)
-    - PhoneNumberKit/UIKit (= 2.6.0)
-  - PhoneNumberKit/PhoneNumberKitCore (2.6.0)
-  - PhoneNumberKit/UIKit (2.6.0):
-    - PhoneNumberKit/PhoneNumberKitCore
-  - RRoostSDK (0.1.6)
-  - RSKGrowingTextView (5.0.2):
-    - RSKPlaceholderTextView (= 5.0.2)
-  - RSKPlaceholderTextView (5.0.2)
-  - SDWebImage (5.4.2):
-    - SDWebImage/Core (= 5.4.2)
-  - SDWebImage/Core (5.4.2)
+  - SDWebImage (5.5.2):
+    - SDWebImage/Core (= 5.5.2)
+  - SDWebImage/Core (5.5.2)
   - SSSpinnerButton (2.0.1)
-  - SVProgressHUD (2.2.5)
   - SwiftyCodeView (0.3.4):
     - SwiftyCodeView/Core (= 0.3.4)
   - SwiftyCodeView/Core (0.3.4)
 
 DEPENDENCIES:
   - Alamofire
-  - Cachable
-  - CalendarKit
-  - ChameleonFramework/Swift (from `https://github.com/ViccAlexander/Chameleon.git`)
-  - CVCalendar
-  - EmptyDataSet-Swift
-  - FacebookCore (~> 0.5.0)
-  - FacebookLogin (~> 0.5.0)
-  - FacebookShare (~> 0.5.0)
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Core
   - Firebase/Firestore
   - Firebase/Storage
   - FirebaseUI/Storage
-  - GlidingCollection
   - iMessageDataKit
-  - IQKeyboardManagerSwift
-  - JKCalendar
-  - libPhoneNumber-iOS (~> 0.8)
   - ObjectMapper (~> 3.1)
-  - PhoneNumberKit (~> 2.0)
-  - RRoostSDK (from `https://github.com/redroostertech/RRoostSDK.git`)
-  - RSKGrowingTextView
-  - SDWebImage
   - SSSpinnerButton
-  - SVProgressHUD
   - SwiftyCodeView
 
 SPEC REPOS:
@@ -384,19 +314,7 @@ SPEC REPOS:
   trunk:
     - abseil
     - Alamofire
-    - Bolts
     - BoringSSL-GRPC
-    - Cachable
-    - CalendarKit
-    - CVCalendar
-    - DateToolsSwift
-    - EmptyDataSet-Swift
-    - FacebookCore
-    - FacebookLogin
-    - FacebookShare
-    - FBSDKCoreKit
-    - FBSDKLoginKit
-    - FBSDKShareKit
     - Firebase
     - FirebaseAnalytics
     - FirebaseAuth
@@ -408,7 +326,6 @@ SPEC REPOS:
     - FirebaseInstanceID
     - FirebaseStorage
     - FirebaseUI
-    - GlidingCollection
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
@@ -416,52 +333,16 @@ SPEC REPOS:
     - "gRPC-C++"
     - gRPC-Core
     - GTMSessionFetcher
-    - IQKeyboardManagerSwift
-    - JKCalendar
-    - JKInfinitePageView
     - leveldb-library
-    - libPhoneNumber-iOS
     - nanopb
-    - Neon
     - ObjectMapper
-    - PhoneNumberKit
-    - RSKGrowingTextView
-    - RSKPlaceholderTextView
     - SDWebImage
-    - SVProgressHUD
     - SwiftyCodeView
-
-EXTERNAL SOURCES:
-  ChameleonFramework:
-    :git: https://github.com/ViccAlexander/Chameleon.git
-  RRoostSDK:
-    :git: https://github.com/redroostertech/RRoostSDK.git
-
-CHECKOUT OPTIONS:
-  ChameleonFramework:
-    :commit: 6dd284bde21ea2e7f9fd89bc36f40df16e16369d
-    :git: https://github.com/ViccAlexander/Chameleon.git
-  RRoostSDK:
-    :commit: 29fa8ce057197dd7d6cc60225dc9930692556767
-    :git: https://github.com/redroostertech/RRoostSDK.git
 
 SPEC CHECKSUMS:
   abseil: 18063d773f5366ff8736a050fe035a28f635fd27
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
-  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   BoringSSL-GRPC: db8764df3204ccea016e1c8dd15d9a9ad63ff318
-  Cachable: af3b7624756db339513c83fedeac67b046f22638
-  CalendarKit: d4f1fcd2e2f8e26e5d175c0a82c64bab28298dfd
-  ChameleonFramework: d21a3cc247abfe5e37609a283a8238b03575cf64
-  CVCalendar: 515092247b9c5059855643c2a2220f259bd5417f
-  DateToolsSwift: 875d97ff9e3a5d54abdd67a269b3f51c757b71ab
-  EmptyDataSet-Swift: eb382c0c87a2d9c678077385a595cec52da38171
-  FacebookCore: 74288d0add931d361b1596beae787ab72c438249
-  FacebookLogin: ebcf34714a1cb9f0759d9f071cfb01ed500996cf
-  FacebookShare: 963b4bb1124a64a395b1e428163d70b5774116e8
-  FBSDKCoreKit: a823ae35bdb60ebb8d7a7e51abe7c5d87d2bfced
-  FBSDKLoginKit: 54ae59987f2a8703021557c90a9aebb9e5c2bef6
-  FBSDKShareKit: 526d4cfb713d24855fa23d0dd74e191accd3a720
   Firebase: 0219bb4782eb1406f1b9b0628a2e625484ce910d
   FirebaseAnalytics: f68b9f3f1241385129ae0a83b63627fc420c05e5
   FirebaseAuth: 831577b184ecaba38bc886768c1c22a450cc44e3
@@ -473,7 +354,6 @@ SPEC CHECKSUMS:
   FirebaseInstanceID: ce993a3c3670a8f5d47ce371ac5d143c560608c5
   FirebaseStorage: 93fe2f8190a01bfb2b2c4932df7d679744c4ef1d
   FirebaseUI: 69f7e480265758a9a9ea39915694b0949bcab23f
-  GlidingCollection: a15dbd9ec1775c781453bc36e6104d0c9dec20fb
   GoogleAppMeasurement: db118eb61a97dd8c4f7014e368d3c335cbbcf80a
   GoogleDataTransport: 8e9b210c97d55fbff306cc5468ff91b9cb32dcf5
   GoogleDataTransportCCTSupport: 202d7cdf9c4a7d81a2bb7f7e7e1ba6faa421b1f2
@@ -482,23 +362,13 @@ SPEC CHECKSUMS:
   gRPC-Core: c9aef9a261a1247e881b18059b84d597293c9947
   GTMSessionFetcher: cea130bbfe5a7edc8d06d3f0d17288c32ffe9925
   iMessageDataKit: dda0d8a248828dcd6561a2fad214ef24922717f4
-  IQKeyboardManagerSwift: 2dde0fc70110e8eac7ccce2a46fdbec6a850b414
-  JKCalendar: b0b6cc011a33e07011a2d7eb842784092d82cca6
-  JKInfinitePageView: 30c9e47e0e75067f9be046e5874edc7f4e7d4dc0
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
-  libPhoneNumber-iOS: 0a32a9525cf8744fe02c5206eb30d571e38f7d75
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
-  Neon: 7fb5a9327e7e57911843f608e08f4893a74deaf9
   ObjectMapper: 70187b8941977c62ccfb423caf6b50be405cabf0
-  PhoneNumberKit: 167ee1f0bbb6efce7c62559e620eae745595532f
-  RRoostSDK: 49c99ba5fdb3b4fcef2ba48757683af7bfc48ce0
-  RSKGrowingTextView: 9fdc68c8dabaacd54e23c316ff14b73aef034594
-  RSKPlaceholderTextView: df72ca93edfac185b98f51cb85e445f54ce8a163
-  SDWebImage: 4ca2dc4eefae4224bea8f504251cda485a363745
+  SDWebImage: 4d5c027c935438f341ed33dbac53ff9f479922ca
   SSSpinnerButton: d19a72144c7241f4c65f25b2debe1bb9e8274acc
-  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftyCodeView: c1e2623d81e9b1d98d1d0203c8d8905447d77a4e
 
-PODFILE CHECKSUM: 3573e0256b654c89095d59ccf9115ad08b3a0a51
+PODFILE CHECKSUM: 81b30cbaf8fde7bf2c77a753685da5d26c57f621
 
 COCOAPODS: 1.8.4

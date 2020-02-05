@@ -693,6 +693,7 @@ public protocol DateTimePickerDelegate: class {
             
             minuteTableView.selectRow(at: IndexPath(row: expectedRow, section: 0), animated: true, scrollPosition: .middle)
         }
+
     }
 }
 
@@ -745,7 +746,8 @@ private extension DateTimePicker {
             return
         }
     
-        dateTitleLabel.text = selectedDateString
+        dateTitleLabel.text = "Tap to select date"
+
     }
     
     @objc

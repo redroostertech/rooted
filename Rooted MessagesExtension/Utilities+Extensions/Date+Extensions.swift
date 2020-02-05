@@ -25,6 +25,18 @@ extension Date {
 
 //  MARK:- Calculations
 extension Date {
+  public func retrieveNextInterval(interval: Int) -> Date? {
+    let calendar = Calendar.current
+    let rightNow = Date()
+    let nextDiff = interval - calendar.component(.minute, from: rightNow) % interval
+    let nextDate = calendar.date(byAdding: .minute, value: nextDiff, to: rightNow) ?? Date()
+    return nextDate
+  }
+
+  public func add(minutes: Int) -> Date? {
+    return Calendar.current.date(byAdding: DateComponents(minute: minutes), to: self)
+  }
+
     public func add(months: Int) -> Date? {
         return Calendar.current.date(byAdding: DateComponents(month: months), to: self)
     }

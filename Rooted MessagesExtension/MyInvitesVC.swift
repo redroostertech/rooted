@@ -15,13 +15,25 @@ class MyInvitesVC: BaseAppViewController {
 
   @IBOutlet private var invitesTable: UITableView!
   @IBOutlet private var addButton: UIButton!
+  @IBOutlet weak var tutorialView: UIView!
 
   var myInvitesManager: MyInvitesManager!
   var eventKitManager = EventKitManager()
+  var activeConvo: MSConversation?
+
+  var isTutorialVisible: Bool = true {
+    didSet {
+      tutorialView.isHidden = !self.isTutorialVisible
+    }
+  }
 
   // MARK: - Lifecycle events
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    tutorialView.applyCornerRadius(0.5)
+
+    isTutorialVisible = true
 
     RProgressHUD.show(on: view)
 
@@ -45,9 +57,18 @@ class MyInvitesVC: BaseAppViewController {
     getCalendarPermissions(onSucces: nil) {
       self.showCalendarError()
     }
+
+    // Add gesture to `tutorialView`
+    let gesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissTutoriaView))
+    gesture.numberOfTapsRequired = 1
+    tutorialView.addGestureRecognizer(gesture)
   }
 
   // MARK: - Private methods
+  @objc func dismissTutoriaView() {
+    self.isTutorialVisible = false
+  }
+
   private func setUpInterface() {
     view.applyPrimaryGradient()
     addButton.applyCornerRadius()
@@ -87,6 +108,7 @@ class MyInvitesVC: BaseAppViewController {
         destination.titleText = title
         destination.startDate = startDate
         destination.endDate = endDate
+        destination.activeConvo = self.activeConvo
 
         if
           // See if the location string will map to the RLocation object
@@ -134,16 +156,24 @@ class MyInvitesVC: BaseAppViewController {
 
 // MARK: - Conversation handler
 extension MyInvitesVC {
-  override func willBecomeActive(with conversation: MSConversation) {
-    DispatchQueue.main.async {
-      if self.presentationStyle != .expanded {
-        self.requestPresentationStyle(.expanded)
-      }
+  override func didTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
+    if presentationStyle == .expanded {
+      self.isTutorialVisible = false
     }
+  }
+  override func didBecomeActive(with conversation: MSConversation) {
+    super.didBecomeActive(with: conversation)
+    if self.presentationStyle != .expanded {
+      
+    }
+  }
+  override func willBecomeActive(with conversation: MSConversation) {
+    super.willBecomeActive(with: conversation)
     getCalendarPermissions(onSucces: {
-      activeConvo = conversation
+      self.activeConvo = conversation
       if let selectedmessage = conversation.selectedMessage {
         selectedMessage = selectedmessage
+        guard let _ = selectedmessage.md.string(forKey: kMessageTitleKey) else { return }
         self.performSegue(withIdentifier: "goToInviteDetails", sender: self)
       }
     }) {
@@ -152,7 +182,7 @@ extension MyInvitesVC {
   }
 
   override func didStartSending(_ message: MSMessage, conversation: MSConversation) {
-      activeConvo = conversation
+      self.activeConvo = conversation
   }
 }
 
@@ -210,8 +240,6 @@ extension MyInvitesVC: MyInviteCellDelegate {
     }
   }
 
-
-
   func trash(_ cell: UITableViewCell, invite: InviteObject?) {
     guard let subject = invite else {
       self.showError(title: "Error", message: "There was an error trying to delete the object. Please try again.")
@@ -249,6 +277,8 @@ extension MyInvitesVC: MyInvitesDelegate {
 
   func didDeleteInvite(_ manager: Any) {
     print("Removed invite")
+    invitesTable.reloadData()
+    invitesTable.refreshControl?.endRefreshing()
   }
 
   func willRefreshInvites(_ manager: Any) {

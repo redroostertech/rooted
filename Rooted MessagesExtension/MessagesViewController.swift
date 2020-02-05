@@ -6,6 +6,7 @@ import MapKit
 import SSSpinnerButton
 import CoreLocation
 import CoreData
+import ObjectMapper
 
 public let kCalendarPermissions = "Calendar Permissions"
 public let kCalendarAccess = "To use Rooted, please go to your settings and enable access to your calendar."
@@ -28,9 +29,59 @@ let kButtonRadius: CGFloat = 15.0
 let kTextFieldIndent: CGFloat = 16.0
 
 private var dateFormatString = "M/dd/yyyy h:mm aa"
+private let interval = DateTimePicker.MinuteInterval.fifteen
 
 class BaseAppViewController: MSMessagesAppViewController {
   var appInitializer = AppInitializer.main
+}
+
+private var meetingTimeLength = [
+  [
+    "id": 0,
+    "length": 30,
+    "name": "30 minutes",
+    "type": "min"
+  ],
+  [
+    "id": 1,
+    "length": 60,
+    "name": "1 hour",
+    "type": "min"
+  ],
+  [
+    "id": 2,
+    "length": 90,
+    "name": "1.5 hours",
+    "type": "min"
+  ],
+  [
+    "id": 3,
+    "length": 120,
+    "name": "2 hours",
+    "type": "min"
+  ],
+  [
+    "id": 4,
+    "length": 0,
+    "name": "Custom",
+    "type": "min"
+  ]
+]
+
+class MeetingTimeLength: Mappable {
+  var id: Int?
+  var length: Int?
+  var name: String?
+  var type: String?
+
+  required init?(map: Map) { }
+
+  func mapping(map: Map) {
+    id <- map["id"]
+    length <- map["length"]
+    name <- map["name"]
+    type <- map["type"]
+  }
 }
 
 class MessagesViewController: BaseAppViewController {
@@ -39,13 +90,14 @@ class MessagesViewController: BaseAppViewController {
   @IBOutlet private weak var locationSelectionLabel: UILabel!
   @IBOutlet private weak var locationSelectionButton: UIButton!
   @IBOutlet private weak var startDateAndTimeButton: UIButton!
-  @IBOutlet private weak var endDateAndTimeButton: UIButton!
+  @IBOutlet private weak var endDateAndTimeTextField: UITextField!
   @IBOutlet private weak var premiumFeaturesLabel: UILabel!
   @IBOutlet private weak var setAsReOcurringButton: SSSpinnerButton!
   @IBOutlet private weak var setAsReocurringLabel: UILabel!
   @IBOutlet private weak var sendToFriendsButton: SSSpinnerButton!
   @IBOutlet private weak var resetButton: SSSpinnerButton!
   @IBOutlet private weak var cancelButton: UIButton!
+  @IBOutlet private weak var actionsContainerView: UIView!
 
   private var isStartCalendarShowing: Bool = false
   private var isEndCalendarShowing: Bool = false
@@ -64,6 +116,8 @@ class MessagesViewController: BaseAppViewController {
 
   var activeConvo: MSConversation?
 
+  var eventTitle: String?
+
   var startDate: Date? {
       didSet {
         startDateAndTimeButton.setTitle(startDate?.toString(format: dateFormatString), for: .normal)
@@ -71,7 +125,7 @@ class MessagesViewController: BaseAppViewController {
   }
   var endDate: Date? {
       didSet {
-        endDateAndTimeButton.setTitle(endDate?.toString(format: dateFormatString), for: .normal)
+        endDateAndTimeTextField.text = endDate?.toString(format: dateFormatString)
       }
   }
   var selectedLocation: RLocation? {
@@ -89,6 +143,10 @@ class MessagesViewController: BaseAppViewController {
   var startDatePicker: DateTimePicker!
   var endDatePicker: DateTimePicker!
 
+  var meetingTime = [MeetingTimeLength]()
+  var meetingTimePicker: UIPickerView!
+  var meetingTimePickerToolbar: UIToolbar!
+
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -97,9 +155,16 @@ class MessagesViewController: BaseAppViewController {
     locationManager = CLLocationManager()
     locationManager?.delegate = self
     locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+
+    // Load meeting times in array
+    for meeting in meetingTimeLength {
+      guard let meetingtimelength = MeetingTimeLength(JSON: meeting) else { return }
+      meetingTime.append(meetingtimelength)
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     eventKitManager.getCalendarPermissions { (success) in
       if success {
         self.sendToFriendsButton.isEnabled = true
@@ -108,6 +173,33 @@ class MessagesViewController: BaseAppViewController {
         self.showError(title: kCalendarPermissions, message: kCalendarAccess)
       }
     }
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(true)
+    setupTimePicker()
+  }
+
+  override func willTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
+    super.willTransition(to: presentationStyle)
+    setupTimePicker()
+  }
+
+  override func willBecomeActive(with conversation: MSConversation) {
+    super.willBecomeActive(with: conversation)
+    DispatchQueue.main.async {
+      if self.presentationStyle != .expanded {
+        self.requestPresentationStyle(.expanded)
+      }
+    }
+    activeConvo = conversation
+    guard let selectedMessage = conversation.selectedMessage else { return }
+    self.selectedMessage = selectedMessage
+  }
+
+  override func didStartSending(_ message: MSMessage, conversation: MSConversation) {
+    super.didStartSending(message, conversation: conversation)
+    activeConvo = conversation
   }
 
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -142,8 +234,48 @@ class MessagesViewController: BaseAppViewController {
     }
   }
 
+  // MARK: - Private methods
+  @objc private func donePicker() {
+    meetingTimePicker.removeFromSuperview()
+    meetingTimePickerToolbar.removeFromSuperview()
+    self.view.endEditing(true)
+  }
 
-  // MARK: - Private UI methods
+  @objc private func cancelPicker() {
+    endDate = nil
+    meetingTimePicker.removeFromSuperview()
+    meetingTimePickerToolbar.removeFromSuperview()
+    self.view.endEditing(true)
+  }
+
+  private func setupTimePicker() {
+    // Load meeting times into picker
+    let picker = UIPickerView(frame: CGRect(x: .zero, y: self.actionsContainerView.frame.minY - 200, width: self.view.bounds.width, height: 200))
+    picker.backgroundColor = .white
+    picker.delegate = self
+    picker.dataSource = self
+    picker.showsSelectionIndicator = true
+
+    let toolBar = UIToolbar(frame: CGRect(x: .zero, y: picker.frame.minY - 44, width: self.view.bounds.width, height: 44))
+    toolBar.barStyle = UIBarStyle.default
+    toolBar.isTranslucent = false
+    toolBar.tintColor = .darkText
+    toolBar.sizeToFit()
+
+    let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(donePicker))
+    let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+    let cancelButton = UIBarButtonItem(title: "Cancel", style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancelPicker))
+
+    toolBar.setItems([cancelButton, spaceButton, doneButton], animated: false)
+    toolBar.isUserInteractionEnabled = true
+
+    endDateAndTimeTextField.inputView = picker
+    endDateAndTimeTextField.inputAccessoryView = toolBar
+
+    meetingTimePickerToolbar = toolBar
+    meetingTimePicker = picker
+  }
+
   private func resetView() {
     titleField.text = ""
     startDate = nil
@@ -178,7 +310,9 @@ class MessagesViewController: BaseAppViewController {
 
   private func setUpTextFields() {
     titleField.delegate = self
-    titleField.addLeftPadding(withWidth: kTextFieldIndent)
+    titleField.placeHolderColor = .white
+    endDateAndTimeTextField.delegate = self
+    endDateAndTimeTextField.placeHolderColor = .white
   }
 
   private func setUpButtons() {
@@ -192,14 +326,15 @@ class MessagesViewController: BaseAppViewController {
 
   private func setupStartDatePicker() {
     let max = Date().addingTimeInterval(60 * 60 * 24 * 7)
-    let picker = DateTimePicker.create(minimumDate: Date(), maximumDate: max)
+
+    let picker = DateTimePicker.create(minimumDate: Date().retrieveNextInterval(interval: interval.rawValue), maximumDate: max)
 
     picker.identifier = "start"
 
     // Set the container view as without it, view will not be able to render
     picker.containerView = self.view
 
-    picker.timeInterval = DateTimePicker.MinuteInterval.thirty
+    picker.timeInterval = interval
     picker.locale = .autoupdatingCurrent
 
     picker.todayButtonTitle = "Today"
@@ -214,12 +349,17 @@ class MessagesViewController: BaseAppViewController {
     picker.darkColor = UIColor.black
     picker.contentViewBackgroundColor = UIColor.white
     picker.completionHandler = { date in
-      self.isCalendarShowing = false
+      self.isStartCalendarShowing = false
+      self.isEndCalendarShowing = false
+      self.startDate = date
+      self.meetingTimePickerToolbar.removeFromSuperview()
     }
     picker.delegate = self
     picker.dismissHandler = {
-      self.isCalendarShowing = false
+      self.isStartCalendarShowing = false
+      self.isEndCalendarShowing = false
       picker.removeFromSuperview()
+      self.meetingTimePickerToolbar.removeFromSuperview()
     }
     startDatePicker = picker
   }
@@ -233,9 +373,8 @@ class MessagesViewController: BaseAppViewController {
     // Set the container view as without it, view will not be able to render
     picker.containerView = self.view
 
-    picker.timeInterval = DateTimePicker.MinuteInterval.thirty
+    picker.timeInterval = interval
     picker.locale = .autoupdatingCurrent
-
     picker.todayButtonTitle = "Today"
     picker.is12HourFormat = true
     picker.dateFormat = dateFormatString
@@ -248,18 +387,19 @@ class MessagesViewController: BaseAppViewController {
     picker.darkColor = UIColor.black
     picker.contentViewBackgroundColor = UIColor.white
     picker.completionHandler = { date in
-      self.isCalendarShowing = false
+      self.isStartCalendarShowing = false
+      self.isEndCalendarShowing = false
+      self.endDate = date
     }
     picker.delegate = self
     picker.dismissHandler = {
-      self.isCalendarShowing = false
+      self.isStartCalendarShowing = false
+      self.isEndCalendarShowing = false
       picker.removeFromSuperview()
     }
     endDatePicker = picker
   }
 
-
-  // MARK: - Private business logic methods
   private func generateMessage(title: String, endDate: Date, startDate: Date, location: RLocation?) -> MSMessage {
 
     let message = MSMessage()
@@ -305,9 +445,7 @@ class MessagesViewController: BaseAppViewController {
 
           self.send(message: message, toConversation: self.currentConversation, { success in
             if success {
-              self.sendToFriendsButton.setTitle("", for: .normal)
-              self.sendToFriendsButton.isHidden = true
-              self.cancelButton.setTitle("DONE", for: .normal)
+              self.dismiss(animated: true, completion: nil)
             }
           })
 
@@ -330,7 +468,7 @@ class MessagesViewController: BaseAppViewController {
   }
 
   private func send(message: MSMessage, toConversation conversation: MSConversation?, _ completion: @escaping (Bool) -> Void) {
-    conversation?.insert(message) { (error) in
+    conversation?.send(message) { (error) in
       if let err = error {
         self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail,backToDefaults: true, complete: {
           print("There was an error \(err.localizedDescription)")
@@ -347,11 +485,12 @@ class MessagesViewController: BaseAppViewController {
   private func sendToFriendsAction() {
       sendToFriendsButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
           guard let title = self.titleField.text,
+            title != "",
               let startDate = self.startDate,
               let endDate = self.endDate else {
 
                   self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-                      self.showError(title: "Incomplete Form", message: "Please fill out the form")
+                      self.showError(title: "Incomplete Form", message: "Please fill out the entire form to create an invite.")
                   })
                   return
           }
@@ -373,34 +512,7 @@ class MessagesViewController: BaseAppViewController {
       }
   }
 
-  // MARK: - UI actions
-  @IBAction func showStartCalendar(_ sender: UIButton) {
-    // If both are empty
-    if !isStartCalendarShowing {
-
-      isStartCalendarShowing = true
-
-      isEndCalendarShowing = false
-      if endDatePicker != nil {
-        endDatePicker.removeFromSuperview()
-      }
-
-      let yOrigin = self.view.frame.maxY - startDatePicker.frame.size.height
-      let width = startDatePicker.frame.size.width
-      let height = startDatePicker.frame.size.height
-      startDatePicker.frame = CGRect(x: 0, y: yOrigin, width: width, height: height)
-      self.view.addSubview(startDatePicker)
-
-    } else {
-
-      isStartCalendarShowing = false
-      startDatePicker.removeFromSuperview()
-
-    }
-
-  }
-
-  @IBAction func showEndCalendar(_ sender: UIButton) {
+  private func showEndCalendar() {
     if let proxyDate = startDate {
       self.setupEndDatePicker(withDate: proxyDate)
     } else {
@@ -432,6 +544,36 @@ class MessagesViewController: BaseAppViewController {
 
   }
 
+  // MARK: - UI actions
+  @IBAction func showStartCalendar(_ sender: UIButton) {
+    // If both are empty
+    meetingTimePicker.removeFromSuperview()
+
+    if !isStartCalendarShowing {
+
+      isStartCalendarShowing = true
+
+      isEndCalendarShowing = false
+      if endDatePicker != nil {
+        endDatePicker.removeFromSuperview()
+      }
+
+      let yOrigin = self.view.frame.maxY - startDatePicker.frame.size.height
+      let width = startDatePicker.frame.size.width
+      let height = startDatePicker.frame.size.height
+      startDatePicker.frame = CGRect(x: 0, y: yOrigin, width: width, height: height)
+      self.view.addSubview(startDatePicker)
+
+    } else {
+
+      isStartCalendarShowing = false
+      startDatePicker.removeFromSuperview()
+
+    }
+
+  }
+
+  // MARK: - IBActions
   @IBAction func selectLocation(_ sender: UIButton) {
     if CLLocationManager.authorizationStatus() == .denied || CLLocationManager.authorizationStatus() == .notDetermined {
       self.locationManager?.requestWhenInUseAuthorization()
@@ -470,32 +612,29 @@ extension MessagesViewController: DateTimePickerDelegate {
         self.endDate = didSelectDate
       }
     }
-
   }
-}
-
-// MARK: - Conversation Handling
-extension MessagesViewController {
-    override func willBecomeActive(with conversation: MSConversation) {
-        DispatchQueue.main.async {
-            if self.presentationStyle != .expanded {
-                self.requestPresentationStyle(.expanded)
-            }
-        }
-        activeConvo = conversation
-        guard let selectedMessage = conversation.selectedMessage else { return }
-        self.selectedMessage = selectedMessage
-        performSegue(withIdentifier: "goToInviteDetails", sender: self)
-    }
-
-    override func didStartSending(_ message: MSMessage, conversation: MSConversation) {
-        activeConvo = conversation
-        resetView()
-    }
 }
 
 // MARK: - UITextField delegate
 extension MessagesViewController: UITextFieldDelegate {
+
+  func textFieldDidBeginEditing(_ textField: UITextField) {
+    if textField == endDateAndTimeTextField {
+      isStartCalendarShowing = false
+      isEndCalendarShowing = false
+      if startDatePicker != nil {
+        startDatePicker.removeFromSuperview()
+      }
+      if endDatePicker != nil {
+        endDatePicker.removeFromSuperview()
+      }
+
+      textField.resignFirstResponder()
+      self.view.addSubview(meetingTimePicker)
+      self.view.addSubview(meetingTimePickerToolbar)
+    }
+  }
+
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -523,4 +662,45 @@ extension MessagesViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.view.endEditing(true)
     }
+}
+
+// MARK: - UIPickerViewDelegate and Datasource
+extension MessagesViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+  func numberOfComponents(in pickerView: UIPickerView) -> Int {
+    return 1
+  }
+
+  func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    return meetingTime.count
+  }
+
+  func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+    return 36
+  }
+
+  func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    let item = meetingTime[row]
+    return item.name ?? ""
+  }
+
+  func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    guard let startdate = self.startDate else {
+      return self.showError(title: "Missing Start Time", message: "Please provide a start date/time.")
+    }
+    let item = meetingTime[row]
+
+    guard let id = item.id, id != 4 else {
+      meetingTimePicker.removeFromSuperview()
+      meetingTimePickerToolbar.removeFromSuperview()
+      self.view.endEditing(true)
+      showEndCalendar()
+      return
+    }
+
+    guard let length = item.length else {
+      endDate = startdate.add(minutes: 60)
+      return
+    }
+    endDate = startdate.add(minutes: length)
+  }
 }

@@ -35,5 +35,13 @@ public class Media: DataClass {
     createdAt <- map["created_at"]
     updatedAt <- map["updated_at"]
     owner <- map["owner"]
+
+//    if let urlString = self.urlString, let url = URL(string: urlString) {
+//      SDWebImageManager().loadImage(with: url, options: .progressiveLoad, progress: { (time, time2, url) in
+//                        print("Is loading \(time) with \(time2) for \(url)")
+//      }) { (image, data, error, cacheType, success, url) in
+//                        print("A lot happened with the image")
+//      }
+//    }
   }
 }
