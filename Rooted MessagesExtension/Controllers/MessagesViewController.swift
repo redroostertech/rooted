@@ -7,33 +7,7 @@ import SSSpinnerButton
 import CoreLocation
 import CoreData
 import ObjectMapper
-
-public let kCalendarPermissions = "Calendar Permissions"
-public let kCalendarAccess = "To use Rooted, please go to your settings and enable access to your calendar."
-
-public let kMessageTitleKey = "title"
-public let kMessageSubCaptionKey = "subcaption"
-public let kMessageStartDateKey = "startDate"
-public let kMessageEndDateKey = "endDate"
-public let kMessageLocationStringKey = "locationString"
-public let kMessageLocationNameKey = "locationName"
-public let kMessageLocationLatKey = "locationLat"
-public let kMessageLocationLonKey = "locationLon"
-public let kMessageLocationAddressKey = "locationAddress"
-public let kMessageLocationCityKey = "locationCity"
-public let kMessageLocationStateKey = "locationState"
-public let kMessageLocationCountryKey = "locationCountry"
-public let kMessageLocationZipCodeKey = "locationZip"
-
-let kButtonRadius: CGFloat = 15.0
-let kTextFieldIndent: CGFloat = 16.0
-
-private var dateFormatString = "M/dd/yyyy h:mm aa"
-private let interval = DateTimePicker.MinuteInterval.fifteen
-
-class BaseAppViewController: MSMessagesAppViewController {
-  var appInitializer = AppInitializer.main
-}
+import Branch
 
 private var meetingTimeLength = [
   [
@@ -68,34 +42,116 @@ private var meetingTimeLength = [
   ]
 ]
 
-class MeetingTimeLength: Mappable {
-  var id: Int?
-  var length: Int?
-  var name: String?
-  var type: String?
+// The url which will be used to encode the current state of the app that can be reconstructed when the recipient receives the message.
+func prepareUrl() -> URL {
+//  var urlComponents = URLComponents()
+//  urlComponents.scheme = "https";
+//  urlComponents.host = "www.ebookfrenzy.com";
+//  let playerQuery = URLQueryItem(name: "currentPlayer",
+//                                 value: currentPlayer)
+//
+//  urlComponents.queryItems = [playerQuery]
+//
+//  for (index, setting) in gameStatus.enumerated() {
+//    let queryItem = URLQueryItem(name: "position\(index)",
+//      value: setting)
+//    urlComponents.queryItems?.append(queryItem)
+//  }
+//  return urlComponents.url!
+  return URL(fileURLWithPath: "/")
+}
 
-  required init?(map: Map) { }
+// Decode the incoming url and update
+func decodeURL(_ url: URL) {
 
-  func mapping(map: Map) {
-    id <- map["id"]
-    length <- map["length"]
-    name <- map["name"]
-    type <- map["type"]
+//  let components = URLComponents(url: url,
+//                                 resolvingAgainstBaseURL: false)
+//
+//  for (index, queryItem) in (components?.queryItems?.enumerated())! {
+//
+//    if queryItem.name == "currentPlayer" {
+//      currentPlayer = queryItem.value == "X" ? "O" : "X"
+//    } else if queryItem.value != "-" {
+//      gameStatus[index-1] = queryItem.value!
+//      Buttons[index-1].setTitle(queryItem.value!, for: .normal)
+//    }
+//  }
+}
+
+class MeetingModelBuilder {
+  var dictionary: [String: Any]?
+  var meeting: Meeting?
+
+  func start() -> MeetingModelBuilder {
+    self.dictionary = [String: Any]()
+    return self
+  }
+
+  func retrieve(forKey key: String) -> Any? {
+    if dictionary != nil {
+      if dictionary![key] != nil {
+        return dictionary![key]
+      } else {
+        return nil
+      }
+    } else {
+      return nil
+    }
+  }
+
+  func has(key: String) -> Bool {
+    if dictionary != nil {
+      return dictionary!.keys.contains(key)
+    } else {
+      return false
+    }
+  }
+
+  func add(key: String, value: Any) -> MeetingModelBuilder {
+    if dictionary != nil {
+      dictionary![key] = value
+      return self
+    } else {
+      return start().add(key: key, value: value)
+    }
+  }
+  func remove(key: String, value: Any) -> MeetingModelBuilder {
+    if dictionary != nil, dictionary![key] != nil {
+      dictionary!.removeValue(forKey: key)
+      return self
+    } else {
+      return self
+    }
+  }
+  func generateMeeting() -> MeetingModelBuilder {
+    if dictionary != nil {
+      var meetingDict: [String: Any] = [
+        "meeting_name": retrieve(forKey: "meeting_name") as? String ?? ""
+      ]
+
+      if let meetinglocation = retrieve(forKey: "meeting_location") as? String, let rlocation = RLocation(JSONString: meetinglocation) {
+        meetingDict["meeting_location"] = rlocation.toJSON()
+      }
+
+      if let startdate = retrieve(forKey: "start_date") as? Date, let enddate = retrieve(forKey: "end_date") as? Date, let dateclass = MeetingDateClass(JSON: [
+          "start_date": startdate.toString(),
+          "end_date": enddate.toString()
+        ]) {
+        meetingDict["meeting_date"] = dateclass.toJSON()
+      }
+      meeting = Meeting(JSON: meetingDict)
+      return self
+    } else {
+      return self
+    }
   }
 }
 
-class MessagesViewController: BaseAppViewController {
+private var meetingTime = [MeetingTimeLength]()
 
-  @IBOutlet private weak var titleField: UITextField!
-  @IBOutlet private weak var locationSelectionLabel: UILabel!
-  @IBOutlet private weak var locationSelectionButton: UIButton!
-  @IBOutlet private weak var startDateAndTimeButton: UIButton!
-  @IBOutlet private weak var endDateAndTimeTextField: UITextField!
-  @IBOutlet private weak var premiumFeaturesLabel: UILabel!
-  @IBOutlet private weak var setAsReOcurringButton: SSSpinnerButton!
-  @IBOutlet private weak var setAsReocurringLabel: UILabel!
+class MessagesViewController: FormMessagesAppViewController {
+
   @IBOutlet private weak var sendToFriendsButton: SSSpinnerButton!
-  @IBOutlet private weak var resetButton: SSSpinnerButton!
   @IBOutlet private weak var cancelButton: UIButton!
   @IBOutlet private weak var actionsContainerView: UIView!
 
@@ -105,66 +161,167 @@ class MessagesViewController: BaseAppViewController {
   private var eventKitManager = EventKitManager()
   private var coreDataManager = CoreDataManager()
   private var invitesManager = MyInvitesManager()
+  private let eventStore = EKEventStore()
 
-  var isReOcurring: Bool = false
-  var isPremium: Bool = false
-  let eventStore = EKEventStore()
-
-  var currentConversation: MSConversation? {
-    return activeConvo ?? self.activeConversation
-  }
-
-  var activeConvo: MSConversation?
-
-  var eventTitle: String?
-
-  var startDate: Date? {
-      didSet {
-        startDateAndTimeButton.setTitle(startDate?.toString(format: dateFormatString), for: .normal)
-      }
-  }
-  var endDate: Date? {
-      didSet {
-        endDateAndTimeTextField.text = endDate?.toString(format: dateFormatString)
-      }
-  }
-  var selectedLocation: RLocation? {
-      didSet {
-        guard let selectedlocation = self.selectedLocation else { return }
-        locationSelectionLabel.text = selectedlocation.readableWhereString
-      }
-  }
-  var selectedMessage: MSMessage?
-  var locationManager: CLLocationManager?
+  // Model
+  private var meetingBuilder = MeetingModelBuilder().start()
+  private var startDate: Date?
+  private var eventLength: MeetingTimeLength?
+  private var endDate: Date?
 
   var invites: [NSManagedObject] = []
 
-  var isCalendarShowing: Bool = false
-  var startDatePicker: DateTimePicker!
-  var endDatePicker: DateTimePicker!
+  private var startDatePicker = WWCalendarTimeSelector.instantiate()
+  private var endDatePicker = WWCalendarTimeSelector.instantiate()
 
-  var meetingTime = [MeetingTimeLength]()
-  var meetingTimePicker: UIPickerView!
-  var meetingTimePickerToolbar: UIToolbar!
+  private var searchCompleter = MKLocalSearchCompleter()
+  private var searchResults = [MKLocalSearchCompletionWrapper]()
 
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupDatePickers()
-    setupUI()
-    locationManager = CLLocationManager()
-    locationManager?.delegate = self
-    locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+
+    setupSendToFriendsButton()
+
+    startDatePicker.delegate = self
+    startDatePicker.optionIdentifier = "start_date"
+    startDatePicker.optionCurrentDate = Date()
+    startDatePicker.optionShowTopPanel = false
+    startDatePicker.optionTimeStep = .fifteenMinutes
 
     // Load meeting times in array
     for meeting in meetingTimeLength {
       guard let meetingtimelength = MeetingTimeLength(JSON: meeting) else { return }
       meetingTime.append(meetingtimelength)
     }
+
+    form
+      +++ Section("Create Invite")
+
+      +++ Section("What?")
+      <<< TextRow() {
+        $0.tag = "meeting_name"
+        $0.title = "Title of Event"
+        let ruleRequiredViaClosure = RuleClosure<String> { rowValue in
+          return (rowValue == nil || rowValue!.isEmpty) ? ValidationError(msg: "Field required!") : nil
+        }
+        $0.add(rule: ruleRequiredViaClosure)
+        $0.validationOptions = .validatesOnChange
+        }.cellUpdate { cell, row in
+          if !row.isValid {
+            cell.titleLabel?.textColor = .red
+          } else {
+            guard let value = row.value else { return }
+            // Set the name of the meeting
+            self.meetingBuilder = self.meetingBuilder.add(key: "meeting_name", value: value)
+          }
+        }
+
+      +++ Section("Where?")
+      <<< LabelRow() {
+        $0.tag = "event_label"
+        $0.hidden = .function(["meeting_location"], { form -> Bool in
+          if let row = form.rowBy(tag: "meeting_location") as? LocationSearchRow {
+            if let labelRow = form.rowBy(tag: "event_label") as? LabelRow {
+              labelRow.title = row.value?.suggestionString ?? ""
+              labelRow.updateCell()
+            }
+//            row.title = "Choose a new location for event"
+//            row.updateCell()
+            return row.value == nil
+          } else {
+            return true
+          }
+        })
+      }
+      <<< LocationSearchRow() {
+        $0.tag = "meeting_location"
+        $0.title = "Choose location for event"
+        }.onChange { row in
+          if let rLocation = row.value?.rLocation {
+            guard let value = rLocation.toJSONString() else { return }
+
+            // Set the location
+            self.meetingBuilder = self.meetingBuilder.add(key: "meeting_location", value: value)
+          }
+      }
+
+      +++ Section("When?")
+      <<< ButtonRow() {
+        $0.tag = "start_date"
+        $0.title = "Start Time"
+        }.cellUpdate { cell, row in
+          cell.textLabel?.textAlignment = .left
+          cell.textLabel?.textColor = .darkText
+        }.onCellSelection { [weak self] (cell, row) in
+          if self != nil {
+            self!.present(self!.startDatePicker, animated: true, completion: nil)
+          }
+      }
+
+      <<< PushRow<String>() {
+        $0.tag = "end_date"
+        $0.title = "Event Length"
+        $0.disabled = .function(["start_date"], { form -> Bool in
+          if let row = form.rowBy(tag: "start_date") as? ButtonRow {
+            return row.value == nil
+          } else {
+            return true
+          }
+        })
+        $0.options = meetingTime.map({ (meetingtime) -> String in
+          return meetingtime.name ?? ""
+        })
+        $0.value = meetingTime[1].name ?? ""
+        }.onPresent { from, to in
+          to.dismissOnSelection = true
+          to.dismissOnChange = true
+          to.sectionKeyForValue = { option in
+            switch option {
+            default: return ""
+            }
+          }
+        }.onChange { row in
+
+          row.updateCell()
+
+          guard let startdate = self.meetingBuilder.retrieve(forKey: "start_date") as? Date, let pushRowValue = row.value else {
+            return
+          }
+          switch pushRowValue.lowercased() {
+          case "custom":
+            self.endDatePicker.delegate = self
+            self.endDatePicker.optionIdentifier = "end_date"
+            self.endDatePicker.optionCurrentDate = startdate
+            self.endDatePicker.optionShowTopPanel = false
+            self.endDatePicker.optionTimeStep = .fifteenMinutes
+            self.present(self.endDatePicker, animated: true, completion: nil)
+          default:
+            guard let meetingtime = meetingTime.first(where: { (meetingTime) -> Bool in
+              return meetingTime.name ?? "" == pushRowValue
+            }) else {
+              guard let value = startdate.add(minutes: 60) else {
+                return
+              }
+              self.meetingBuilder = self.meetingBuilder.add(key: "end_date", value: value)
+              return
+            }
+            self.eventLength = meetingtime
+            return
+          }
+        }
+    animateScroll = true
+    rowKeyboardSpacing = 20
+
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+
+    navigationController?.setNavigationBarHidden(true, animated: animated)
+
+    view.bringSubviewToFront(actionsContainerView)
+    
     eventKitManager.getCalendarPermissions { (success) in
       if success {
         self.sendToFriendsButton.isEnabled = true
@@ -175,293 +332,138 @@ class MessagesViewController: BaseAppViewController {
     }
   }
 
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(true)
-    setupTimePicker()
-  }
-
-  override func willTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
-    super.willTransition(to: presentationStyle)
-    setupTimePicker()
-  }
-
-  override func willBecomeActive(with conversation: MSConversation) {
-    super.willBecomeActive(with: conversation)
-    DispatchQueue.main.async {
-      if self.presentationStyle != .expanded {
-        self.requestPresentationStyle(.expanded)
-      }
-    }
-    activeConvo = conversation
-    guard let selectedMessage = conversation.selectedMessage else { return }
-    self.selectedMessage = selectedMessage
-  }
-
-  override func didStartSending(_ message: MSMessage, conversation: MSConversation) {
-    super.didStartSending(message, conversation: conversation)
-    activeConvo = conversation
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-
-    if segue.identifier == "goSelectLocation" {
-      guard let destination = segue.destination as? LocationSearchVC else { return }
-      destination.locSearchDelegate = self
-    }
-
-    if segue.identifier == "goToInviteDetails" {
-
-      guard let selectedMessage = self.selectedMessage else { return }
-
-      sendToFriendsButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
-
-        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: true, complete: {
-          guard
-            let title = selectedMessage.md.string(forKey: kMessageTitleKey),
-            let startDate = selectedMessage.md.string(forKey: kMessageStartDateKey)?.toDate(),
-            let endDate = selectedMessage.md.string(forKey: kMessageEndDateKey)?.toDate(), let destination = segue.destination as? InviteDetailsVC  else { return }
-
-          destination.titleText = title
-          destination.startDate = startDate
-          destination.endDate = endDate
-
-          if let locationString = selectedMessage.md.string(forKey: kMessageLocationStringKey), let rLocation = RLocation(JSONString: locationString) {
-            destination.rLocation = rLocation
-          }
-          destination.viewDidLoad()
-        })
-      })
-    }
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    navigationController?.setNavigationBarHidden(false, animated: animated)
   }
 
   // MARK: - Private methods
-  @objc private func donePicker() {
-    meetingTimePicker.removeFromSuperview()
-    meetingTimePickerToolbar.removeFromSuperview()
-    self.view.endEditing(true)
-  }
-
-  @objc private func cancelPicker() {
-    endDate = nil
-    meetingTimePicker.removeFromSuperview()
-    meetingTimePickerToolbar.removeFromSuperview()
-    self.view.endEditing(true)
-  }
-
-  private func setupTimePicker() {
-    // Load meeting times into picker
-    let picker = UIPickerView(frame: CGRect(x: .zero, y: self.actionsContainerView.frame.minY - 200, width: self.view.bounds.width, height: 200))
-    picker.backgroundColor = .white
-    picker.delegate = self
-    picker.dataSource = self
-    picker.showsSelectionIndicator = true
-
-    let toolBar = UIToolbar(frame: CGRect(x: .zero, y: picker.frame.minY - 44, width: self.view.bounds.width, height: 44))
-    toolBar.barStyle = UIBarStyle.default
-    toolBar.isTranslucent = false
-    toolBar.tintColor = .darkText
-    toolBar.sizeToFit()
-
-    let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: self, action: #selector(donePicker))
-    let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-    let cancelButton = UIBarButtonItem(title: "Cancel", style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancelPicker))
-
-    toolBar.setItems([cancelButton, spaceButton, doneButton], animated: false)
-    toolBar.isUserInteractionEnabled = true
-
-    endDateAndTimeTextField.inputView = picker
-    endDateAndTimeTextField.inputAccessoryView = toolBar
-
-    meetingTimePickerToolbar = toolBar
-    meetingTimePicker = picker
-  }
-
-  private func resetView() {
-    titleField.text = ""
-    startDate = nil
-    endDate = nil
-    selectedLocation = nil
-  }
-
   private func setupSendToFriendsButton() {
-    sendToFriendsButton.layer.cornerRadius = sendToFriendsButton.frame.height / 2
-    sendToFriendsButton.clipsToBounds = true
-    sendToFriendsButton.spinnerColor = UIColor.gradientColor1
+    sendToFriendsButton.applyCornerRadius()
+    sendToFriendsButton.spinnerColor = UIColor.gradientColor2
   }
 
-  private func setupReocurringButton() {
-    setAsReOcurringButton.layer.cornerRadius = setAsReOcurringButton.frame.height / 2
-    setAsReOcurringButton.clipsToBounds = true
-    setAsReOcurringButton.spinnerColor = UIColor.gradientColor1
-    setAsReOcurringButton.isHidden = true
-  }
+  private func sendToFriendsAction() {
+    sendToFriendsButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
 
-  private func setupUI() {
-    view.applyPrimaryGradient()
-    setUpTextFields()
-    setUpButtons()
-    setUpLabels()
-  }
-
-  private func setUpLabels() {
-    premiumFeaturesLabel.isHidden = true
-    setAsReocurringLabel.isHidden = true
-  }
-
-  private func setUpTextFields() {
-    titleField.delegate = self
-    titleField.placeHolderColor = .white
-    endDateAndTimeTextField.delegate = self
-    endDateAndTimeTextField.placeHolderColor = .white
-  }
-
-  private func setUpButtons() {
-    setupReocurringButton()
-    setupSendToFriendsButton()
-  }
-
-  private func setupDatePickers() {
-    setupStartDatePicker()
-  }
-
-  private func setupStartDatePicker() {
-    let max = Date().addingTimeInterval(60 * 60 * 24 * 7)
-
-    let picker = DateTimePicker.create(minimumDate: Date().retrieveNextInterval(interval: interval.rawValue), maximumDate: max)
-
-    picker.identifier = "start"
-
-    // Set the container view as without it, view will not be able to render
-    picker.containerView = self.view
-
-    picker.timeInterval = interval
-    picker.locale = .autoupdatingCurrent
-
-    picker.todayButtonTitle = "Today"
-    picker.is12HourFormat = true
-    picker.dateFormat = dateFormatString
-    picker.includeMonth = true
-    picker.highlightColor = .gradientColor1
-    picker.doneButtonTitle = "Done"
-    picker.doneBackgroundColor = .gradientColor1
-    picker.customFontSetting = DateTimePicker.CustomFontSetting(selectedDateLabelFont: .boldSystemFont(ofSize: 20))
-    picker.normalColor = UIColor.white
-    picker.darkColor = UIColor.black
-    picker.contentViewBackgroundColor = UIColor.white
-    picker.completionHandler = { date in
-      self.isStartCalendarShowing = false
-      self.isEndCalendarShowing = false
-      self.startDate = date
-      self.meetingTimePickerToolbar.removeFromSuperview()
-    }
-    picker.delegate = self
-    picker.dismissHandler = {
-      self.isStartCalendarShowing = false
-      self.isEndCalendarShowing = false
-      picker.removeFromSuperview()
-      self.meetingTimePickerToolbar.removeFromSuperview()
-    }
-    startDatePicker = picker
-  }
-
-  private func setupEndDatePicker(withDate date: Date) {
-    let max = date.addingTimeInterval(60 * 60 * 24 * 7)
-    let picker = DateTimePicker.create(minimumDate: date, maximumDate: max)
-
-    picker.identifier = "end"
-
-    // Set the container view as without it, view will not be able to render
-    picker.containerView = self.view
-
-    picker.timeInterval = interval
-    picker.locale = .autoupdatingCurrent
-    picker.todayButtonTitle = "Today"
-    picker.is12HourFormat = true
-    picker.dateFormat = dateFormatString
-    picker.includeMonth = true
-    picker.highlightColor = .gradientColor1
-    picker.doneButtonTitle = "Done"
-    picker.doneBackgroundColor = .gradientColor1
-    picker.customFontSetting = DateTimePicker.CustomFontSetting(selectedDateLabelFont: .boldSystemFont(ofSize: 20))
-    picker.normalColor = UIColor.white
-    picker.darkColor = UIColor.black
-    picker.contentViewBackgroundColor = UIColor.white
-    picker.completionHandler = { date in
-      self.isStartCalendarShowing = false
-      self.isEndCalendarShowing = false
-      self.endDate = date
-    }
-    picker.delegate = self
-    picker.dismissHandler = {
-      self.isStartCalendarShowing = false
-      self.isEndCalendarShowing = false
-      picker.removeFromSuperview()
-    }
-    endDatePicker = picker
-  }
-
-  private func generateMessage(title: String, endDate: Date, startDate: Date, location: RLocation?) -> MSMessage {
-
-    let message = MSMessage()
-    var subcaption = ""
-
-    let layout = MSMessageTemplateLayout()
-    layout.caption = String(format: captionString, arguments: [title, startDate.toString(.rooted)])
-
-    message.md.set(value: title, forKey: kMessageTitleKey)
-    message.md.set(value: startDate.toString(), forKey: kMessageStartDateKey)
-    message.md.set(value: endDate.toString(), forKey: kMessageEndDateKey)
-
-    if let loc = location, let locationString = loc.toJSONString() {
-      subcaption += loc.readableWhereString
-      message.md.set(value: loc.readableWhereString, forKey: kMessageSubCaptionKey)
-      message.md.set(value: locationString, forKey: kMessageLocationStringKey)
-    }
-
-    layout.subcaption = subcaption
-    message.layout = layout
-
-    return message
-  }
-
-  private func insertEvent(title: String, endDate: Date, startDate: Date, location: RLocation?) {
-    self.eventKitManager.insertEvent(title: title, startDate: startDate, endDate: endDate, location: self.selectedLocation, {
-      (success, error) in
-      if let _ = error {
-        DispatchQueue.main.async {
-          if self.presentationStyle == .expanded {
-            self.requestPresentationStyle(.compact)
-          }
-        }
-
-        // TODO: - Handle error
-      } else {
-        if success {
-
-          let message = self.generateMessage(title: title, endDate: endDate, startDate: startDate, location: self.selectedLocation)
-
-          // Save invite to Core Data
-          self.saveInviteToCoreData(endDate: endDate, startDate: startDate, title: title, message: message)
-
-          self.send(message: message, toConversation: self.currentConversation, { success in
-            if success {
-              self.dismiss(animated: true, completion: nil)
-            }
-          })
-
-        } else {
-          // TODO: - Handle success of false
-        }
+      // Check if start time exists
+      if let eventlength = self.eventLength?.length, let startdate = self.meetingBuilder.retrieve(forKey: "start_date") as? Date {
+        guard let value = startdate.add(minutes: eventlength) else { return }
+        self.meetingBuilder = self.meetingBuilder.add(key: "end_date", value: value)
       }
 
+      if self.eventLength == nil, let startdate = self.meetingBuilder.retrieve(forKey: "start_date") as? Date {
+        // Default selection to 1 hour
+        guard let value = startdate.add(minutes: 60) else { return }
+        self.meetingBuilder = self.meetingBuilder.add(key: "end_date", value: value)
+      }
+
+      guard let _ = self.meetingBuilder.retrieve(forKey: "meeting_name") as? String,
+        let _ = self.meetingBuilder.retrieve(forKey: "start_date") as? Date,
+        let _ = self.meetingBuilder.retrieve(forKey: "end_date") as? Date,
+        let meeting = self.meetingBuilder.generateMeeting().meeting else {
+
+        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
+
+          self.showError(title: "Incomplete Form", message: "Please fill out the entire form to create an invite.")
+        })
+
+        return
+      }
+
+      self.insert(meeting: meeting)
     })
   }
 
-  private func saveInviteToCoreData(endDate: Date, startDate: Date, title: String, message: MSMessage) {
-    self.invitesManager.save(title: title, endDate: endDate, startDate: startDate, location: self.selectedLocation) { (success, error) in
-      DispatchQueue.main.async {
-        if self.presentationStyle == .expanded {
-          self.requestPresentationStyle(.compact)
+  private func insert(meeting: Meeting) {
+    // Try to convert meeting object into MSMessage object
+    guard let message = DataConverter.Meetings.meetingToMessage(meeting) else {
+      self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
+
+        self.showError(title: "Incomplete Form", message: "Please fill out the entire form to create an invite.")
+      })
+      return
+    }
+    // TODO: - Track the name, location, and length of an event
+
+    // Send meeting object to event kit manager to save as event into calendar
+    eventKitManager.insertMeeting(meeting: meeting) { (success, error) in
+      if let err = error {
+        // TODO: - Handle error
+        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
+
+          self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.\n\nError message: \(err.localizedDescription)")
+        })
+      } else {
+        if success {
+
+          BranchEvent.customEvent(withName: "event_added_apple_calendar")
+
+          // If inserting meeting into calendar was successful we want to save invite into core data
+          // Save invite to Core Data
+          self.saveInviteToCoreData(meeting: meeting, message: message)
+
+        } else {
+          // If inserting meeting into calendar was unsuccessful we want to save invite into core data
+          // TODO: - Handle success of false
+          self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
+
+            self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.")
+          })
+        }
+      }
+    }
+  }
+
+  private func saveInviteToCoreData(meeting: Meeting, message: MSMessage) {
+    invitesManager.save(meeting: meeting) { (success, error) in
+      if let err = error {
+        // TODO: - Handle error if meeting was not saved into core data
+        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
+
+          self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.\n\nError message: \(err.localizedDescription)")
+        })
+      } else {
+        if success {
+
+          let alert = UIAlertController(title: "Share Event", message: "Would you like to share event in current chat conversation?", preferredStyle: .alert)
+          let share = UIAlertAction(title: "Yes", style: .default, handler: { action in
+
+            // After saving invite into core data, send the message
+            self.send(message: message, toConversation: ConversationManager.shared.conversation, { success in
+              if success {
+
+                BranchEvent.customEvent(withName: "event_shared_conversation")
+
+                // If message was sent into the conversation dismiss the view
+                self.dismiss(animated: true, completion: nil)
+              } else {
+
+                BranchEvent.customEvent(withName: "event_shared_conversation_failed")
+
+                // TODO: - Handle error if message couldn't be sent
+                self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
+
+                  self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.")
+                })
+              }
+            })
+
+          })
+          let delete = UIAlertAction(title: "No", style: .destructive, handler: { action in
+            self.dismiss(animated: true, completion: nil)
+          })
+          alert.addAction(share)
+          alert.addAction(delete)
+          self.present(alert, animated: true, completion: nil)
+
+        } else {
+          // If inserting meeting into calendar was unsuccessful we want to save invite into core data
+          // TODO: - Handle success of false
+          self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
+
+            self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.")
+          })
         }
       }
     }
@@ -475,6 +477,9 @@ class MessagesViewController: BaseAppViewController {
           completion(false)
         })
       } else {
+
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "MyInvitesVC.reload"), object: nil, userInfo: [:])
+
         self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: true, complete: {
           completion(true)
         })
@@ -482,116 +487,12 @@ class MessagesViewController: BaseAppViewController {
     }
   }
 
-  private func sendToFriendsAction() {
-      sendToFriendsButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
-          guard let title = self.titleField.text,
-            title != "",
-              let startDate = self.startDate,
-              let endDate = self.endDate else {
-
-                  self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-                      self.showError(title: "Incomplete Form", message: "Please fill out the entire form to create an invite.")
-                  })
-                  return
-          }
-        self.insertEvent(title: title, endDate: endDate, startDate: startDate, location: self.selectedLocation)
-      })
-  }
-
-  private func setPremiumAction() {
-      if !isPremium {
-          setAsReOcurringButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
-              self.setAsReOcurringButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: false, complete: {
-                  self.isPremium = true
-              })
-          })
-      } else {
-          self.setAsReOcurringButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .none, backToDefaults: true, complete: {
-              self.isPremium = false
-          })
-      }
-  }
-
-  private func showEndCalendar() {
-    if let proxyDate = startDate {
-      self.setupEndDatePicker(withDate: proxyDate)
-    } else {
-      self.setupEndDatePicker(withDate: Date())
-    }
-
-    // If both are empty
-    if !isEndCalendarShowing {
-
-      isEndCalendarShowing = true
-
-      isStartCalendarShowing = false
-      if startDatePicker != nil {
-        startDatePicker.removeFromSuperview()
-      }
-
-      let yOrigin = self.view.frame.maxY - endDatePicker.frame.size.height
-      let width = endDatePicker.frame.size.width
-      let height = endDatePicker.frame.size.height
-      endDatePicker.frame = CGRect(x: 0, y: yOrigin, width: width, height: height)
-      self.view.addSubview(endDatePicker)
-
-    } else {
-
-      isEndCalendarShowing = false
-      endDatePicker.removeFromSuperview()
-
-    }
-
-  }
-
-  // MARK: - UI actions
-  @IBAction func showStartCalendar(_ sender: UIButton) {
-    // If both are empty
-    meetingTimePicker.removeFromSuperview()
-
-    if !isStartCalendarShowing {
-
-      isStartCalendarShowing = true
-
-      isEndCalendarShowing = false
-      if endDatePicker != nil {
-        endDatePicker.removeFromSuperview()
-      }
-
-      let yOrigin = self.view.frame.maxY - startDatePicker.frame.size.height
-      let width = startDatePicker.frame.size.width
-      let height = startDatePicker.frame.size.height
-      startDatePicker.frame = CGRect(x: 0, y: yOrigin, width: width, height: height)
-      self.view.addSubview(startDatePicker)
-
-    } else {
-
-      isStartCalendarShowing = false
-      startDatePicker.removeFromSuperview()
-
-    }
-
-  }
-
   // MARK: - IBActions
-  @IBAction func selectLocation(_ sender: UIButton) {
-    if CLLocationManager.authorizationStatus() == .denied || CLLocationManager.authorizationStatus() == .notDetermined {
-      self.locationManager?.requestWhenInUseAuthorization()
-    } else {
-      performSegue(withIdentifier: "goSelectLocation", sender: self)
-    }
-  }
-
   @IBAction func sendToFriends(_ sender: UIButton) {
+    
+    BranchEvent.customEvent(withName: "user_started_save")
+
     sendToFriendsAction()
-  }
-
-  @IBAction func resetForm(_ sender: UIButton) {
-    resetView()
-  }
-
-  @IBAction func setPremium(_ sender: UIButton) {
-    setPremiumAction()
   }
 
   @IBAction func cancelAction(_ sender: UIButton) {
@@ -600,107 +501,56 @@ class MessagesViewController: BaseAppViewController {
   }
 }
 
-// MARK: - DateTimePickerDelegate
-extension MessagesViewController: DateTimePickerDelegate {
-  func dateTimePicker(_ picker: DateTimePicker, didSelectDate: Date) {
+// MARK: -
+extension MessagesViewController: WWCalendarTimeSelectorProtocol {
+  func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, date: Date) {
 
-    if let identifier = picker.identifier {
-      if identifier == "start" {
-        self.startDate = didSelectDate
-      }
-      if identifier == "end" {
-        self.endDate = didSelectDate
+    if selector.optionIdentifier ?? "" == "start_date" {
+
+      let _ = self.meetingBuilder.add(key: "start_date", value: date)
+
+      if let cell = form.rowBy(tag: "start_date") as? ButtonRow {
+        cell.title = date.toString(.proper)
+        cell.value = date.toString(.proper)
+        cell.updateCell()
       }
     }
-  }
-}
 
-// MARK: - UITextField delegate
-extension MessagesViewController: UITextFieldDelegate {
+    if selector.optionIdentifier ?? "" == "end_date" {
 
-  func textFieldDidBeginEditing(_ textField: UITextField) {
-    if textField == endDateAndTimeTextField {
-      isStartCalendarShowing = false
-      isEndCalendarShowing = false
-      if startDatePicker != nil {
-        startDatePicker.removeFromSuperview()
+      let _ = self.meetingBuilder.add(key: "end_date", value: date)
+
+      if let cell = form.rowBy(tag: "end_date") as? PushRow<String> {
+        cell.title = "Event ends on"
+        cell.value = date.toString(.proper)
       }
-      if endDatePicker != nil {
-        endDatePicker.removeFromSuperview()
-      }
-
-      textField.resignFirstResponder()
-      self.view.addSubview(meetingTimePicker)
-      self.view.addSubview(meetingTimePickerToolbar)
     }
+    self.navigationController?.popViewController(animated: true)
   }
 
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
+  func WWCalendarTimeSelectorShouldSelectDate(_ selector: WWCalendarTimeSelector, date: Date) -> Bool {
+    if selector.optionIdentifier ?? "" == "start_date" {
+      if date.timeIntervalSinceNow.isLess(than: 0) {
+        return false
+      }
+
+      if date.timeIntervalSince(Date().addingTimeInterval(60 * 60 * 24 * 7)).isLess(than: 0) {
         return true
+      }
     }
 
-    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        DispatchQueue.main.async {
-            if self.presentationStyle != .expanded {
-                self.requestPresentationStyle(.expanded)
-            }
-        }
+    if selector.optionIdentifier ?? "" == "end_date" {
+
+      guard let startdate = self.meetingBuilder.retrieve(forKey: "start_date") as? String else { return true }
+
+      if date.timeIntervalSince(startdate.toDate(.proper)).isLess(than: 0) {
+        return false
+      }
+
+      if date.timeIntervalSince(startdate.toDate(.proper).addingTimeInterval(60 * 60 * 24 * 7)).isLess(than: 0) {
         return true
+      }
     }
-}
-
-// MARK: - LocationSearch delegate
-extension MessagesViewController: LocationSearchDelegate {
-  func selectLocation(_ searchVC: LocationSearchVC, location: RLocation?) {
-    selectedLocation = location
-  }
-}
-
-// MARK: - CLLocationManager delegate
-extension MessagesViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        self.view.endEditing(true)
-    }
-}
-
-// MARK: - UIPickerViewDelegate and Datasource
-extension MessagesViewController: UIPickerViewDelegate, UIPickerViewDataSource {
-  func numberOfComponents(in pickerView: UIPickerView) -> Int {
-    return 1
-  }
-
-  func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-    return meetingTime.count
-  }
-
-  func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
-    return 36
-  }
-
-  func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-    let item = meetingTime[row]
-    return item.name ?? ""
-  }
-
-  func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-    guard let startdate = self.startDate else {
-      return self.showError(title: "Missing Start Time", message: "Please provide a start date/time.")
-    }
-    let item = meetingTime[row]
-
-    guard let id = item.id, id != 4 else {
-      meetingTimePicker.removeFromSuperview()
-      meetingTimePickerToolbar.removeFromSuperview()
-      self.view.endEditing(true)
-      showEndCalendar()
-      return
-    }
-
-    guard let length = item.length else {
-      endDate = startdate.add(minutes: 60)
-      return
-    }
-    endDate = startdate.add(minutes: length)
+    return false
   }
 }

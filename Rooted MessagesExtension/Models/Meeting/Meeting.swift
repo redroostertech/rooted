@@ -22,7 +22,9 @@ public class Meetings: Mappable {
   }
 }
 // MARK: - Meeting
-public class Meeting: DataClass {
+public class Meeting: Mappable {
+  public var id: Int?
+  public var metaInformation: [String: Any]?
   public var dashboardSectionId, meetingStatusId, meetingOwnerId: Int?
   public var meetingName, meetingDescription: String?
   public var meetingLocation: RLocation?
@@ -38,12 +40,11 @@ public class Meeting: DataClass {
   public var files: [Media]?
   public var reminders: [Reminders]?
 
-  required public init?(map: Map) {
-    super.init(map: map)
-  }
+  required public init?(map: Map) { }
 
-  public override func mapping(map: Map) {
-    super.mapping(map: map)
+  public func mapping(map: Map) {
+    id <- map["id"]
+    metaInformation <- map["meta_information"]
     owner <- map["owner"]
     dashboardSectionId <- map["dashboard_section_id"]
     meetingStatusId <- map["meeting_status_id"]
@@ -89,18 +90,19 @@ public class MeetingInvitation: DataClass {
 }
 
 // MARK: - Meeting Response
-public class MeetingResponse: DataClass {
+public class MeetingResponse: Mappable {
+  public var id: Int?
+  public var metaInformation: [String: Any]?
   public var meetingId, ownerId: Int?
   public var meetingResponse, createdAt, updatedAt: String?
 
   public var owner: UserProfileShortData?
 
-  required public init?(map: Map) {
-    super.init(map: map)
-  }
+  required public init?(map: Map) { }
 
-  public override func mapping(map: Map) {
-    super.mapping(map: map)
+  public func mapping(map: Map) {
+    id <- map["id"]
+    metaInformation <- map["meta_information"]
     meetingId <- map["meeting_id"]
     ownerId <- map["owner_id"]
     createdAt <- map["created_at"]

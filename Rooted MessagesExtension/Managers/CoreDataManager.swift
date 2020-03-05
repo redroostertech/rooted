@@ -7,34 +7,46 @@ typealias CoreDataResultsHandler = (Bool, Error?) -> Void
 class CoreDataManager: NSObject {
     private lazy var applicationDocumentsDirectory: URL? = {
         // The directory the application uses to store the Core Data store file. This code uses a directory named "com.yourdomain.YourAwesomeApp" in the application's documents Application Support directory.
-        return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.rrtech.rooted.Rooted") ?? nil
+        return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: kGroupName) ?? nil
     }()
 
     private lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Invites")
-        var persistentStoreDescriptions: NSPersistentStoreDescription
+      let container = NSPersistentContainer(name: "Invites")
+      //  Setup Core Data for communication via App Groups
+      let storeURL = URL.storeURL(for: "group.com.rrtech.rooted.Rooted.MessagesExtension", databaseName: "Rooted")
+      let storeDescription = NSPersistentStoreDescription(url: storeURL)
+      container.persistentStoreDescriptions = [storeDescription]
 
-        let description = NSPersistentStoreDescription()
-        description.shouldInferMappingModelAutomatically = true
-        description.shouldMigrateStoreAutomatically = true
-        description.url = applicationDocumentsDirectory ?? nil
+      /*
+       var persistentStoreDescriptions: NSPersistentStoreDescription
 
-        container.persistentStoreDescriptions = [NSPersistentStoreDescription(url: applicationDocumentsDirectory!.appendingPathComponent("Rooted.sqlite"))]
+      let description = NSPersistentStoreDescription()
+      description.shouldInferMappingModelAutomatically = true
+      description.shouldMigrateStoreAutomatically = true
+      description.url = applicationDocumentsDirectory ?? nil
 
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            } else {
-                print("Successfully connected to store.")
-            }
-        })
-        return container
+      container.persistentStoreDescriptions = [NSPersistentStoreDescription(url: applicationDocumentsDirectory!.appendingPathComponent("Rooted.sqlite"))]
+       */
+
+      container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        if let error = error as NSError? {
+          fatalError("Unresolved error \(error), \(error.userInfo)")
+        } else {
+          print("Successfully connected to store.")
+        }
+      })
+      return container
     }()
 
-    var entity: NSEntityDescription? {
+    var inviteEntiry: NSEntityDescription? {
         let entity = NSEntityDescription.entity(forEntityName: "Invite", in: persistentContainer.viewContext)
         return entity
     }
+
+  var meetingEntity: NSEntityDescription? {
+    let entity = NSEntityDescription.entity(forEntityName: "MeetingEntity", in: persistentContainer.viewContext)
+    return entity
+  }
 
     var managedContext: NSManagedObjectContext {
         return persistentContainer.viewContext
@@ -55,7 +67,14 @@ class CoreDataManager: NSObject {
 
     // MARK: - CRUD operations
     func retrieve(entityName: String, _ completion: CoreDataHandler) {
+        let sectionSortDescriptor = NSSortDescriptor(key: "createdAt", ascending: true)
+        let sortDescriptors = [sectionSortDescriptor]
+
+        let predicate = NSPredicate(format: "createdAt != nil")
+
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: entityName)
+        fetchRequest.predicate = predicate
+        fetchRequest.sortDescriptors = sortDescriptors
         do {
             let data = try managedContext.fetch(fetchRequest)
             completion(data, nil)
@@ -74,4 +93,14 @@ class CoreDataManager: NSObject {
             completion(false, error)
         }
     }
+}
+
+public extension URL {
+  /// Returns a URL for the given app group and database pointing to the sqlite database.
+  static func storeURL(for appGroup: String, databaseName: String) -> URL {
+    guard let fileContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup) else {
+      fatalError("Shared file container could not be created.")
+    }
+    return fileContainer.appendingPathComponent("\(databaseName).sqlite")
+  }
 }

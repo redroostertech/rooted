@@ -2,9 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>rooted.app.link</string>
+		<string>rooted-alternate.app.link</string>
+	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.rrtech.rooted.Rooted</string>
+		<string>group.com.rrtech.rooted.Rooted.MessagesExtension</string>
 	</array>
 </dict>
 </plist>

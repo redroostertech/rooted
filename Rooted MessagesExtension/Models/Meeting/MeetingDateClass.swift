@@ -15,8 +15,11 @@ import ObjectMapper
 public class MeetingDateClass: Mappable {
   public var month, monthSh, dayOfWeek, dayNumerical: String?
   public var year, yearSh: String?
+  public var endMonth, endMonthSh, endDayOfWeek, endDayNumerical: String?
+  public var endYear, endYearSh: String?
   public var startTime, endTime: Time?
   public var dateString: String?
+  public var startDate, endDate: String?
 
   required public init?(map: Map) { }
 
@@ -30,5 +33,26 @@ public class MeetingDateClass: Mappable {
     startTime <- map["start_time"]
     endTime <- map["end_time"]
     dateString <- map["date_string"]
+    endMonth <- map["end_month"]
+    endMonthSh <- map["end_month_sh"]
+    endDayOfWeek <- map["end_day_of_week"]
+    endDayNumerical <- map["end_day_numerical"]
+    endYear <- map["end_year"]
+    endYearSh <- map["end_year_sh"]
+    startDate <- map["start_date"]
+    endDate <- map["end_date"]
+  }
+
+  public var readableTime: String {
+    var string = ""
+    guard let startdate = startDate, let enddate = endDate else { return string }
+    if startdate.toDate(.normal).toString() == enddate.toDate(.normal).toString() {
+      string += startdate.toDate().toString(.proper)
+      string += " to \(enddate.toDate().toString(.timeOnly))"
+    } else {
+      string += startdate.toDate().toString(.abbrMonthDayTime)
+      string += " to \(enddate.toDate().toString(.abbrMonthDayTime))"
+    }
+    return string
   }
 }

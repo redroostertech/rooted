@@ -13,7 +13,7 @@ import ObjectMapper
 import MapKit
 
 // MARK: - Location
-public class RLocation: Mappable {
+public class RLocation: Mappable, SuggestionValue {
   public var name, address1, address2, address3, address4: String?
   public var city, state, stateSh, zipCode, country: String?
   public var coordinates: Coordinates?
@@ -60,8 +60,18 @@ public class RLocation: Mappable {
     }
     return addressString
   }
+
+  // Text that is displayed as a completion suggestion.
+  public var suggestionString: String {
+    return "\(readableAddres)"
+  }
   
   required public init?(map: Map) { }
+
+  // Required by `InputTypeInitiable`, can always return nil in the SuggestionValue context.
+  required convenience public init?(string stringValue: String) {
+    return nil
+  }
 
   public func mapping(map: Map) {
     name <- map["name"]
@@ -78,4 +88,10 @@ public class RLocation: Mappable {
     metaInformation <- map["meta_information"]
   }
 
+}
+
+extension RLocation: Equatable {
+  public static func == (lhs: RLocation, rhs: RLocation) -> Bool {
+    return lhs.coordinates?.lat == rhs.coordinates?.lat && lhs.coordinates?.long == rhs.coordinates?.long
+  }
 }

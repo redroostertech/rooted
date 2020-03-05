@@ -6,29 +6,218 @@ protocol LocationSearchDelegate: class {
   func selectLocation(_ searchVC: LocationSearchVC, location: RLocation?)
 }
 
-class LocationSearchVC: BaseAppViewController {
+final class LocationSearchRow: OptionsRow<PushSelectorCell<MKLocalSearchCompletionWrapper>>, PresenterRowType, RowType {
 
-  @IBOutlet private var backButton: UIButton!
-  @IBOutlet private weak var searchResultsTableView: UITableView!
-  @IBOutlet private var searchFormField: UISearchBar!
+  typealias PresentedControllerType = LocationSearchVC
 
+  /// Defines how the view controller will be presented, pushed, etc.
+  public var presentationMode: PresentationMode<PresentedControllerType>?
+
+  /// Will be called before the presentation occurs.
+  public var onPresentCallback: ((FormMessagesAppViewController, PresentedControllerType) -> Void)?
+
+  public required init(tag: String?) {
+    super.init(tag: tag)
+    presentationMode = .show(controllerProvider: ControllerProvider.callback { return LocationSearchVC(){ _ in } }, onDismiss: { vc in _ = vc.navigationController?.popViewController(animated: true) })
+  }
+
+  /**
+   Extends `didSelect` method
+   */
+  public override func customDidSelect() {
+    super.customDidSelect()
+    guard let presentationMode = presentationMode, !isDisabled else { return }
+    if let controller = presentationMode.makeController() {
+      controller.row = self
+      controller.title = selectorTitle ?? controller.title
+      onPresentCallback?(cell.formViewController()!, controller)
+      presentationMode.present(controller, row: self, presentingController: self.cell.formViewController()!)
+    } else {
+      presentationMode.present(nil, row: self, presentingController: self.cell.formViewController()!)
+    }
+  }
+
+  /**
+   Prepares the pushed row setting its title and completion callback.
+   */
+  public override func prepare(for segue: UIStoryboardSegue) {
+    super.prepare(for: segue)
+    guard let rowVC = segue.destination as? PresentedControllerType else { return }
+    rowVC.title = selectorTitle ?? rowVC.title
+    rowVC.onDismissCallback = presentationMode?.onDismissCallback ?? rowVC.onDismissCallback
+    onPresentCallback?(cell.formViewController()!, rowVC)
+    rowVC.row = self
+  }
+
+}
+
+class LocationSearchVC: UIViewController, TypedRowControllerType {
+
+  public var row: RowOf<MKLocalSearchCompletionWrapper>!
+  public var onDismissCallback: ((UIViewController) -> ())?
+
+  lazy var searchResultsTableView: UITableView = { [unowned self] in
+    let tableView = UITableView(frame: CGRect(x: .zero, y: 56, width: self.view.bounds.width, height: self.view.bounds.height - 56))
+    if self.navigationController != nil {
+      tableView.frame = CGRect(x: .zero,
+                               y: self.navigationController!.navigationBar.frame.height + 56,
+                               width: self.view.bounds.width,
+                               height: self.view.bounds.height - (self.navigationController!.navigationBar.frame.height + 56))
+    } else {
+      tableView.frame = CGRect(x: .zero, y: 56, width: self.view.bounds.width, height: self.view.bounds.height - 56)
+    }
+    tableView.estimatedRowHeight = UITableView.automaticDimension
+    tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    return tableView
+  }()
+
+  lazy var searchFormField: UISearchBar = { [unowned self] in
+    let searchBar = UISearchBar()
+    if self.navigationController != nil {
+      searchBar.frame = CGRect(x: .zero, y: self.navigationController!.navigationBar.frame.height, width: self.view.bounds.width, height: 56)
+    } else {
+      searchBar.frame = CGRect(x: .zero, y: .zero, width: self.view.bounds.width, height: 56)
+    }
+    searchBar.setPlaceholderTextColorTo(color: .darkText)
+    searchBar.setMagnifyingGlassColorTo(color: .darkText)
+    return searchBar
+  }()
+
+  private var locationManager: CLLocationManager?
   private var searchCompleter = MKLocalSearchCompleter()
-  private var searchResults = [MKLocalSearchCompletion]()
+  private var searchResults = [MKLocalSearchCompletionWrapper]()
 
-  weak var locSearchDelegate: LocationSearchDelegate?
+  required public init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+  }
+
+  public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  convenience public init(_ callback: ((UIViewController) -> ())?){
+    self.init(nibName: nil, bundle: nil)
+    onDismissCallback = callback
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    view.applyPrimaryGradient()
+    setupView()
 
-    searchCompleter.delegate = self
-
-    searchFormField.setPlaceholderTextColorTo(color: .white)
-    searchFormField.setMagnifyingGlassColorTo(color: .white)
+    if CLLocationManager.authorizationStatus() == .denied || CLLocationManager.authorizationStatus() == .notDetermined {
+      self.locationManager?.requestWhenInUseAuthorization()
+    }
   }
 
-  // MARK: - Private methods
+  private func setupView() {
+    view.addSubview(searchResultsTableView)
+    searchResultsTableView.delegate = self
+    searchResultsTableView.dataSource = self
+
+    view.addSubview(searchFormField)
+    searchFormField.delegate = self
+
+    searchCompleter.delegate = self
+  }
+}
+
+// MARK: - UITableViewDataSource
+extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
+
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return searchResults.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let searchResult = searchResults[indexPath.row]
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+
+        cell.backgroundColor = .clear
+        cell.textLabel?.textColor = .darkText
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        cell.textLabel?.numberOfLines = 2
+        cell.detailTextLabel?.textColor = .white
+
+        cell.textLabel?.text = searchResult.suggestionString
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let searchResult = searchResults[indexPath.row]
+        row.value = searchResult
+        self.onDismissCallback?(self)
+    }
+}
+
+
+// MARK: - UISearchBarDelegate
+extension LocationSearchVC: UISearchBarDelegate {
+  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    searchCompleter.queryFragment = searchText
+  }
+}
+
+// MARK: - MKLocalSearchCompleterDelegate
+extension LocationSearchVC: MKLocalSearchCompleterDelegate {
+  func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+    searchResults = completer.results.map({ (localSearchCompletion) -> MKLocalSearchCompletionWrapper in
+      return MKLocalSearchCompletionWrapper(localSearchCompletion: localSearchCompletion)
+    })
+    searchResultsTableView.reloadData()
+  }
+
+  func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+    // handle error
+  }
+}
+
+// MARK: - CLLocationManager delegate
+extension LocationSearchVC: CLLocationManagerDelegate {
+  func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    switch status {
+    case .denied, .notDetermined:
+      onDismissCallback?(self)
+    default:
+      break
+    }
+  }
+}
+
+open class MKLocalSearchCompletionWrapper: SuggestionValue {
+
+  private var mkLocalSearchCompletion: MKLocalSearchCompletion?
+  var rLocation: RLocation?
+
+  public var suggestionString: String {
+    return "\(mkLocalSearchCompletion?.title ?? "") at \(mkLocalSearchCompletion?.subtitle ?? "")"
+  }
+
+  init(localSearchCompletion: MKLocalSearchCompletion) {
+
+    mkLocalSearchCompletion = localSearchCompletion
+    let searchRequest = MKLocalSearch.Request(completion: localSearchCompletion)
+    let search = MKLocalSearch(request: searchRequest)
+    search.start { (response, error) in
+
+      guard let mapItem = response?.mapItems[0], let location = self.generateRLocation(from: mapItem) else { return }
+
+      // Add MKMapItem to RLocation
+      location.mapItem = mapItem
+
+      self.rLocation = location
+    }
+  }
+
+  required convenience public init?(string stringValue: String) {
+    return nil
+  }
+
   private func generateRLocation(from mapItem: MKMapItem) -> RLocation? {
     var dict = [String: Any]()
 
@@ -82,72 +271,7 @@ class LocationSearchVC: BaseAppViewController {
     return RLocation(JSON: dict)
   }
 
-  @IBAction func back(_ sender: UIButton) {
-    dismiss(animated: true, completion: nil)
-  }
-}
-
-// MARK: - UITableViewDataSource
-extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
-
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return searchResults.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let searchResult = searchResults[indexPath.row]
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-
-        cell.backgroundColor = .clear
-        cell.textLabel?.textColor = .white
-        cell.detailTextLabel?.textColor = .white
-
-        cell.textLabel?.text = searchResult.title
-        cell.detailTextLabel?.text = searchResult.subtitle
-        return cell
-    }
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-
-        let completion = searchResults[indexPath.row]
-
-        let searchRequest = MKLocalSearch.Request(completion: completion)
-        let search = MKLocalSearch(request: searchRequest)
-        search.start { (response, error) in
-
-          guard let mapItem = response?.mapItems[0], let location = self.generateRLocation(from: mapItem) else { return }
-
-          // Add MKMapItem to RLocation
-          location.mapItem = mapItem
-
-          self.dismiss(animated: true, completion: {
-            self.locSearchDelegate?.selectLocation(self, location: location)
-          })
-        }
-    }
-}
-
-
-// MARK: - UISearchBarDelegate
-extension LocationSearchVC: UISearchBarDelegate {
-  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-    searchCompleter.queryFragment = searchText
-  }
-}
-
-// MARK: - MKLocalSearchCompleterDelegate
-extension LocationSearchVC: MKLocalSearchCompleterDelegate {
-  func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-    searchResults = completer.results
-    searchResultsTableView.reloadData()
-  }
-
-  func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-    // handle error
+  public static func == (lhs: MKLocalSearchCompletionWrapper, rhs: MKLocalSearchCompletionWrapper) -> Bool {
+    return lhs.mkLocalSearchCompletion?.title == rhs.mkLocalSearchCompletion?.title && lhs.mkLocalSearchCompletion?.subtitle == rhs.mkLocalSearchCompletion?.subtitle
   }
 }

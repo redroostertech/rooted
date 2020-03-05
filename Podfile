@@ -23,5 +23,7 @@ target 'Rooted MessagesExtension' do
   pod 'Alamofire'
   pod 'ObjectMapper', '~> 3.1'
   pod 'SwiftyCodeView'
+  pod 'Branch'
+  pod 'FloatingButton'
 
 end

@@ -17,7 +17,18 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.5</string>
+	<string>1.6</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.rrtech.rooted.Rooted.MessagesExtension</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rootedext</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSCalendarsUsageDescription</key>
@@ -33,5 +44,9 @@
 	<string>Rooted needs access to your location to search for and add locations to invites.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Rooted needs access to your location to search for and add locations to invites.</string>
+	<key>branch_app_domain</key>
+	<string>rooted.app.link</string>
+	<key>branch_key</key>
+	<string>key_live_npNUJjsLcUnbq6xSqRwS9mmjvsbMMu0R</string>
 </dict>
 </plist>

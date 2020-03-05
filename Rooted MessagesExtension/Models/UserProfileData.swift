@@ -13,7 +13,7 @@ import ObjectMapper
 
 // MARK: - UserProfileData
 public class UserProfileData: Mappable {
-  public var id: Int?
+  public var id: String?
   public var firstName, lastName, fullName: String?
   public var accountTypeId, phoneNumberId: [Int]?
   public var location: RLocation?
@@ -56,7 +56,7 @@ public class UserProfileData: Mappable {
 
 // MARK: - User Profile Short
 public class UserProfileShortData: Codable {
-  public var id: Int?
+  public var id: String?
   public var firstName, lastName, fullName: String?
 
   enum CodingKeys: String, CodingKey {
@@ -64,5 +64,337 @@ public class UserProfileShortData: Codable {
     case firstName = "first_name"
     case lastName = "last_name"
     case fullName = "full_name"
+  }
+}
+
+extension UserProfileData {
+  static var anonymousUser: UserProfileData? {
+    let dict: [String: Any] = [
+      "first_name": "",
+      "last_name": "",
+      "full_name": "",
+      "account_type_id": [0],
+      "user_preferences": [
+        [
+          "preference_id": 0,
+          "preference_selection_id": 0,
+          "meta_information": [],
+          "preference": [
+            "priority": 0,
+            "minimum_user_type_required": 0,
+            "id": 0,
+            "title": "Notifications",
+            "type": "boolean",
+            "description": "Enable push notifications",
+            "is_on": true,
+            "action" : [
+              "type": "URL",
+              "data": "www.google.com"
+            ],
+            "choices": [
+              [
+                "order": 0,
+                "id": 0,
+                "title": "true",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],
+              [
+                "order": 1,
+                "id": 1,
+                "title": "false",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ]
+            ],
+            "created_at": "",
+            "updated_at": ""
+          ]
+        ],
+        [
+          "preference_id": 1,
+          "preference_selection_id": 0,
+          "meta_information": [],
+          "preference": [
+            "priority": 0,
+            "minimum_user_type_required": 0,
+            "id": 1,
+            "title": "Location",
+            "description": "Allow access to your location?",
+            "is_on": true,
+            "action" : [
+              "type": "URL",
+              "data": "www.google.com",
+              "meta_information": []
+            ],
+            "type": "boolean",
+            "choices": [
+              [
+                "order": 0,
+                "id": 0,
+                "title": "true",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],
+              [
+                "order": 1,
+                "id": 1,
+                "title": "false",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ]
+            ],
+            "created_at": "",
+            "updated_at": ""
+          ]
+        ],
+        [
+          "preference_id": 2,
+          "preference_selection_id": 0,
+          "meta_information": [],
+          "preference": [
+            "priority": 0,
+            "minimum_user_type_required": 0,
+            "id": 2,
+            "title": "Start of the Week",
+            "description": "",
+            "is_on": false,
+            "action" : [
+              "type": "URL",
+              "data": "www.google.com",
+              "meta_information": []
+            ],
+            "type": "picker",
+            "choices": [
+              [
+                "order": 0,
+                "id": 0,
+                "title": "Sunday",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 1,
+                "id": 1,
+                "title": "Monday",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 2,
+                "id": 2,
+                "title": "Tuesday",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 3,
+                "id": 3,
+                "title": "Wednesday",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 4,
+                "id": 4,
+                "title": "Thursday",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 5,
+                "id": 5,
+                "title": "Friday",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 6,
+                "id": 6,
+                "title": "Saturday",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ]
+            ],
+            "created_at": "",
+            "updated_at": ""
+          ]
+        ],
+        [
+          "preference_id": 3,
+          "preference_selection_id": 0,
+          "meta_information": [],
+          "preference": [
+            "priority": 0,
+            "minimum_user_type_required": 0,
+            "id": 3,
+            "title": "Show declined events",
+            "type": "boolean",
+            "description": "Show declined events",
+            "is_on": true,
+            "action" : [
+              "type": "URL",
+              "data": "www.google.com"
+            ],
+            "choices": [
+              [
+                "order": 0,
+                "id": 0,
+                "title": "true",
+                "meta_information": [],
+                "is_premium": false
+              ],
+              [
+                "order": 1,
+                "id": 1,
+                "title": "false",
+                "meta_information": [],
+                "is_premium": false
+              ]
+            ],
+            "created_at": "",
+            "updated_at": ""
+          ]
+        ],
+        [
+          "preference_id": 4,
+          "preference_selection_id": 0,
+          "meta_information": [],
+          "preference": [
+            "priority": 1,
+            "minimum_user_type_required": 0,
+            "id": 4,
+            "title": "Default Reminder Notifications",
+            "type": "picker",
+            "description": "Enable reminder notifications",
+            "is_on": true,
+            "action" : [
+              "type": "URL",
+              "data": "www.google.com"
+            ],
+            "choices": [
+              [
+                "order": 0,
+                "id": 0,
+                "title": "10 minutes before",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 1,
+                "id": 1,
+                "title": "25 minutes before",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 2,
+                "id": 2,
+                "title": "30 minutes before",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 3,
+                "id": 3,
+                "title": "1 hour before",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 4,
+                "id": 4,
+                "title": "1 day before",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 5,
+                "id": 5,
+                "title": "1 week before",
+                "meta_information": [],
+                "minimum_user_type_required": 0
+              ],[
+                "order": 6,
+                "id": 6,
+                "title": "Custom",
+                "meta_information": [
+                  [
+                    "options": [
+                      [
+                        "id": 0,
+                        "title": "Minutes"
+                      ],
+                      [
+                        "id": 1,
+                        "title": "Hours"
+                      ],
+                      [
+                        "id": 2,
+                        "title": "Days"
+                      ],
+                      [
+                        "id": 3,
+                        "title": "Weeks"
+                      ],
+                      [
+                        "id": 4,
+                        "title":"Months"
+                      ]
+                    ]
+                  ]
+                ],
+                "minimum_user_type_required": 0
+              ]
+            ],
+            "created_at": "",
+            "updated_at": ""
+          ]
+        ]
+      ],
+      "notifications": false,
+      "card_on_file": false,
+      "dashboard_sections": [
+        [
+          "dashboard_id": 0,
+          "header_is_visible": false,
+          "meta_information": [],
+          "dashboard_section": [
+            "priority": 0,
+            "id": 0,
+            "header_title": "Incoming Meetings",
+            "header_description": "Meetings that have been requested"
+          ]
+        ],
+        [
+          "dashboard_id": 1,
+          "header_is_visible": false,
+          "meta_information": [],
+          "dashboard_section": [
+            "priority": 1,
+            "id": 1,
+            "header_title": "Today",
+            "header_description": "Meetings that are today"
+          ]
+        ],
+        [
+          "dashboard_id": 2,
+          "header_is_visible": false,
+          "meta_information": [],
+          "dashboard_section": [
+            "priority": 2,
+            "id": 2,
+            "header_title": "Tomorrow",
+            "header_description": "Meetings that are tomorrow"
+          ]
+        ]
+      ],
+
+      "account_type" : [
+        [
+          "id": 0,
+          "max_dashboard_sections_count": 3,
+          "created_at": "",
+          "updated_at": "",
+          "meta_information": [],
+          "owner": [
+            "id": 0,
+            "first_name": "John",
+            "last_name": "Doe",
+            "full_name": "John Doe"
+          ]
+        ]
+      ]
+    ]
+    return UserProfileData(JSON: dict)
   }
 }

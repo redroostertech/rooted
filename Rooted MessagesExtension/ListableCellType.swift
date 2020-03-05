@@ -1,5 +1,5 @@
 //
-//  Configuration.swift
+//  ListableCellType.swift
 //  Rooted MessagesExtension
 //
 //  Created by Michael Westbrooks on 2/26/20.
@@ -7,3 +7,7 @@
 //
 
 import Foundation
+
+public enum ListableCellType {
+  case meeting
+}

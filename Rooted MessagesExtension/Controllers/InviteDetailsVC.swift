@@ -5,42 +5,84 @@ import EventKit
 import iMessageDataKit
 import SSSpinnerButton
 import CoreLocation
+import Branch
 
-class InviteDetailsVC: BaseAppViewController {
+class InviteDetailsVC: FormMessagesAppViewController {
 
-  @IBOutlet private weak var timeLabel: UILabel!
-  @IBOutlet private weak var titleLabel: UILabel!
-  @IBOutlet private weak var locationNameLabel: UILabel!
-  @IBOutlet private weak var locationLabel: UILabel!
   @IBOutlet private weak var acceptInviteButton: SSSpinnerButton!
-  @IBOutlet private weak var autoResponseSwitch: UISwitch!
-  @IBOutlet private weak var proposeNewTimeButton: UIButton!
-  @IBOutlet private weak var proposeNewTimeLabel: UILabel!
-  @IBOutlet private weak var switchContainerView: UIView!
+  @IBOutlet private weak var declineInviteButton: UIButton!
+  @IBOutlet private weak var backButton: UIButton!
+  @IBOutlet private weak var actionsContainerView: UIView!
 
   private var eventKitManager = EventKitManager()
-  private var shouldSendRespone = false
+  private var coreDataManager = CoreDataManager()
+  private var invitesManager = MyInvitesManager()
+  private let eventStore = EKEventStore()
 
-  var titleText: String?
-  var startDate: Date?
-  var endDate: Date?
-  var rLocation: RLocation?
-  var activeConvo: MSConversation?
+  private var shouldSendRespone = false
+  fileprivate var meeting: Meeting?
 
   // MARK: - Lifecycle methods
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    // TODO: - There are a few dependencies; make hidden for now.
-    proposeNewTimeLabel.isHidden = true
-    proposeNewTimeButton.isHidden = true
-    switchContainerView.applyPrimaryGradient()
-    view.applyPrimaryGradient()
-    acceptInviteButton.layer.cornerRadius = acceptInviteButton.frame.height / 2
+  static func setupViewController(meeting: Meeting) -> InviteDetailsVC {
+    let storyboard = UIStoryboard(name: kStoryboardMain, bundle: nil)
+    let viewController = storyboard.instantiateViewController(withIdentifier: "InviteDetailsVC") as! InviteDetailsVC
+    viewController.meeting = meeting
+    return viewController
   }
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    loadVC()
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    backButton.applyCornerRadius()
+    acceptInviteButton.applyCornerRadius()
+
+    // Set up form
+    form
+      +++ Section("Event details")
+
+      +++ Section("Title of Event")
+      <<< LabelRow() {
+        $0.tag = "meeting_name"
+        if let meetingName = self.meeting?.meetingName {
+          $0.title = meetingName
+        }
+      }
+
+      +++ Section("Location of Event")
+      <<< LabelRow() {
+        $0.tag = "meeting_location"
+        if let meetingLocation = meeting?.meetingLocation {
+          $0.title = meetingLocation.readableWhereString
+        } else {
+          $0.title = "No location provided"
+        }
+      }
+
+      +++ Section("Time of Event")
+      <<< LabelRow() {
+        $0.tag = "meeting_date"
+        if let meetingTime = meeting?.meetingDate {
+          $0.title  = meetingTime.readableTime
+        }
+    }
+
+    if let currentUser = SessionManager.shared.currentUser, let meetingOwner = meeting?.owner, let meetingOwnerId = meetingOwner.id, meetingOwnerId == currentUser.id  {
+      view.sendSubviewToBack(actionsContainerView)
+    } else {
+      view.bringSubviewToFront(actionsContainerView)
+      self.form
+        +++ Section()
+          <<< SwitchRow() {
+            $0.tag = "sending_a_response"
+            $0.title = "Send a response?"
+            }.onChange { [weak self] row in
+              guard let responseValue = row.value else { return }
+              self?.shouldSendRespone = responseValue
+        }
+    }
+
+    animateScroll = true
+    rowKeyboardSpacing = 20
   }
 
   override func willBecomeActive(with conversation: MSConversation) {
@@ -59,28 +101,6 @@ class InviteDetailsVC: BaseAppViewController {
   }
 
   // MARK: - Private member methods
-  private func loadVC() {
-    if let titleText = self.titleText {
-      self.titleLabel.text = titleText
-    }
-
-    if let startDate = self.startDate {
-      self.timeLabel.text = startDate.toString(CustomDateFormat.rooted)
-    }
-
-    if let endDate = self.endDate?.toString(CustomDateFormat.rooted) {
-      self.timeLabel.text = timeLabel.text! + " to " +  endDate
-    }
-
-    if let selectedLocationName = self.rLocation?.name {
-      self.locationNameLabel.text = selectedLocationName
-    }
-
-    if let selectedLocation = self.rLocation?.readableAddres {
-      self.locationLabel.text = selectedLocation
-    }
-  }
-
   func displayError(with title: String, and message: String) {
     HUDFactory.showError(with: title, and: message, on: self)
   }
@@ -100,12 +120,13 @@ class InviteDetailsVC: BaseAppViewController {
   private func acceptInvite() {
     acceptInviteButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
 
-      guard let title = self.titleText, let startDate = self.startDate, let endDate = self.endDate else {
-        return self.stopAnimatingButtonAndDisplayError(with: "Incomplete Form", and: "Please fill out the form.")
+
+      guard let meeting = self.meeting else {
+        return self.stopAnimatingButtonAndDisplayError(with: "Error", and: "There was an error adding event to your calendar. Please try again.")
       }
 
       // Insert invite into calendar
-      self.insertEvent(title: title, endDate: endDate, startDate: startDate, location: self.rLocation)
+      self.insert(meeting: meeting)
     })
   }
 
@@ -138,9 +159,9 @@ class InviteDetailsVC: BaseAppViewController {
     self.stopAnimatingButtonAndDisplayError(with: "Error", and: "Something went wrong. Please try again.")
   }
 
-  private func insertEvent(title: String, endDate: Date, startDate: Date, location: RLocation?) {
-    self.eventKitManager.insertEvent(title: title, startDate: startDate, endDate: endDate, location: location, {
-      (success, error) in
+  private func insert(meeting: Meeting) {
+    // Send meeting object to event kit manager to save as event into calendar
+    eventKitManager.insertMeeting(meeting: meeting) { (success, error) in
       if let _ = error {
 
         // TODO: - Handle error
@@ -154,7 +175,9 @@ class InviteDetailsVC: BaseAppViewController {
             let okAction = UIAlertAction(title: "Ok", style: .default, handler: { action in
               let message = MessageFactory.generateMessage(title: "I am confirmed. See you soon!")
 
-              MessageFactory.send(message: message, to: self.activeConvo, of: .insert, { success in
+              MessageFactory.send(message: message,
+                                  to: ConversationManager.shared.conversation,
+                                  of: .insert, { success in
                 if success {
 
                   self.stopAnimatingButtonAndDisplaySuccess()
@@ -174,20 +197,21 @@ class InviteDetailsVC: BaseAppViewController {
           }
         }
       }
-    })
+    }
   }
-
 
   // MARK: - IBActions
-  @IBAction func autoResponseSwitch(_ sender: UISwitch) {
-    shouldSendRespone = sender.isOn
-  }
-
   @IBAction func acceptInvite(_ sender: UIButton) {
+
+    BranchEvent.customEvent(withName: "event_invite_accepted")
+
     acceptInvite()
   }
 
   @IBAction func declineInvite(_ sender: UIButton) {
+
+    BranchEvent.customEvent(withName: "event_invite_declined")
+
     declineInvite()
   }
 
@@ -198,11 +222,13 @@ class InviteDetailsVC: BaseAppViewController {
   @IBAction func proposeNewTimeAction(_ sender: UIButton) {
     let sendResponseAction = UIAlertAction(title: "Yes", style: .default, handler: { action in
 
+      /*
       let message = MessageFactory.generateMessage(title: " \(self.startDate!.toString(.rooted)) does not work for me. Please select a new time.")
 
       MessageFactory.send(message: message, to: self.activeConvo, of: .insert, { success in
         NSLog("[ROOTED-IMESSAGE] InviteDetailsVC: User is proposing a new time.")
       })
+ */
 
     })
 
