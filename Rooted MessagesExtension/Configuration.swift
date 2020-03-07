@@ -138,3 +138,8 @@ public let kGoToDashboardSegue = "goToDashboard"
 public let kGoToLoginSegue = "goToLoginSegue"
 public let kGoToInviteDetails = "goToInviteDetails"
 public let kGoToAddInviteVC = "goToAddInviteVC"
+
+// MARK: - User Experience Strings
+public let kDeleteTitle = "Delete Invite"
+public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
+public let captionString = "%@ on %@"

@@ -7,12 +7,6 @@ import NotificationCenter
 import CoreData
 import Branch
 
-private var activeConvo: MSConversation?
-
-public let kDeleteTitle = "Delete Invite"
-public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
-public let captionString = "%@ on %@"
-
 class MyInvitesVC: ResponsiveViewController {
 
   @IBOutlet private weak var collectionView: UICollectionView!
