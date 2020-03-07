@@ -128,7 +128,7 @@ extension String {
         return isEqual
     }
 
-    func toDate(_ format: CustomDateFormat = .timeDate) -> Date {
+    func convertToDate(_ format: CustomDateFormat = .timeDate) -> Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format.rawValue
         print(dateFormatter.date(from: self))

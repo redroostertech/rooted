@@ -24,6 +24,6 @@ target 'Rooted MessagesExtension' do
   pod 'ObjectMapper', '~> 3.1'
   pod 'SwiftyCodeView'
   pod 'Branch'
-  pod 'FloatingButton'
+  pod 'SwiftDate', '~> 5.0'
 
 end

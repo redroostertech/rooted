@@ -46,11 +46,11 @@ class DataConverter {
       var subcaption = ""
 
       let layout = MSMessageTemplateLayout()
-      layout.caption = String(format: captionString, arguments: [meetingname, startdate.toDate().toString(.rooted)])
+      layout.caption = String(format: captionString, arguments: [meetingname, startdate.convertToDate().toString(.rooted)])
 
       message.md.set(value: meetingname, forKey: kMessageTitleKey)
-      message.md.set(value: startdate.toDate().toString(), forKey: kMessageStartDateKey)
-      message.md.set(value: enddate.toDate().toString(), forKey: kMessageEndDateKey)
+      message.md.set(value: startdate.convertToDate().toString(), forKey: kMessageStartDateKey)
+      message.md.set(value: enddate.convertToDate().toString(), forKey: kMessageEndDateKey)
 
       if let meetingjson = meeting.toJSONString() {
         message.md.set(value: meetingjson, forKey: kMessageObjectKey)

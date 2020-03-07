@@ -20,6 +20,7 @@ class RootedCollectionViewCell: UICollectionViewCell {
   @IBOutlet weak var dateImageView: UIButton!
   @IBOutlet weak var participantsButton: UIButton!
   @IBOutlet weak var actionsButton: UIButton!
+  @IBOutlet weak var separatorView: UILabel!
 
   private weak var delegate: RootedCellDelegate?
   private var participants = [UserProfileShortData]()
@@ -62,8 +63,10 @@ class RootedCollectionViewCell: UICollectionViewCell {
 
     if layout == .horizontalList {
       actionsButton.isHidden = true
+      separatorView.isHidden = true
     } else {
       actionsButton.isHidden = false
+      separatorView.isHidden = false
     }
   }
 

@@ -87,8 +87,8 @@ class EventKitManager: NSObject {
 
   func insertMeeting(meeting: Meeting, _ completion: @escaping (Bool, Error?) -> Void) {
     guard let meetingname = meeting.meetingName,
-      let startdate = meeting.meetingDate?.startDate?.toDate(),
-      let enddate = meeting.meetingDate?.endDate?.toDate() else {
+      let startdate = meeting.meetingDate?.startDate?.convertToDate(),
+      let enddate = meeting.meetingDate?.endDate?.convertToDate() else {
         return completion(false, RError.generalError.error)
       }
     insertEvent(title: meetingname, startDate: startdate, endDate: enddate, location: meeting.meetingLocation, completion)

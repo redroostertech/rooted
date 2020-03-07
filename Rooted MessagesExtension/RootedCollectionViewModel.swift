@@ -13,6 +13,7 @@ public class RootedCollectionViewModel {
   var cells: [RootedCellViewModel] = [RootedCellViewModel]()
 
   init(section: ListViewSection = .none, cells: [RootedCellViewModel] = [RootedCellViewModel]()) {
-
+    self.section = section
+    self.cells = cells
   }
 }

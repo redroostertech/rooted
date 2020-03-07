@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-private let kListViewSectionSize: CGFloat = 50.0
+public let kListViewSectionSize: CGFloat = 50.0
 
 public enum ListViewSection {
 
@@ -47,13 +47,13 @@ public enum ListViewSection {
     case .custom(let value):
       return value
     case .incoming:
-      return "Incoming"
+      return "Incoming Invites"
     case .today:
-      return "Today"
+      return "Today' Invites"
     case .tomorrow:
-      return "Tomorrow"
+      return "Tomorrow's Invites"
     case .sent:
-      return "Sent"
+      return "Sent Invites"
     case .none: return ""
     }
   }

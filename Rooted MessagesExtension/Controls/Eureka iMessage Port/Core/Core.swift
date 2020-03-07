@@ -455,7 +455,7 @@ open class FormMessagesAppViewController: BaseAppViewController, FormViewControl
         navigationAccessoryView.autoresizingMask = .flexibleWidth
 
         if tableView == nil {
-            tableView = UITableView(frame: view.bounds, style: tableViewStyle)
+            tableView = UITableView(frame: CGRect(x: .zero, y: .zero, width: view.bounds.width, height: view.bounds.height - 58), style: tableViewStyle)
             tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             tableView.cellLayoutMarginsFollowReadableWidth = false
         }
@@ -1018,7 +1018,7 @@ extension FormMessagesAppViewController {
         let endFrame = keyBoardInfo[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
 
         let keyBoardFrame = table.window!.convert(endFrame.cgRectValue, to: table.superview)
-        var newBottomInset = table.frame.origin.y + table.frame.size.height - keyBoardFrame.origin.y + rowKeyboardSpacing
+        var newBottomInset = table.frame.origin.y + table.frame.size.height - keyBoardFrame.origin.y + rowKeyboardSpacing + 100.0
         if #available(iOS 11.0, *) {
             newBottomInset = newBottomInset - tableView.safeAreaInsets.bottom
         }

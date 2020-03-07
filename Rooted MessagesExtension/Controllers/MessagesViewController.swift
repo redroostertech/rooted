@@ -8,6 +8,7 @@ import CoreLocation
 import CoreData
 import ObjectMapper
 import Branch
+import SwiftDate
 
 private var meetingTimeLength = [
   [
@@ -133,11 +134,34 @@ class MeetingModelBuilder {
         meetingDict["meeting_location"] = rlocation.toJSON()
       }
 
-      if let startdate = retrieve(forKey: "start_date") as? Date, let enddate = retrieve(forKey: "end_date") as? Date, let dateclass = MeetingDateClass(JSON: [
+      if let startdate = retrieve(forKey: "start_date") as? Date, let enddate = retrieve(forKey: "end_date") as? Date {
+
+        var dateDict = [
           "start_date": startdate.toString(),
           "end_date": enddate.toString()
-        ]) {
-        meetingDict["meeting_date"] = dateclass.toJSON()
+        ]
+
+        if let timezone = retrieve(forKey: "time_zone") as? String {
+          dateDict["time_zone"] = timezone
+        }
+
+        if let dateclass = MeetingDateClass(JSON: dateDict) {
+          meetingDict["meeting_date"] = dateclass.toJSON()
+        }
+      }
+
+      if let meetingTypes = retrieve(forKey: "meeting_type") as? [[String: Any]] {
+
+        var meetingtypes = [MeetingType]()
+
+        for meetingType in meetingTypes {
+          if let meetingtype = MeetingType(JSON: meetingType) {
+            meetingtypes.append(meetingtype)
+          }
+        }
+
+        meetingDict["meeting_type"] = meetingtypes.toJSON()
+
       }
       meeting = Meeting(JSON: meetingDict)
       return self
@@ -194,7 +218,6 @@ class MessagesViewController: FormMessagesAppViewController {
       guard let meetingtimelength = MeetingTimeLength(JSON: meeting) else { return }
       meetingTime.append(meetingtimelength)
     }
-
     form
       +++ Section("Create Invite")
 
@@ -246,6 +269,16 @@ class MessagesViewController: FormMessagesAppViewController {
           }
       }
 
+      +++ Section("Participants can join by")
+      <<< PhoneRow() {
+        $0.tag = "type_of_meeting_phone"
+        $0.title = "Phone/Conference Line"
+    }
+      <<< URLRow() {
+        $0.tag = "type_of_meeting_video"
+        $0.title = "URL of Video Conference"
+      }
+
       +++ Section("When?")
       <<< ButtonRow() {
         $0.tag = "start_date"
@@ -258,6 +291,28 @@ class MessagesViewController: FormMessagesAppViewController {
             self!.present(self!.startDatePicker, animated: true, completion: nil)
           }
       }
+      <<< SuggestionAccessoryRow<String> {
+        $0.tag = "time_zone"
+        $0.cell.customizeCollectionViewCell = {(cell) in
+          cell.label.backgroundColor = UIColor.gradientColor2
+          cell.label.numberOfLines = 2
+          cell.label.minimumScaleFactor = 0.8
+          cell.label.textColor = UIColor.white
+        }
+        $0.filterFunction = { [unowned self] text in
+          Zones.array.map( { $0.readableString } ).filter({ $0.lowercased().contains(text.lowercased()) })
+        }
+        $0.placeholder = "Select time zone"
+        }.onChange { row in
+          if let value = row.value {
+            guard let selection = Zones.array.first(where: { zones -> Bool in
+              return zones.readableString == value
+            }) else { return }
+
+            // Set the location
+            self.meetingBuilder = self.meetingBuilder.add(key: "time_zone", value: selection.rawValue)
+          }
+        }
 
       <<< PushRow<String>() {
         $0.tag = "end_date"
@@ -310,9 +365,21 @@ class MessagesViewController: FormMessagesAppViewController {
             return
           }
         }
+
     animateScroll = true
     rowKeyboardSpacing = 20
 
+    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: NSNotification.Name.init(rawValue: "keyboardWillShowNotification"), object: nil)
+
+    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: NSNotification.Name.init(rawValue: "keyboardWillHideNotification"), object: nil)
+
+  }
+
+  override func keyboardWillShow(_ notification:Notification) {
+    super.keyboardWillShow(notification)
+  }
+  override func keyboardWillHide(_ notification:Notification) {
+    super.keyboardWillHide(notification)
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -357,6 +424,31 @@ class MessagesViewController: FormMessagesAppViewController {
         guard let value = startdate.add(minutes: 60) else { return }
         self.meetingBuilder = self.meetingBuilder.add(key: "end_date", value: value)
       }
+
+      // Check timeZone
+      if self.meetingBuilder.retrieve(forKey: "time_zone") == nil {
+        self.meetingBuilder = self.meetingBuilder.add(key: "time_zone", value: Zones.current.toTimezone().identifier)
+      }
+
+      // Check meeting type by phone
+      var meetingTypeDict: [[String: Any]] = []
+      if let meetingTypePhone = self.form.rowBy(tag: "type_of_meeting_phone") as? PhoneRow, let value = meetingTypePhone.value {
+        let meetingType: [String: Any] = [
+          "type_of_meeting": "type_of_meeting_phone",
+          "meeting_meta": value
+        ]
+        meetingTypeDict.append(meetingType)
+      }
+
+      if let meetingTypeVideo = self.form.rowBy(tag: "type_of_meeting_video") as? URLRow, let value = meetingTypeVideo.value {
+        let meetingType: [String: Any] = [
+          "type_of_meeting": "type_of_meeting_video",
+          "meeting_meta": value.absoluteString
+        ]
+        meetingTypeDict.append(meetingType)
+      }
+
+      self.meetingBuilder.add(key: "meeting_type", value: meetingTypeDict)
 
       guard let _ = self.meetingBuilder.retrieve(forKey: "meeting_name") as? String,
         let _ = self.meetingBuilder.retrieve(forKey: "start_date") as? Date,
@@ -543,14 +635,15 @@ extension MessagesViewController: WWCalendarTimeSelectorProtocol {
 
       guard let startdate = self.meetingBuilder.retrieve(forKey: "start_date") as? String else { return true }
 
-      if date.timeIntervalSince(startdate.toDate(.proper)).isLess(than: 0) {
+      if date.timeIntervalSince(startdate.convertToDate(.proper)).isLess(than: 0) {
         return false
       }
 
-      if date.timeIntervalSince(startdate.toDate(.proper).addingTimeInterval(60 * 60 * 24 * 7)).isLess(than: 0) {
+      if date.timeIntervalSince(startdate.convertToDate(.proper).addingTimeInterval(60 * 60 * 24 * 7)).isLess(than: 0) {
         return true
       }
     }
     return false
   }
 }
+

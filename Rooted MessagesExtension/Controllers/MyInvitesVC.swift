@@ -275,7 +275,11 @@ class MyInvitesVC: ResponsiveViewController {
       } else {
         self.toggleMenuButton = true
         if self.presentationStyle == .expanded {
-          self.floatingMenu?.toggleMenu()
+          if self.floatingMenu == nil {
+            self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.addButton, images: [UIImage(named: "create")!, UIImage(named: "refresh")!])
+            self.floatingMenu?.delegate = self
+          }
+          self.floatingMenu!.toggleMenu()
         }
       }
     }
@@ -333,7 +337,9 @@ extension MyInvitesVC: MyInvitesDelegate {
     }
 
     collectionViewModels.append(collectionViewModel)
-    reloadTable(withData: collectionViewModels)
+    DispatchQueue.main.async {
+      self.reloadTable(withData: collectionViewModels)
+    }
   }
 
   func didFailRefreshingInvites(_ manager: Any?, error: Error) {

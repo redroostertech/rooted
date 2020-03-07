@@ -47,9 +47,7 @@ class InviteDetailsVC: FormMessagesAppViewController {
           $0.title = meetingName
         }
       }
-
-      +++ Section("Location of Event")
-      <<< LabelRow() {
+      <<< ButtonRow() {
         $0.tag = "meeting_location"
         if let meetingLocation = meeting?.meetingLocation {
           $0.title = meetingLocation.readableWhereString
@@ -64,7 +62,87 @@ class InviteDetailsVC: FormMessagesAppViewController {
         if let meetingTime = meeting?.meetingDate {
           $0.title  = meetingTime.readableTime
         }
+      }
+      <<< LabelRow() {
+        $0.tag = "meeting_time_zone"
+        $0.title  = meeting?.meetingDate?.timeZone ?? "No time zone provided"
     }
+
+    for meetingType in meeting?.meetingType ?? [MeetingType]() {
+      self.form
+      +++ ButtonRow() {
+        $0.tag = meetingType.typeOfMeeting ?? ""
+        if meetingType.typeOfMeeting ?? "" == "type_of_meeting_phone" {
+          $0.title = "Join by phone: \(meetingType.meetingMeta ?? "")"
+        }
+
+        if meetingType.typeOfMeeting ?? "" == "type_of_meeting_video" {
+          $0.title = "Join by url: \(meetingType.meetingMeta ?? "")"
+        }
+      }.onCellSelection { cell, row in
+        if let rowTag = row.tag {
+          if rowTag == "type_of_meeting_phone" {
+            if let url = URL(string: "tel://\(meetingType.meetingMeta ?? "")"){
+              // technique that works rather than self.extensionContext.open
+              var responder = self as UIResponder?
+              /* old approach using openURL which has now been deprecated
+               if responder?.responds(to: #selector(UIApplication.openURL(_:))) == true{
+               responder?.perform(#selector(UIApplication.openURL(_:)), with: url)
+               */
+              let handler = { (success:Bool) -> () in
+                if success {
+                  print("Finished opening URL")
+                } else {
+                  print("Failed to open URL")
+                }
+              }
+
+              let openSel = #selector(UIApplication.open(_:options:completionHandler:))
+              while (responder != nil){
+                if responder?.responds(to: openSel ) == true{
+                  // cannot package up multiple args to openSel so we explicitly call it on the iMessage application instance
+                  // found by iterating up the chain
+                  (responder as? UIApplication)?.open(url, completionHandler:handler)  // perform(openSel, with: url)
+                  return
+                }
+                responder = responder!.next
+              }
+            }
+          }
+
+          if rowTag == "type_of_meeting_video" {
+            if let url = URL(string: "https://\(meetingType.meetingMeta ?? "")") {
+              // technique that works rather than self.extensionContext.open
+              var responder = self as UIResponder?
+              /* old approach using openURL which has now been deprecated
+               if responder?.responds(to: #selector(UIApplication.openURL(_:))) == true{
+               responder?.perform(#selector(UIApplication.openURL(_:)), with: url)
+               */
+              let handler = { (success:Bool) -> () in
+                if success {
+                  print("Finished opening URL")
+                } else {
+                  print("Failed to open URL")
+                }
+              }
+
+              let openSel = #selector(UIApplication.open(_:options:completionHandler:))
+              while (responder != nil){
+                if responder?.responds(to: openSel ) == true{
+                  // cannot package up multiple args to openSel so we explicitly call it on the iMessage application instance
+                  // found by iterating up the chain
+                  (responder as? UIApplication)?.open(url, completionHandler:handler)  // perform(openSel, with: url)
+                  return
+                }
+                responder = responder!.next
+              }
+            }
+
+          }
+        }
+      }
+    }
+
 
     if let currentUser = SessionManager.shared.currentUser, let meetingOwner = meeting?.owner, let meetingOwnerId = meetingOwner.id, meetingOwnerId == currentUser.id  {
       view.sendSubviewToBack(actionsContainerView)

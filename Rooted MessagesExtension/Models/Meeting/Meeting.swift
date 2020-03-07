@@ -23,7 +23,7 @@ public class Meetings: Mappable {
 }
 // MARK: - Meeting
 public class Meeting: Mappable {
-  public var id: Int?
+  public var id: String?
   public var metaInformation: [String: Any]?
   public var dashboardSectionId, meetingStatusId, meetingOwnerId: Int?
   public var meetingName, meetingDescription: String?
@@ -39,6 +39,7 @@ public class Meeting: Mappable {
   public var agendaItems: [AgendaItem]?
   public var files: [Media]?
   public var reminders: [Reminders]?
+  public var meetingType: [MeetingType]?
 
   required public init?(map: Map) { }
 
@@ -68,6 +69,20 @@ public class Meeting: Mappable {
     agendaItems <- map["agenda_items"]
     files <- map["meeting_files"]
     reminders <- map["reminders"]
+    meetingType <- map["meeting_type"]
+  }
+}
+
+// MARK: - Meeting Type
+public class MeetingType: Mappable {
+  public var id, typeOfMeeting, meetingMeta: String?
+
+  required public init?(map: Map) { }
+
+  public func mapping(map: Map) {
+    id <- map["id"]
+    typeOfMeeting <- map["type_of_meeting"]
+    meetingMeta <- map["meeting_meta"]
   }
 }
 
@@ -91,7 +106,7 @@ public class MeetingInvitation: DataClass {
 
 // MARK: - Meeting Response
 public class MeetingResponse: Mappable {
-  public var id: Int?
+  public var id: String?
   public var metaInformation: [String: Any]?
   public var meetingId, ownerId: Int?
   public var meetingResponse, createdAt, updatedAt: String?

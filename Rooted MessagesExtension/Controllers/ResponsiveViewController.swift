@@ -31,6 +31,8 @@ class ResponsiveViewController: BaseAppViewController {
     mainCollectionViewController = collectionView
     mainCollectionViewController?.delegate = self
     mainCollectionViewController?.dataSource = self
+    mainCollectionViewController?.register(UINib(nibName: "CustomHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "CustomHeader")
+    mainCollectionViewController?.register(UINib(nibName: "EmptyHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "EmptyHeader")
 
     mainCollectionViewController?.emptyDataSetView { view in
       view.titleLabelString(NSAttributedString(string: "No Events"))
@@ -77,13 +79,17 @@ class ResponsiveViewController: BaseAppViewController {
 
     switch layoutOption {
     case .horizontalList:
+
       maincollectionviewcontroller.contentInset = UIEdgeInsets(top: 0.0, left: 0, bottom: 0.0, right: 0)
+      flowLayout.headerReferenceSize = .zero
       flowLayout.minimumInteritemSpacing = 0
       flowLayout.minimumLineSpacing = 0
       flowLayout.itemSize = CGSize(width: 250, height: 150)
       flowLayout.scrollDirection = .horizontal
 
     case .list:
+
+      flowLayout.headerReferenceSize = CGSize(width:  self.view.bounds.width, height: kListViewSectionSize)
       flowLayout.minimumInteritemSpacing = 0
       flowLayout.minimumLineSpacing = 0
       flowLayout.itemSize = CGSize(width: self.view.bounds.width, height: 200)
@@ -139,6 +145,11 @@ class ResponsiveViewController: BaseAppViewController {
 
 // MARK: - UICollectionViewDataSource, UICollectionViewDelegate
 extension ResponsiveViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+
+  func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    return true
+  }
+
   func numberOfSections(in collectionView: UICollectionView) -> Int {
     return cells.count
   }
@@ -150,9 +161,29 @@ extension ResponsiveViewController: UICollectionViewDataSource, UICollectionView
 
   func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
     let listViewCells = cells[indexPath.section]
-    return listViewCells.section.reusableView
+    if listViewCells.cells.count > 0 {
+      switch kind {
+      case UICollectionView.elementKindSectionHeader:
+        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "CustomHeader", for: indexPath) as! CustomHeader
+        if layoutOption == .horizontalList {
+          headerView.configure(title: listViewCells.section.title + ":")
+        } else {
+          headerView.configure(title: listViewCells.section.title)
+        }
+        return headerView
+      default:
+        assert(false, "Unexpected element kind")
+      }
+    } else {
+      switch kind {
+      case UICollectionView.elementKindSectionHeader:
+        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "EmptyHeader", for: indexPath) as! EmptyHeader
+        return headerView
+      default:
+        assert(false, "Unexpected element kind")
+      }
+    }
   }
-
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let listViewCells = cells[indexPath.section]

@@ -20,6 +20,7 @@ public class MeetingDateClass: Mappable {
   public var startTime, endTime: Time?
   public var dateString: String?
   public var startDate, endDate: String?
+  public var timeZone: String?
 
   required public init?(map: Map) { }
 
@@ -41,17 +42,18 @@ public class MeetingDateClass: Mappable {
     endYearSh <- map["end_year_sh"]
     startDate <- map["start_date"]
     endDate <- map["end_date"]
+    timeZone <- map["time_zone"]
   }
 
   public var readableTime: String {
     var string = ""
     guard let startdate = startDate, let enddate = endDate else { return string }
-    if startdate.toDate(.normal).toString() == enddate.toDate(.normal).toString() {
-      string += startdate.toDate().toString(.proper)
-      string += " to \(enddate.toDate().toString(.timeOnly))"
+    if startdate.convertToDate(.normal).toString() == enddate.convertToDate(.normal).toString() {
+      string += startdate.convertToDate().toString(.proper)
+      string += " to \(enddate.convertToDate().toString(.timeOnly))"
     } else {
-      string += startdate.toDate().toString(.abbrMonthDayTime)
-      string += " to \(enddate.toDate().toString(.abbrMonthDayTime))"
+      string += startdate.convertToDate().toString(.abbrMonthDayTime)
+      string += " to \(enddate.convertToDate().toString(.abbrMonthDayTime))"
     }
     return string
   }
