@@ -183,6 +183,7 @@ extension ResponsiveViewController: UICollectionViewDataSource, UICollectionView
         assert(false, "Unexpected element kind")
       }
     }
+    assert(false, "Unexpected element kind")
   }
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
