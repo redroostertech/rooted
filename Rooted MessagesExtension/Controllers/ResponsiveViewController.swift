@@ -160,10 +160,10 @@ extension ResponsiveViewController: UICollectionViewDataSource, UICollectionView
   }
 
   func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-    let listViewCells = cells[indexPath.section]
-    if listViewCells.cells.count > 0 {
-      switch kind {
-      case UICollectionView.elementKindSectionHeader:
+    switch kind {
+    case UICollectionView.elementKindSectionHeader:
+      let listViewCells = cells[indexPath.section]
+      if listViewCells.cells.count > 0 {
         let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "CustomHeader", for: indexPath) as! CustomHeader
         if layoutOption == .horizontalList {
           headerView.configure(title: listViewCells.section.title + ":")
@@ -171,19 +171,14 @@ extension ResponsiveViewController: UICollectionViewDataSource, UICollectionView
           headerView.configure(title: listViewCells.section.title)
         }
         return headerView
-      default:
-        assert(false, "Unexpected element kind")
-      }
-    } else {
-      switch kind {
-      case UICollectionView.elementKindSectionHeader:
+      } else {
         let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "EmptyHeader", for: indexPath) as! EmptyHeader
         return headerView
-      default:
-        assert(false, "Unexpected element kind")
       }
+    default:
+      let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "EmptyHeader", for: indexPath) as! EmptyHeader
+      return headerView
     }
-    assert(false, "Unexpected element kind")
   }
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
