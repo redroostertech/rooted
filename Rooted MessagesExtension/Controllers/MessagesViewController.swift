@@ -224,7 +224,7 @@ class MessagesViewController: FormMessagesAppViewController {
       +++ Section("What?")
       <<< TextRow() {
         $0.tag = "meeting_name"
-        $0.title = "Title of Event"
+        $0.title = "Event Name"
         let ruleRequiredViaClosure = RuleClosure<String> { rowValue in
           return (rowValue == nil || rowValue!.isEmpty) ? ValidationError(msg: "Field required!") : nil
         }
@@ -240,7 +240,7 @@ class MessagesViewController: FormMessagesAppViewController {
           }
         }
 
-      +++ Section("Where?")
+      +++ Section(header: "Where?", footer: "Use this optional field to provide a location for your in-person event.")
       <<< LabelRow() {
         $0.tag = "event_label"
         $0.hidden = .function(["meeting_location"], { form -> Bool in
@@ -259,7 +259,7 @@ class MessagesViewController: FormMessagesAppViewController {
       }
       <<< LocationSearchRow() {
         $0.tag = "meeting_location"
-        $0.title = "Choose location for event"
+        $0.title = "Set Address for In-Person Meeting"
         }.onChange { row in
           if let rLocation = row.value?.rLocation {
             guard let value = rLocation.toJSONString() else { return }
@@ -272,17 +272,17 @@ class MessagesViewController: FormMessagesAppViewController {
       +++ Section("Participants can join by")
       <<< PhoneRow() {
         $0.tag = "type_of_meeting_phone"
-        $0.title = "Phone/Conference Line"
+        $0.title = "Phone Call"
     }
       <<< URLRow() {
         $0.tag = "type_of_meeting_video"
-        $0.title = "URL of Video Conference"
+        $0.title = "Web Conference (URL)"
       }
 
       +++ Section("When?")
       <<< ButtonRow() {
         $0.tag = "start_date"
-        $0.title = "Start Time"
+        $0.title = "Start Date/Time"
         }.cellUpdate { cell, row in
           cell.textLabel?.textAlignment = .left
           cell.textLabel?.textColor = .darkText
@@ -302,7 +302,7 @@ class MessagesViewController: FormMessagesAppViewController {
         $0.filterFunction = { [unowned self] text in
           Zones.array.map( { $0.readableString } ).filter({ $0.lowercased().contains(text.lowercased()) })
         }
-        $0.placeholder = "Select time zone"
+        $0.placeholder = "Event Time Zone"
         }.onChange { row in
           if let value = row.value {
             guard let selection = Zones.array.first(where: { zones -> Bool in
@@ -316,7 +316,7 @@ class MessagesViewController: FormMessagesAppViewController {
 
       <<< PushRow<String>() {
         $0.tag = "end_date"
-        $0.title = "Event Length"
+        $0.title = "Event Duration"
         $0.disabled = .function(["start_date"], { form -> Bool in
           if let row = form.rowBy(tag: "start_date") as? ButtonRow {
             return row.value == nil
@@ -365,6 +365,11 @@ class MessagesViewController: FormMessagesAppViewController {
             return
           }
         }
+
+      +++ Section(header:"Description", footer: "Use this optional field to provide a description of your event. The circled text in the screen shot below is the event description.")
+      <<< TextAreaRow("meeting_description") {
+        $0.textAreaHeight = .dynamic(initialTextViewHeight: 50)
+    }
 
     animateScroll = true
     rowKeyboardSpacing = 20
@@ -448,7 +453,11 @@ class MessagesViewController: FormMessagesAppViewController {
         meetingTypeDict.append(meetingType)
       }
 
-      self.meetingBuilder.add(key: "meeting_type", value: meetingTypeDict)
+      self.meetingBuilder = self.meetingBuilder.add(key: "meeting_type", value: meetingTypeDict)
+
+      if let meetingDescription = self.form.rowBy(tag: "meeting_description") as? TextAreaRow, let value = meetingDescription.value {
+        self.meetingBuilder = self.meetingBuilder.add(key: "meeting_description", value: value)
+      }
 
       guard let _ = self.meetingBuilder.retrieve(forKey: "meeting_name") as? String,
         let _ = self.meetingBuilder.retrieve(forKey: "start_date") as? Date,

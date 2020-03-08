@@ -40,13 +40,15 @@ class InviteDetailsVC: FormMessagesAppViewController {
     form
       +++ Section("Event details")
 
-      +++ Section("Title of Event")
+      +++ Section("Event Name")
       <<< LabelRow() {
         $0.tag = "meeting_name"
         if let meetingName = self.meeting?.meetingName {
           $0.title = meetingName
         }
       }
+
+      +++ Section("Event Location")
       <<< ButtonRow() {
         $0.tag = "meeting_location"
         if let meetingLocation = meeting?.meetingLocation {
@@ -56,7 +58,7 @@ class InviteDetailsVC: FormMessagesAppViewController {
         }
       }
 
-      +++ Section("Time of Event")
+      +++ Section("Event Start Date/Time")
       <<< LabelRow() {
         $0.tag = "meeting_date"
         if let meetingTime = meeting?.meetingDate {
@@ -70,14 +72,15 @@ class InviteDetailsVC: FormMessagesAppViewController {
 
     for meetingType in meeting?.meetingType ?? [MeetingType]() {
       self.form
-      +++ ButtonRow() {
+      +++ Section("Type of Event")
+      <<< ButtonRow() {
         $0.tag = meetingType.typeOfMeeting ?? ""
         if meetingType.typeOfMeeting ?? "" == "type_of_meeting_phone" {
           $0.title = "Join by phone: \(meetingType.meetingMeta ?? "")"
         }
 
         if meetingType.typeOfMeeting ?? "" == "type_of_meeting_video" {
-          $0.title = "Join by url: \(meetingType.meetingMeta ?? "")"
+          $0.title = "Join by web conference: \(meetingType.meetingMeta ?? "")"
         }
       }.onCellSelection { cell, row in
         if let rowTag = row.tag {
@@ -143,6 +146,13 @@ class InviteDetailsVC: FormMessagesAppViewController {
       }
     }
 
+    self.form
+      +++ Section("Event Description")
+      <<< TextAreaRow("meeting_description") {
+        $0.value = self.meeting?.meetingDescription ?? "No description provided."
+        $0.textAreaMode = .readOnly
+        $0.textAreaHeight = .fixed(cellHeight: 125)
+    }
 
     if let currentUser = SessionManager.shared.currentUser, let meetingOwner = meeting?.owner, let meetingOwnerId = meetingOwner.id, meetingOwnerId == currentUser.id  {
       view.sendSubviewToBack(actionsContainerView)
