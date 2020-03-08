@@ -69,6 +69,7 @@
 		D7255F8E2413607C0048F8D8 /* Zones+Extensions+Readable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F8D2413607C0048F8D8 /* Zones+Extensions+Readable.swift */; };
 		D7255F91241387600048F8D8 /* EmptyHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F8F241387600048F8D8 /* EmptyHeader.swift */; };
 		D7255F92241387600048F8D8 /* EmptyHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7255F90241387600048F8D8 /* EmptyHeader.xib */; };
+		D7255F9424154C460048F8D8 /* AvailabilityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F9324154C460048F8D8 /* AvailabilityViewController.swift */; };
 		D747BAB7240EBB0700E571CF /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747BAB6240EBB0600E571CF /* SessionManager.swift */; };
 		D747BAB9240EE5D600E571CF /* RegistrationForm.xib in Resources */ = {isa = PBXBuildFile; fileRef = D747BAB8240EE5D600E571CF /* RegistrationForm.xib */; };
 		D747BABB240EE64900E571CF /* RegistrationForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747BABA240EE64900E571CF /* RegistrationForm.swift */; };
@@ -294,6 +295,7 @@
 		D7255F8D2413607C0048F8D8 /* Zones+Extensions+Readable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Zones+Extensions+Readable.swift"; sourceTree = "<group>"; };
 		D7255F8F241387600048F8D8 /* EmptyHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyHeader.swift; sourceTree = "<group>"; };
 		D7255F90241387600048F8D8 /* EmptyHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmptyHeader.xib; sourceTree = "<group>"; };
+		D7255F9324154C460048F8D8 /* AvailabilityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityViewController.swift; sourceTree = "<group>"; };
 		D747BAB6240EBB0600E571CF /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		D747BAB8240EE5D600E571CF /* RegistrationForm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegistrationForm.xib; sourceTree = "<group>"; };
 		D747BABA240EE64900E571CF /* RegistrationForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationForm.swift; sourceTree = "<group>"; };
@@ -890,6 +892,7 @@
 				BA98DD91225255B90070BC39 /* InfoVC.swift */,
 				BA0D0EDB2248019B00209993 /* InviteDetailsVC.swift */,
 				BA068C1E2247BE2F00A0EE9B /* LocationSearchVC.swift */,
+				D7255F9324154C460048F8D8 /* AvailabilityViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1150,6 +1153,7 @@
 				D79A5EAB2406B070006DAA7A /* RRLogger.swift in Sources */,
 				D79A5F4F2407FF91006DAA7A /* RuleRegExp.swift in Sources */,
 				BA0D0EF2224A6B7600209993 /* String+Extension.swift in Sources */,
+				D7255F9424154C460048F8D8 /* AvailabilityViewController.swift in Sources */,
 				D75711ED23D811E000BDD6A0 /* DateTimePicker+CollectionView.swift in Sources */,
 				BA1314E0225C08610089EDE0 /* MSMessages+Extensions.swift in Sources */,
 				D701DC7123E945D000A45E9B /* MessageFactory.swift in Sources */,

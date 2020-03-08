@@ -279,6 +279,76 @@
             </objects>
             <point key="canvasLocation" x="580.79999999999995" y="738.53073463268368"/>
         </scene>
+        <!--Availability View Controller-->
+        <scene sceneID="5SV-A6-OdG">
+            <objects>
+                <viewController storyboardIdentifier="AvailabilityViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="wuH-8U-6F1" customClass="AvailabilityViewController" customModule="Rooted_MessagesExtension" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="hMd-EV-ZQa">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="528"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vRz-2w-PPA">
+                                <rect key="frame" x="0.0" y="470" width="320" height="58"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hy5-Pa-MXK" customClass="SSSpinnerButton" customModule="SSSpinnerButton">
+                                        <rect key="frame" x="179" y="8" width="125" height="42"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="125" id="mom-zx-RRQ"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                        <state key="normal" title="Share Availability">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="sendToFriends:" destination="ObA-dk-sSI" eventType="touchUpInside" id="H0Q-tl-uM6"/>
+                                            <action selector="sendToFriends:" destination="wuH-8U-6F1" eventType="touchUpInside" id="KGA-5E-E2o"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N0d-4q-oiP">
+                                        <rect key="frame" x="8" y="8" width="42" height="42"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="42" id="ZD5-US-D8a"/>
+                                            <constraint firstAttribute="height" constant="42" id="on2-5e-s0n"/>
+                                        </constraints>
+                                        <color key="tintColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <state key="normal" image="arrow-back-icon"/>
+                                        <connections>
+                                            <action selector="cancelAction:" destination="ObA-dk-sSI" eventType="touchUpInside" id="IZy-u7-oW5"/>
+                                            <action selector="cancelAction:" destination="wuH-8U-6F1" eventType="touchUpInside" id="poA-d4-r5Z"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="Hy5-Pa-MXK" secondAttribute="trailing" constant="16" id="0OB-ee-EDV"/>
+                                    <constraint firstItem="Hy5-Pa-MXK" firstAttribute="top" secondItem="N0d-4q-oiP" secondAttribute="top" id="MK0-77-bL4"/>
+                                    <constraint firstItem="N0d-4q-oiP" firstAttribute="top" secondItem="vRz-2w-PPA" secondAttribute="top" constant="8" id="P8H-5R-ZqL"/>
+                                    <constraint firstAttribute="bottom" secondItem="N0d-4q-oiP" secondAttribute="bottom" constant="8" id="hOM-Vc-XAi"/>
+                                    <constraint firstItem="N0d-4q-oiP" firstAttribute="leading" secondItem="vRz-2w-PPA" secondAttribute="leading" constant="8" id="jyc-tf-2Hb"/>
+                                    <constraint firstItem="Hy5-Pa-MXK" firstAttribute="bottom" secondItem="N0d-4q-oiP" secondAttribute="bottom" id="pT2-jJ-aKc"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="vRz-2w-PPA" firstAttribute="trailing" secondItem="5ki-Lo-YSy" secondAttribute="trailing" id="5dZ-Er-Qwu"/>
+                            <constraint firstItem="vRz-2w-PPA" firstAttribute="bottom" secondItem="5ki-Lo-YSy" secondAttribute="bottom" id="5oi-fW-YOO"/>
+                            <constraint firstItem="vRz-2w-PPA" firstAttribute="leading" secondItem="5ki-Lo-YSy" secondAttribute="leading" id="XAF-y3-xR4"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="5ki-Lo-YSy"/>
+                    </view>
+                    <size key="freeformSize" width="320" height="528"/>
+                    <connections>
+                        <outlet property="actionsContainerView" destination="vRz-2w-PPA" id="91z-aK-gM4"/>
+                        <outlet property="cancelButton" destination="N0d-4q-oiP" id="f0l-9C-2UU"/>
+                        <outlet property="shareAvailabilityButton" destination="Hy5-Pa-MXK" id="hXL-In-SlQ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4h5-Hp-D8h" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1184" y="739"/>
+        </scene>
         <!--InfoVC-->
         <scene sceneID="MHg-HZ-qgY">
             <objects>
