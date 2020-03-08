@@ -20,6 +20,10 @@ class MyInvitesVC: ResponsiveViewController {
 
   var floatingMenu: FloatingMenuBtn?
 
+  var menuItems: [UIImage] {
+    return [UIImage(named: "create")!, UIImage(named: "refresh")!, UIImage(named: "addavailability")!]
+  }
+
   // MARK: - Lifecycle events
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -172,7 +176,7 @@ class MyInvitesVC: ResponsiveViewController {
       break
     default:
       if toggleMenuButton {
-        self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.addButton, images: [UIImage(named: "create")!, UIImage(named: "refresh")!])
+        self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.addButton, images: menuItems)
         self.floatingMenu?.delegate = self
         self.floatingMenu?.toggleMenu()
       }
