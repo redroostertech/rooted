@@ -163,6 +163,7 @@ class MeetingModelBuilder {
         meetingDict["meeting_type"] = meetingtypes.toJSON()
 
       }
+      meetingDict["id"] = RanStringGen(length: 26).returnString()
       meeting = Meeting(JSON: meetingDict)
       return self
     } else {
