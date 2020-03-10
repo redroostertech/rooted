@@ -34,7 +34,7 @@ class MyInvitesVC: ResponsiveViewController {
     view.applyPrimaryGradient()
     addButton.applyCornerRadius()
 
-    NotificationCenter.default.addObserver(self, selector: #selector(refreshInvites), name: Notification.Name(rawValue: "MyInvitesVC.reload"), object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(refreshInvites), name: Notification.Name(rawValue: kNotificationMyInvitesReload), object: nil)
 
     myInvitesManager.invitesDelegate = self
     myInvitesManager.loadData()
@@ -248,10 +248,10 @@ class MyInvitesVC: ResponsiveViewController {
 
       BranchEvent.customEvent(withName: "maximum_reached")
 
-      self.showError(title: "Maximum Invites Reached", message: "At this time you can only have 3 live calendar invites. Please delete ones not in use and then try again.")
+      self.showError(title: "Oops!", message: "At this time, you can only have 3 live calendar invites. Please delete ones not in use and then try again.")
     } else {
-      let sb = UIStoryboard(name: "MainInterface", bundle: nil)
-      let vc = sb.instantiateViewController(withIdentifier: "MessagesNavigationController")
+      let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
+      let vc = sb.instantiateViewController(withIdentifier: kViewControllerMessagesNavigation)
       self.present(vc, animated: true, completion: nil)
     }
   }
@@ -422,6 +422,10 @@ extension MyInvitesVC: FloatingMenuBtnAction {
     case 1:
       progressHUD?.show()
       self.myInvitesManager.refreshMeetings()
+    case 2:
+      let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
+      let vc = sb.instantiateViewController(withIdentifier: kViewControllerAvailabilityNavigation)
+      self.present(vc, animated: true, completion: nil)
     default:
       RRLogger.log(message: "Unsupported menu action", owner: self)
       break

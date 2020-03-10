@@ -329,25 +329,65 @@
                                     <constraint firstItem="Hy5-Pa-MXK" firstAttribute="bottom" secondItem="N0d-4q-oiP" secondAttribute="bottom" id="pT2-jJ-aKc"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HRm-EY-vYX" customClass="FSCalendar">
+                                <rect key="frame" x="0.0" y="140.5" width="320" height="252"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="252" id="tZn-SX-r9S"/>
+                                </constraints>
+                            </view>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="jj2-DI-vwN">
+                                <rect key="frame" x="0.0" y="392.5" width="320" height="77.5"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Availability" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kll-BF-AnM">
+                                <rect key="frame" x="8" y="80" width="304" height="19.5"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set your available hours when people can schedule meetings with you." textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LcG-lY-tdq">
+                                <rect key="frame" x="8" y="103.5" width="304" height="29"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="HRm-EY-vYX" firstAttribute="trailing" secondItem="5ki-Lo-YSy" secondAttribute="trailing" id="4qq-79-ovY"/>
                             <constraint firstItem="vRz-2w-PPA" firstAttribute="trailing" secondItem="5ki-Lo-YSy" secondAttribute="trailing" id="5dZ-Er-Qwu"/>
                             <constraint firstItem="vRz-2w-PPA" firstAttribute="bottom" secondItem="5ki-Lo-YSy" secondAttribute="bottom" id="5oi-fW-YOO"/>
+                            <constraint firstItem="jj2-DI-vwN" firstAttribute="top" secondItem="HRm-EY-vYX" secondAttribute="bottom" id="6RZ-au-kw6"/>
+                            <constraint firstItem="vRz-2w-PPA" firstAttribute="top" secondItem="jj2-DI-vwN" secondAttribute="bottom" id="6yp-7V-PWH"/>
+                            <constraint firstItem="LcG-lY-tdq" firstAttribute="trailing" secondItem="Kll-BF-AnM" secondAttribute="trailing" id="8iH-pw-Lox"/>
+                            <constraint firstItem="5ki-Lo-YSy" firstAttribute="trailing" secondItem="Kll-BF-AnM" secondAttribute="trailing" constant="8" id="C3b-jj-gCi"/>
+                            <constraint firstItem="LcG-lY-tdq" firstAttribute="top" secondItem="Kll-BF-AnM" secondAttribute="bottom" constant="4" id="JwN-Ii-fma"/>
                             <constraint firstItem="vRz-2w-PPA" firstAttribute="leading" secondItem="5ki-Lo-YSy" secondAttribute="leading" id="XAF-y3-xR4"/>
+                            <constraint firstItem="jj2-DI-vwN" firstAttribute="leading" secondItem="5ki-Lo-YSy" secondAttribute="leading" id="afr-1w-hU1"/>
+                            <constraint firstItem="HRm-EY-vYX" firstAttribute="top" secondItem="LcG-lY-tdq" secondAttribute="bottom" constant="8" id="gtP-fE-ezP"/>
+                            <constraint firstItem="jj2-DI-vwN" firstAttribute="trailing" secondItem="5ki-Lo-YSy" secondAttribute="trailing" id="icl-ab-zix"/>
+                            <constraint firstItem="Kll-BF-AnM" firstAttribute="leading" secondItem="5ki-Lo-YSy" secondAttribute="leading" constant="8" id="oVJ-SH-glJ"/>
+                            <constraint firstItem="HRm-EY-vYX" firstAttribute="leading" secondItem="5ki-Lo-YSy" secondAttribute="leading" id="wIB-eA-wa2"/>
+                            <constraint firstItem="Kll-BF-AnM" firstAttribute="top" secondItem="5ki-Lo-YSy" secondAttribute="top" constant="16" id="xfe-uf-qAx"/>
+                            <constraint firstItem="LcG-lY-tdq" firstAttribute="leading" secondItem="Kll-BF-AnM" secondAttribute="leading" id="xnk-P5-AFG"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="5ki-Lo-YSy"/>
                     </view>
+                    <navigationItem key="navigationItem" id="PbH-Uz-0sZ"/>
                     <size key="freeformSize" width="320" height="528"/>
                     <connections>
                         <outlet property="actionsContainerView" destination="vRz-2w-PPA" id="91z-aK-gM4"/>
+                        <outlet property="calendar" destination="HRm-EY-vYX" id="1we-Xr-kHS"/>
+                        <outlet property="calendarHeightConstraint" destination="tZn-SX-r9S" id="gNO-VW-nza"/>
                         <outlet property="cancelButton" destination="N0d-4q-oiP" id="f0l-9C-2UU"/>
                         <outlet property="shareAvailabilityButton" destination="Hy5-Pa-MXK" id="hXL-In-SlQ"/>
+                        <outlet property="tableView" destination="jj2-DI-vwN" id="DTu-Xw-g2G"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4h5-Hp-D8h" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1184" y="739"/>
+            <point key="canvasLocation" x="2123.1999999999998" y="738.53073463268368"/>
         </scene>
         <!--InfoVC-->
         <scene sceneID="MHg-HZ-qgY">
@@ -528,6 +568,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AXn-hd-wGY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-23.199999999999999" y="132.68365817091455"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="x4u-a4-nZ9">
+            <objects>
+                <navigationController storyboardIdentifier="AvailabilityNavigationViewController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="hoY-aP-LVc" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Gg1-tJ-KQD">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="wuH-8U-6F1" kind="relationship" relationship="rootViewController" id="rWl-TR-pUS"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lgF-Su-Xzl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1183.2" y="738.08095952023996"/>
         </scene>
     </scenes>
     <resources>

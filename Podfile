@@ -25,5 +25,6 @@ target 'Rooted MessagesExtension' do
   pod 'SwiftyCodeView'
   pod 'Branch'
   pod 'SwiftDate', '~> 5.0'
+  pod 'FSCalendar'
 
 end

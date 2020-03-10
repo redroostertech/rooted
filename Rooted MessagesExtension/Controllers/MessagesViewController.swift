@@ -457,7 +457,7 @@ class MessagesViewController: FormMessagesAppViewController {
 
         self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
 
-          self.showError(title: "Incomplete Form", message: "Please fill out the entire form to create an invite.")
+          self.showError(title: "Oops!", message: "Please fill out the entire form to create an invite.")
         })
 
         return
@@ -570,7 +570,7 @@ class MessagesViewController: FormMessagesAppViewController {
         })
       } else {
 
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "MyInvitesVC.reload"), object: nil, userInfo: [:])
+        NotificationCenter.default.post(name: Notification.Name(rawValue: kNotificationMyInvitesReload), object: nil, userInfo: [:])
 
         self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: true, complete: {
           completion(true)
@@ -588,7 +588,7 @@ class MessagesViewController: FormMessagesAppViewController {
   }
 
   @IBAction func cancelAction(_ sender: UIButton) {
-    NotificationCenter.default.post(name: Notification.Name(rawValue: "MyInvitesVC.reload"), object: nil, userInfo: [:])
+    NotificationCenter.default.post(name: Notification.Name(rawValue: kNotificationMyInvitesReload), object: nil, userInfo: [:])
     dismiss(animated: true, completion: nil)
   }
 }
@@ -628,6 +628,8 @@ extension MessagesViewController: WWCalendarTimeSelectorProtocol {
 
       if date.timeIntervalSince(Date().addingTimeInterval(60 * 60 * 24 * 7)).isLess(than: 0) {
         return true
+      } else {
+        self.showError(title: "Oops!", message: "At this time, creating meetings outside 7 days from today is not available.")
       }
     }
 

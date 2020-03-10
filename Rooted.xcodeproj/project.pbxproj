@@ -64,12 +64,14 @@
 		D701DC6D23E8DC6B00A45E9B /* PaymentInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D701DC6C23E8DC6B00A45E9B /* PaymentInformation.swift */; };
 		D701DC6F23E9459B00A45E9B /* HUDFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D701DC6E23E9459B00A45E9B /* HUDFactory.swift */; };
 		D701DC7123E945D000A45E9B /* MessageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D701DC7023E945D000A45E9B /* MessageFactory.swift */; };
+		D70741D12417198100115998 /* AvailabilityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70741D02417198100115998 /* AvailabilityManager.swift */; };
 		D71F075423E0CA6E0039F572 /* UISearchBar+Ectensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71F075323E0CA6E0039F572 /* UISearchBar+Ectensions.swift */; };
 		D7255F8C24134FD60048F8D8 /* Zones+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F8B24134FD60048F8D8 /* Zones+Extensions.swift */; };
 		D7255F8E2413607C0048F8D8 /* Zones+Extensions+Readable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F8D2413607C0048F8D8 /* Zones+Extensions+Readable.swift */; };
 		D7255F91241387600048F8D8 /* EmptyHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F8F241387600048F8D8 /* EmptyHeader.swift */; };
 		D7255F92241387600048F8D8 /* EmptyHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7255F90241387600048F8D8 /* EmptyHeader.xib */; };
 		D7255F9424154C460048F8D8 /* AvailabilityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F9324154C460048F8D8 /* AvailabilityViewController.swift */; };
+		D744F2D32416DC3B00F14CA8 /* Availability.swift in Sources */ = {isa = PBXBuildFile; fileRef = D744F2D22416DC3B00F14CA8 /* Availability.swift */; };
 		D747BAB7240EBB0700E571CF /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747BAB6240EBB0600E571CF /* SessionManager.swift */; };
 		D747BAB9240EE5D600E571CF /* RegistrationForm.xib in Resources */ = {isa = PBXBuildFile; fileRef = D747BAB8240EE5D600E571CF /* RegistrationForm.xib */; };
 		D747BABB240EE64900E571CF /* RegistrationForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747BABA240EE64900E571CF /* RegistrationForm.swift */; };
@@ -192,6 +194,9 @@
 		D7A18AEB24063ACC0039A295 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7A18AEA24063ACC0039A295 /* Configuration.swift */; };
 		D7A18AED24063B330039A295 /* BaseAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7A18AEC24063B330039A295 /* BaseAppViewController.swift */; };
 		D7A18AEF24063BB00039A295 /* DefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7A18AEE24063BB00039A295 /* DefaultsManager.swift */; };
+		D7C3B92F2416696700B22E8F /* DateRangePickerInlineRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C3B92E2416696700B22E8F /* DateRangePickerInlineRow.swift */; };
+		D7C3B9312416762D00B22E8F /* DateRangeVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7C3B9302416762D00B22E8F /* DateRangeVC.xib */; };
+		D7C3B9392416880F00B22E8F /* CalendarViewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */; };
 		D7F1AAE3240AD5A200210504 /* DataConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F1AAE2240AD5A200210504 /* DataConverter.swift */; };
 		D7F1AAE9240BEE0F00210504 /* industriesJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE5240BEE0F00210504 /* industriesJson.json */; };
 		D7F1AAEA240BEE0F00210504 /* RootedJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE6240BEE0F00210504 /* RootedJson.json */; };
@@ -290,12 +295,14 @@
 		D701DC6C23E8DC6B00A45E9B /* PaymentInformation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentInformation.swift; sourceTree = "<group>"; };
 		D701DC6E23E9459B00A45E9B /* HUDFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDFactory.swift; sourceTree = "<group>"; };
 		D701DC7023E945D000A45E9B /* MessageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageFactory.swift; sourceTree = "<group>"; };
+		D70741D02417198100115998 /* AvailabilityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityManager.swift; sourceTree = "<group>"; };
 		D71F075323E0CA6E0039F572 /* UISearchBar+Ectensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UISearchBar+Ectensions.swift"; sourceTree = "<group>"; };
 		D7255F8B24134FD60048F8D8 /* Zones+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Zones+Extensions.swift"; sourceTree = "<group>"; };
 		D7255F8D2413607C0048F8D8 /* Zones+Extensions+Readable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Zones+Extensions+Readable.swift"; sourceTree = "<group>"; };
 		D7255F8F241387600048F8D8 /* EmptyHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyHeader.swift; sourceTree = "<group>"; };
 		D7255F90241387600048F8D8 /* EmptyHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmptyHeader.xib; sourceTree = "<group>"; };
 		D7255F9324154C460048F8D8 /* AvailabilityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityViewController.swift; sourceTree = "<group>"; };
+		D744F2D22416DC3B00F14CA8 /* Availability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Availability.swift; sourceTree = "<group>"; };
 		D747BAB6240EBB0600E571CF /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		D747BAB8240EE5D600E571CF /* RegistrationForm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegistrationForm.xib; sourceTree = "<group>"; };
 		D747BABA240EE64900E571CF /* RegistrationForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationForm.swift; sourceTree = "<group>"; };
@@ -418,6 +425,9 @@
 		D7A18AEA24063ACC0039A295 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		D7A18AEC24063B330039A295 /* BaseAppViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseAppViewController.swift; sourceTree = "<group>"; };
 		D7A18AEE24063BB00039A295 /* DefaultsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultsManager.swift; sourceTree = "<group>"; };
+		D7C3B92E2416696700B22E8F /* DateRangePickerInlineRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRangePickerInlineRow.swift; sourceTree = "<group>"; };
+		D7C3B9302416762D00B22E8F /* DateRangeVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DateRangeVC.xib; sourceTree = "<group>"; };
+		D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewRow.swift; sourceTree = "<group>"; };
 		D7F1AAE2240AD5A200210504 /* DataConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataConverter.swift; sourceTree = "<group>"; };
 		D7F1AAE5240BEE0F00210504 /* industriesJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = industriesJson.json; sourceTree = "<group>"; };
 		D7F1AAE6240BEE0F00210504 /* RootedJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RootedJson.json; sourceTree = "<group>"; };
@@ -565,6 +575,7 @@
 				D701DB8123E8DBF600A45E9B /* DataDashboardSection.swift */,
 				D701DB8223E8DBF600A45E9B /* UserProfileDataDashboardSection.swift */,
 				D79A5EA824064287006DAA7A /* MeetingTimeLength.swift */,
+				D744F2D22416DC3B00F14CA8 /* Availability.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -680,6 +691,7 @@
 				BA1314DD225C07370089EDE0 /* EventKitManager.swift */,
 				BA1314DB225BFCE50089EDE0 /* CoreDataManager.swift */,
 				D79A5EAE2406C987006DAA7A /* ConversationManager.swift */,
+				D70741D02417198100115998 /* AvailabilityManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -759,6 +771,9 @@
 		D79A5EDC2407FF90006DAA7A /* Rows */ = {
 			isa = PBXGroup;
 			children = (
+				D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */,
+				D7C3B936241687A700B22E8F /* DateRangeRow */,
+				D7C3B937241687B800B22E8F /* LocationSearchRow */,
 				D79A5F7024083036006DAA7A /* SuggestionRow */,
 				D79A5F53240811FD006DAA7A /* SplitRow */,
 				D79A5EDD2407FF90006DAA7A /* MultipleSelectorRow.swift */,
@@ -891,10 +906,26 @@
 				BA068C052245AD7D00A0EE9B /* MessagesViewController.swift */,
 				BA98DD91225255B90070BC39 /* InfoVC.swift */,
 				BA0D0EDB2248019B00209993 /* InviteDetailsVC.swift */,
-				BA068C1E2247BE2F00A0EE9B /* LocationSearchVC.swift */,
 				D7255F9324154C460048F8D8 /* AvailabilityViewController.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		D7C3B936241687A700B22E8F /* DateRangeRow */ = {
+			isa = PBXGroup;
+			children = (
+				D7C3B92E2416696700B22E8F /* DateRangePickerInlineRow.swift */,
+				D7C3B9302416762D00B22E8F /* DateRangeVC.xib */,
+			);
+			path = DateRangeRow;
+			sourceTree = "<group>";
+		};
+		D7C3B937241687B800B22E8F /* LocationSearchRow */ = {
+			isa = PBXGroup;
+			children = (
+				BA068C1E2247BE2F00A0EE9B /* LocationSearchVC.swift */,
+			);
+			path = LocationSearchRow;
 			sourceTree = "<group>";
 		};
 		D7F1AAE4240BEE0F00210504 /* JSON */ = {
@@ -1015,6 +1046,7 @@
 				D7F1AAEC240BEE0F00210504 /* Rooted_User_Response.json in Resources */,
 				D747BAEB2411C6B200E571CF /* CustomHeader.xib in Resources */,
 				D787A26823E1EB41001795D3 /* GoogleService-Info.plist in Resources */,
+				D7C3B9312416762D00B22E8F /* DateRangeVC.xib in Resources */,
 				BA068C0B2245AD7D00A0EE9B /* Assets.xcassets in Resources */,
 				BA98DD90225101210070BC39 /* MyInviteCell.xib in Resources */,
 				D747BAB9240EE5D600E571CF /* RegistrationForm.xib in Resources */,
@@ -1123,6 +1155,7 @@
 				D79A5FA1240960F5006DAA7A /* Duration.swift in Sources */,
 				D79A5F2F2407FF91006DAA7A /* DateFieldRow.swift in Sources */,
 				BA1314DE225C07370089EDE0 /* EventKitManager.swift in Sources */,
+				D744F2D32416DC3B00F14CA8 /* Availability.swift in Sources */,
 				D79A5F3C2407FF91006DAA7A /* DatePickerRow.swift in Sources */,
 				D79A5EBF240710F0006DAA7A /* RootedCellViewModel.swift in Sources */,
 				BA068C062245AD7D00A0EE9B /* MessagesViewController.swift in Sources */,
@@ -1200,6 +1233,7 @@
 				D7A18AEB24063ACC0039A295 /* Configuration.swift in Sources */,
 				D79A5F2C2407FF91006DAA7A /* DateRow.swift in Sources */,
 				D79A5F1C2407FF91006DAA7A /* SelectableSection.swift in Sources */,
+				D70741D12417198100115998 /* AvailabilityManager.swift in Sources */,
 				D79A5F132407FF91006DAA7A /* Helpers.swift in Sources */,
 				D701DC6923E8DBF600A45E9B /* AccountType.swift in Sources */,
 				D79A5F162407FF91006DAA7A /* HeaderFooterView.swift in Sources */,
@@ -1211,6 +1245,7 @@
 				D79A5F7924083038006DAA7A /* SuggestionRow.swift in Sources */,
 				D701DC5D23E8DBF600A45E9B /* Response.swift in Sources */,
 				D701DC5E23E8DBF600A45E9B /* Meeting.swift in Sources */,
+				D7C3B92F2416696700B22E8F /* DateRangePickerInlineRow.swift in Sources */,
 				D747BAEA2411C6B200E571CF /* CustomHeader.swift in Sources */,
 				BA0D0EF4224A6B7600209993 /* UIView+Extensions+iMess.swift in Sources */,
 				D75711EA23D811E000BDD6A0 /* StepCollectionViewFlowLayout.swift in Sources */,
@@ -1245,6 +1280,7 @@
 				D79A5F102407FF91006DAA7A /* Cell.swift in Sources */,
 				D79A5F402407FF91006DAA7A /* ButtonRow.swift in Sources */,
 				D79A5F9C240960F5006DAA7A /* Int+Timepiece.swift in Sources */,
+				D7C3B9392416880F00B22E8F /* CalendarViewRow.swift in Sources */,
 				D701DC6723E8DBF600A45E9B /* PollResponse.swift in Sources */,
 				D701DC6B23E8DBF600A45E9B /* UserProfileDataDashboardSection.swift in Sources */,
 				BA1314DC225BFCE50089EDE0 /* CoreDataManager.swift in Sources */,

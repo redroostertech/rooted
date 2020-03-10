@@ -48,6 +48,16 @@ class CoreDataManager: NSObject {
     return entity
   }
 
+  var availabilityEntity: NSEntityDescription? {
+    let entity = NSEntityDescription.entity(forEntityName: "AvailabilityEntity", in: persistentContainer.viewContext)
+    return entity
+  }
+
+  var meetingDraftsEntity: NSEntityDescription? {
+    let entity = NSEntityDescription.entity(forEntityName: "MeetingDraftsEntity", in: persistentContainer.viewContext)
+    return entity
+  }
+
     var managedContext: NSManagedObjectContext {
         return persistentContainer.viewContext
     }

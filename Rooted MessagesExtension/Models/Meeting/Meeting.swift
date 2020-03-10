@@ -21,6 +21,7 @@ public class Meetings: Mappable {
     meetings <- map["meetings"]
   }
 }
+
 // MARK: - Meeting
 public class Meeting: Mappable {
   public var id: String?

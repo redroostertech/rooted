@@ -133,6 +133,11 @@ public let kMessageObjectKey = "meetingJSON"
 // MARK: - Storyboard
 public let kStoryboardMain = "MainInterface"
 
+// MARK: - ViewControllers
+public let kViewControllerAvailability = "AvailabilityViewController"
+public let kViewControllerAvailabilityNavigation = "AvailabilityNavigationViewController"
+public let kViewControllerMessagesNavigation = "MessagesNavigationController"
+
 // MARK: - Segues
 public let kGoToDashboardSegue = "goToDashboard"
 public let kGoToLoginSegue = "goToLoginSegue"
@@ -143,3 +148,6 @@ public let kGoToAddInviteVC = "goToAddInviteVC"
 public let kDeleteTitle = "Delete Invite"
 public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
 public let captionString = "%@ on %@"
+
+// MARK: - NotificationCenter Methods
+public let kNotificationMyInvitesReload = "MyInvitesVC.reload"
