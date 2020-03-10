@@ -151,3 +151,12 @@ public let captionString = "%@ on %@"
 
 // MARK: - NotificationCenter Methods
 public let kNotificationMyInvitesReload = "MyInvitesVC.reload"
+public let kNotificationKeyboardWillShowNotification = "keyboardWillShowNotification"
+public let kNotificationKeyboardWillHideNotification = "keyboardWillHideNotification"
+
+// MARK: - Branch Custom Event Keys
+public let kBranchEventSharedConversation = "event_shared_conversation"
+public let kBranchEventSharedConversationFailed = "event_shared_conversation_failed"
+public let kBranchUserStartedSharingAvailability = "user_started_sharing_availability"
+public let kBranchEventAddedAppleCalendar = "event_added_apple_calendar"
+public let kBranchAvailabilityAddedCoreData = "availability_added_core_data"

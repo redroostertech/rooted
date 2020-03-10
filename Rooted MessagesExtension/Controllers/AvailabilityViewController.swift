@@ -59,7 +59,7 @@ class AvailabilityModelBuilder {
       return self
     }
   }
-  func generateMeeting() -> AvailabilityModelBuilder {
+  func generateModel() -> AvailabilityModelBuilder {
     if dictionary != nil {
       var meetingDict: [String: Any] = [:]
 
@@ -194,9 +194,9 @@ class AvailabilityViewController: FormMessagesAppViewController {
   }
 
   private func setupObservers() {
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: NSNotification.Name.init(rawValue: "keyboardWillShowNotification"), object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: NSNotification.Name.init(rawValue: kNotificationKeyboardWillShowNotification), object: nil)
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: NSNotification.Name.init(rawValue: "keyboardWillHideNotification"), object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: NSNotification.Name.init(rawValue: kNotificationKeyboardWillHideNotification), object: nil)
   }
 
   private func displayError() {
@@ -213,7 +213,7 @@ class AvailabilityViewController: FormMessagesAppViewController {
       return
     }
 
-    BranchEvent.customEvent(withName: "event_added_apple_calendar")
+    BranchEvent.customEvent(withName: kBranchAvailabilityAddedCoreData)
 
     // Save availability to Core Data
     self.saveToCoreData(availability, message: message)
@@ -235,13 +235,13 @@ class AvailabilityViewController: FormMessagesAppViewController {
             self.send(message: message, toConversation: ConversationManager.shared.conversation, { success in
               if success {
 
-                BranchEvent.customEvent(withName: "event_shared_conversation")
+                BranchEvent.customEvent(withName: kBranchEventSharedConversation)
 
                 // If message was sent into the conversation dismiss the view
                 self.dismiss(animated: true, completion: nil)
               } else {
 
-                BranchEvent.customEvent(withName: "event_shared_conversation_failed")
+                BranchEvent.customEvent(withName: kBranchEventSharedConversationFailed)
 
                 // TODO: - Handle error if message couldn't be sent
                 self.shareAvailabilityButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
@@ -291,7 +291,7 @@ class AvailabilityViewController: FormMessagesAppViewController {
 
   // MARK: - IBActions
   @IBAction func sendToFriends(_ sender: UIButton) {
-    BranchEvent.customEvent(withName: "user_started_sharing_availability")
+    BranchEvent.customEvent(withName: kBranchUserStartedSharingAvailability)
 
     shareAvailabilityButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
 
@@ -316,7 +316,7 @@ class AvailabilityViewController: FormMessagesAppViewController {
         self.modelBuilder = self.modelBuilder.add(key: "available_dates", value: availabilityDates)
       }
 
-      guard let _ = self.modelBuilder.retrieve(forKey: "available_dates") as? [MeetingDateClass], let availability = self.modelBuilder.generateMeeting().availability else {
+      guard let _ = self.modelBuilder.retrieve(forKey: "available_dates") as? [MeetingDateClass], let availability = self.modelBuilder.generateModel().availability else {
 
         self.shareAvailabilityButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
           self.displayError()
