@@ -138,3 +138,6 @@ public let kGoToDashboardSegue = "goToDashboard"
 public let kGoToLoginSegue = "goToLoginSegue"
 public let kGoToInviteDetails = "goToInviteDetails"
 public let kGoToAddInviteVC = "goToAddInviteVC"
+
+// MARK: - Notifications
+public let kNotificationMyInvitesReload = "MyInvitesVC.reload"

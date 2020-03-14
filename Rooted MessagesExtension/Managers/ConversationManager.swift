@@ -9,6 +9,11 @@
 import Foundation
 import Messages
 
+enum ConversationSendType {
+  case send
+  case insert
+}
+
 final class ConversationManager {
   static var shared = ConversationManager()
 
@@ -34,6 +39,31 @@ final class ConversationManager {
 
   static func update(conversation: MSConversation) {
     ConversationManager.shared.conversation = conversation
+  }
+
+  func send(message: MSMessage, of type: ConversationSendType, _ completion: @escaping (Bool, Error?) -> Void) {
+    guard let convo = self.conversation else {
+      NSLog("[ROOTED-IMESSAGE] MessageFactory: Active conversation unavailable")
+      return completion(false, RError.customError("Oops! Something went wrong. Please try again.").error)
+    }
+    switch type {
+    case .insert:
+      convo.insert(message) { error in
+        if let err = error {
+          completion(false, err)
+        } else {
+          completion(true, nil)
+        }
+      }
+    case .send:
+      convo.send(message) { error in
+        if let err = error {
+          completion(false, err)
+        } else {
+          completion(true, nil)
+        }
+      }
+    }
   }
 }
 

@@ -49,6 +49,8 @@ class EventKitManager: NSObject {
         event.title = title
         event.startDate = startDate
         event.endDate = endDate
+        // TODO: - Use this property to be able to identify event in calendar to delete it
+        // event.eventIdentifier
         event.addAlarm(EKAlarm(relativeOffset: -10800))
         event.addAlarm(EKAlarm(relativeOffset: -86400))
 
@@ -67,6 +69,9 @@ class EventKitManager: NSObject {
       }
     }
 
+    if calendars.count == 0 {
+      completion(false, RError.customError("There was an error retreiving your calendars.").error)
+    }
   }
 
   // MARK: - Public methods
@@ -87,8 +92,8 @@ class EventKitManager: NSObject {
 
   func insertMeeting(meeting: Meeting, _ completion: @escaping (Bool, Error?) -> Void) {
     guard let meetingname = meeting.meetingName,
-      let startdate = meeting.meetingDate?.startDate?.convertToDate(),
-      let enddate = meeting.meetingDate?.endDate?.convertToDate() else {
+      let startdate = meeting.meetingDate?.startDate?.toDate()?.date,
+      let enddate = meeting.meetingDate?.endDate?.toDate()?.date else {
         return completion(false, RError.generalError.error)
       }
     insertEvent(title: meetingname, startDate: startdate, endDate: enddate, location: meeting.meetingLocation, completion)

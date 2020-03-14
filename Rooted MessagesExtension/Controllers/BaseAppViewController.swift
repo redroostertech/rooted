@@ -8,6 +8,7 @@
 
 import Foundation
 import Messages
+import SSSpinnerButton
 
 open class BaseAppViewController: MSMessagesAppViewController {
   var appInitializer = AppInitializer.main
@@ -31,5 +32,31 @@ open class BaseAppViewController: MSMessagesAppViewController {
     }
   }
 
+  func displayError(with title: String, and message: String) {
+    HUDFactory.showError(with: title, and: message, on: self)
+  }
+
+  func stopAnimating(_ spinnerButton: SSSpinnerButton, for completionType: CompletionType, completion: @escaping () -> Void) {
+    spinnerButton.stopAnimatingWithCompletionType(completionType: completionType, complete: completion)
+  }
+
+  func startAnimating(_ spinnerButton: SSSpinnerButton, completion: @escaping () -> Void) {
+    spinnerButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: completion)
+  }
+
+  func displayFailure(with title: String, and message: String, afterAnimating spinnerButton: SSSpinnerButton) {
+    stopAnimating(spinnerButton, for: .fail) {
+      self.displayError(with: title, and: message)
+    }
+  }
+
+  func displaySuccess(afterAnimating spinnerButton: SSSpinnerButton, completion: @escaping () -> Void) {
+    stopAnimating(spinnerButton, for: .success, completion: completion)
+  }
+
+  func postNotification(withName name: String, andUserInfo userInfo: [String: Any]? = [:], completion: @escaping () -> Void) {
+    NotificationCenter.default.post(name: Notification.Name(rawValue: name), object: nil, userInfo: userInfo)
+    completion()
+  }
 }
 

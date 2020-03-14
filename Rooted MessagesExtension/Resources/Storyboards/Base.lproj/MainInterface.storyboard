@@ -18,8 +18,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="528"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="G49-fd-08p">
-                                <rect key="frame" x="0.0" y="20" width="320" height="446"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="G49-fd-08p">
+                                <rect key="frame" x="0.0" y="95" width="320" height="433"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="pUl-Rt-aLE">
                                     <size key="itemSize" width="50" height="50"/>
@@ -42,21 +42,6 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </collectionReusableView>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aFI-iG-64F">
-                                <rect key="frame" x="16" y="476" width="100" height="42"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="100" id="x1J-bE-Owy"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="12"/>
-                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <state key="normal" title="LEARN MORE">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <connections>
-                                    <segue destination="360-OS-VU0" kind="presentation" id="MuS-gQ-daC"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lfh-Px-pbt">
                                 <rect key="frame" x="262" y="476" width="42" height="42"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -64,10 +49,28 @@
                                     <constraint firstAttribute="height" constant="42" id="Jxp-Zg-kLH"/>
                                     <constraint firstAttribute="width" constant="42" id="hnM-xG-fjg"/>
                                 </constraints>
-                                <color key="tintColor" red="0.97254901959999995" green="0.64705882349999999" blue="0.035294117649999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" image="menu"/>
                                 <connections>
                                     <action selector="addAction:" destination="Ts0-8B-CVl" eventType="touchUpInside" id="GmE-Az-d7z"/>
+                                </connections>
+                            </button>
+                            <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BmR-DY-Maj" customClass="ScrollableSegmentedControl" customModule="Rooted_MessagesExtension" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="20" width="200" height="0.0"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" id="LSq-Go-Mpl"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="naM-hf-Hg5">
+                                <rect key="frame" x="269" y="33" width="25" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="49" id="fAM-CR-VEP"/>
+                                </constraints>
+                                <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" image="refresh"/>
+                                <connections>
+                                    <action selector="refreshAction:" destination="Ts0-8B-CVl" eventType="touchUpInside" id="dQ2-aS-WKg"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -75,13 +78,16 @@
                         <constraints>
                             <constraint firstItem="Z6K-sP-Wx0" firstAttribute="trailing" secondItem="lfh-Px-pbt" secondAttribute="trailing" constant="16" id="4qS-hp-GYK"/>
                             <constraint firstItem="G49-fd-08p" firstAttribute="leading" secondItem="Z6K-sP-Wx0" secondAttribute="leading" id="6DQ-GY-hcq"/>
-                            <constraint firstItem="lfh-Px-pbt" firstAttribute="top" secondItem="aFI-iG-64F" secondAttribute="top" id="BQM-HE-Vej"/>
+                            <constraint firstItem="G49-fd-08p" firstAttribute="bottom" secondItem="Z6K-sP-Wx0" secondAttribute="bottom" id="EH1-Ii-wXL"/>
+                            <constraint firstItem="naM-hf-Hg5" firstAttribute="leading" secondItem="BmR-DY-Maj" secondAttribute="trailing" constant="16" id="Ery-jx-VV2"/>
                             <constraint firstItem="Z6K-sP-Wx0" firstAttribute="bottom" secondItem="lfh-Px-pbt" secondAttribute="bottom" constant="10" id="FFj-b2-h2d"/>
-                            <constraint firstItem="aFI-iG-64F" firstAttribute="leading" secondItem="Z6K-sP-Wx0" secondAttribute="leading" constant="16" id="MTC-Cn-cu1"/>
-                            <constraint firstItem="lfh-Px-pbt" firstAttribute="top" secondItem="G49-fd-08p" secondAttribute="bottom" constant="10" id="gtw-v7-NnK"/>
-                            <constraint firstItem="lfh-Px-pbt" firstAttribute="bottom" secondItem="aFI-iG-64F" secondAttribute="bottom" id="qYs-KM-h40"/>
-                            <constraint firstItem="G49-fd-08p" firstAttribute="top" secondItem="Z6K-sP-Wx0" secondAttribute="top" id="s1q-L8-95E"/>
+                            <constraint firstItem="naM-hf-Hg5" firstAttribute="top" secondItem="BmR-DY-Maj" secondAttribute="top" id="KX1-8Z-OSX"/>
+                            <constraint firstItem="G49-fd-08p" firstAttribute="top" secondItem="BmR-DY-Maj" secondAttribute="bottom" id="hAV-ml-BgK"/>
+                            <constraint firstItem="BmR-DY-Maj" firstAttribute="leading" secondItem="Z6K-sP-Wx0" secondAttribute="leading" id="kXM-Yg-zN8"/>
+                            <constraint firstItem="BmR-DY-Maj" firstAttribute="top" secondItem="Z6K-sP-Wx0" secondAttribute="top" id="qBb-dL-nNs"/>
+                            <constraint firstItem="naM-hf-Hg5" firstAttribute="bottom" secondItem="BmR-DY-Maj" secondAttribute="bottom" id="rIg-NM-WVS"/>
                             <constraint firstItem="Z6K-sP-Wx0" firstAttribute="trailing" secondItem="G49-fd-08p" secondAttribute="trailing" id="xHh-t3-wZa"/>
+                            <constraint firstItem="Z6K-sP-Wx0" firstAttribute="trailing" secondItem="naM-hf-Hg5" secondAttribute="trailing" constant="16" id="zyZ-Fo-RrH"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Z6K-sP-Wx0"/>
                     </view>
@@ -89,6 +95,9 @@
                     <connections>
                         <outlet property="addButton" destination="lfh-Px-pbt" id="w29-al-3Le"/>
                         <outlet property="collectionView" destination="G49-fd-08p" id="0pL-Fx-aVq"/>
+                        <outlet property="refreshButton" destination="naM-hf-Hg5" id="8oL-b1-yGJ"/>
+                        <outlet property="segmentControlHeightConstraint" destination="LSq-Go-Mpl" id="QFx-3P-ZRV"/>
+                        <outlet property="segmentedControl" destination="BmR-DY-Maj" id="DX9-La-Dnu"/>
                         <segue destination="YFS-x1-ggo" kind="show" identifier="goToAddInviteVC" id="hBj-aX-Gfx"/>
                     </connections>
                 </viewController>
@@ -465,5 +474,6 @@
         <image name="Rooted" width="2207" height="1524"/>
         <image name="arrow-back-icon" width="25" height="25"/>
         <image name="menu" width="25" height="25"/>
+        <image name="refresh" width="25" height="25"/>
     </resources>
 </document>
