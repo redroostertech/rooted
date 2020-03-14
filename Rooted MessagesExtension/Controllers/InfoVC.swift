@@ -2,8 +2,14 @@ import UIKit
 import Messages
 
 class InfoVC: BaseAppViewController {
-    @IBOutlet var closeButton: UIButton!
-    @IBOutlet var grantAccessButton: UIButton!
+  @IBOutlet private weak var versionLabel: UILabel!
+  @IBOutlet private weak var closeButton: UIButton!
+    @IBOutlet private weak var grantAccessButton: UIButton!
+
+  private var appVersion: String {
+    return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+  }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         closeButton.applyCornerRadius()
@@ -19,7 +25,10 @@ class InfoVC: BaseAppViewController {
                 self.grantAccessButton.backgroundColor = .white
             }
         }
+
+      versionLabel.text = "Version \(appVersion)"
     }
+
     @IBAction func closeAction(_ sender: UIButton) {
         dismiss(animated: true, completion: nil)
     }
