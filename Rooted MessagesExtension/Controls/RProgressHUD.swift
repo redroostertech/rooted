@@ -11,10 +11,16 @@ import UIKit
 
 public class RProgressHUD {
 
-  internal static var hud: UIView?
+  private var hud: UIView?
+  private var parent: UIView?
 
-  public static func show(on view: UIView?) {
-    guard let appWindow = view else { return }
+  init(on view: UIView?) {
+    parent = view
+  }
+
+  public func show() {
+    
+    guard let appWindow = parent else { return }
 
     let spinnerView = UIView.init(frame: appWindow.bounds)
     spinnerView.backgroundColor = UIColor.gradientColor1.withAlphaComponent(0.75)
@@ -22,19 +28,15 @@ public class RProgressHUD {
     ai.startAnimating()
     ai.center = spinnerView.center
 
-    DispatchQueue.main.async {
-      spinnerView.addSubview(ai)
-      appWindow.addSubview(spinnerView)
-      appWindow.bringSubviewToFront(spinnerView)
-    }
+    spinnerView.addSubview(ai)
+    appWindow.addSubview(spinnerView)
+    appWindow.bringSubviewToFront(spinnerView)
 
-    RProgressHUD.hud = spinnerView
+    hud = spinnerView
   }
 
-  public static func dismiss() {
-    DispatchQueue.main.async {
-      RProgressHUD.hud?.removeFromSuperview()
-      RProgressHUD.hud = nil
-    }
+  public func dismiss() {
+    self.hud?.removeFromSuperview()
+    self.hud = nil
   }
 }

@@ -128,9 +128,12 @@ extension String {
         return isEqual
     }
 
-    func toDate(_ format: CustomDateFormat = .timeDate) -> Date {
+  func convertToDate(_ format: CustomDateFormat = .rooted, inTimeZone: String? = nil) -> Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format.rawValue
+        if inTimeZone == nil {
+            dateFormatter.timeZone = .autoupdatingCurrent
+        }
         print(dateFormatter.date(from: self))
         return dateFormatter.date(from: self) ?? Date()
     }

@@ -10,13 +10,18 @@
 
 import Foundation
 import ObjectMapper
+import SwiftDate
 
 // MARK: - MeetingDateClass
 public class MeetingDateClass: Mappable {
   public var month, monthSh, dayOfWeek, dayNumerical: String?
   public var year, yearSh: String?
+  public var endMonth, endMonthSh, endDayOfWeek, endDayNumerical: String?
+  public var endYear, endYearSh: String?
   public var startTime, endTime: Time?
   public var dateString: String?
+  public var startDate, endDate: String?
+  public var timeZone: String?
 
   required public init?(map: Map) { }
 
@@ -30,5 +35,28 @@ public class MeetingDateClass: Mappable {
     startTime <- map["start_time"]
     endTime <- map["end_time"]
     dateString <- map["date_string"]
+    endMonth <- map["end_month"]
+    endMonthSh <- map["end_month_sh"]
+    endDayOfWeek <- map["end_day_of_week"]
+    endDayNumerical <- map["end_day_numerical"]
+    endYear <- map["end_year"]
+    endYearSh <- map["end_year_sh"]
+    startDate <- map["start_date"]
+    endDate <- map["end_date"]
+    timeZone <- map["time_zone"]
   }
+
+  public var readableTime: String {
+    var string = ""
+    guard let startdate = startDate?.toDate()?.date, let enddate = endDate?.toDate()?.date else { return string }
+    if startdate.toString() == enddate.toString() {
+      string += startdate.toString(.proper)
+      string += " to \(enddate.toString(.timeOnly))"
+    } else {
+      string += startdate.toString(.abbrMonthDayTime)
+      string += " to \(enddate.toString(.abbrMonthDayTime))"
+    }
+    return string
+  }
+
 }

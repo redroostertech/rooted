@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CustomHeader" id="U6b-Vx-4bR" customClass="CustomHeader" customModule="Rooted_MessagesExtension" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1WS-gX-F59">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S4S-na-eRL">
+                            <rect key="frame" x="8" y="16" width="304" height="18"/>
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="S4S-na-eRL" secondAttribute="bottom" constant="16" id="QOr-6m-JNd"/>
+                        <constraint firstAttribute="trailing" secondItem="S4S-na-eRL" secondAttribute="trailing" constant="8" id="YnZ-C4-43X"/>
+                        <constraint firstItem="S4S-na-eRL" firstAttribute="top" secondItem="1WS-gX-F59" secondAttribute="top" constant="16" id="bhy-tb-dB9"/>
+                        <constraint firstItem="S4S-na-eRL" firstAttribute="leading" secondItem="1WS-gX-F59" secondAttribute="leading" constant="8" id="cEv-oN-AZP"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="1WS-gX-F59" secondAttribute="bottom" id="BWA-qH-BLZ"/>
+                <constraint firstItem="1WS-gX-F59" firstAttribute="top" secondItem="U6b-Vx-4bR" secondAttribute="top" id="EbH-rO-8Od"/>
+                <constraint firstItem="1WS-gX-F59" firstAttribute="leading" secondItem="VXr-Tz-HHm" secondAttribute="leading" id="RoB-dt-ZO0"/>
+                <constraint firstItem="VXr-Tz-HHm" firstAttribute="trailing" secondItem="1WS-gX-F59" secondAttribute="trailing" id="SFJ-0T-U8F"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="VXr-Tz-HHm"/>
+            <connections>
+                <outlet property="mainTitleLabel" destination="S4S-na-eRL" id="YXR-VT-Id7"/>
+            </connections>
+        </collectionReusableView>
+    </objects>
+</document>

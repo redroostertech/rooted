@@ -165,6 +165,9 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.3):
     - BoringSSL-GRPC/Interface (= 0.0.3)
   - BoringSSL-GRPC/Interface (0.0.3)
+  - Branch (0.31.4):
+    - Branch/Core (= 0.31.4)
+  - Branch/Core (0.31.4)
   - Firebase/Analytics (6.16.0):
     - Firebase/Core
   - Firebase/Auth (6.16.0):
@@ -302,6 +305,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
+  - Branch
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Core
@@ -318,6 +322,7 @@ SPEC REPOS:
     - abseil
     - Alamofire
     - BoringSSL-GRPC
+    - Branch
     - Firebase
     - FirebaseAnalytics
     - FirebaseAuth
@@ -350,6 +355,7 @@ SPEC CHECKSUMS:
   abseil: 18063d773f5366ff8736a050fe035a28f635fd27
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   BoringSSL-GRPC: db8764df3204ccea016e1c8dd15d9a9ad63ff318
+  Branch: 5180bca89b8942dd0fe8175d7ecb8a8a451cf5b0
   Firebase: 497158b816d0a86fc31babbd05546fcd7e6083ff
   FirebaseAnalytics: cf95d3aab897612783020fbd98401d5366f135ee
   FirebaseAuth: 5ce2b03a3d7fe56b7a6e4c5ec7ff1522890b1d6f
@@ -378,6 +384,6 @@ SPEC CHECKSUMS:
   SSSpinnerButton: ba9ec6858f2f6fa902a5131d3aec5282588241f8
   SwiftyCodeView: c1e2623d81e9b1d98d1d0203c8d8905447d77a4e
 
-PODFILE CHECKSUM: 81b30cbaf8fde7bf2c77a753685da5d26c57f621
+PODFILE CHECKSUM: d21fd67ef602992493ce9c9092ce825b7c81d208
 
 COCOAPODS: 1.8.4

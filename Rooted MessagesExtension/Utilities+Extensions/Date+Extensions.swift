@@ -13,6 +13,9 @@ enum CustomDateFormat: String {
     case timeDate = "yyyy-MM-dd'T'HH:mm:ssZ"
     case regular = "yyyy-MM-dd hh:mm a"
     case rooted = "MMMM d YYYY @ h:mm a"
+    case proper = "M/d/yyyy h:mm aa"
+    case timeOnly = "h:mm aa"
+    case abbrMonthDayTime = "MMM d @ h:mm aa"
 }
 
 //  MARK:- Initializers
@@ -144,6 +147,7 @@ extension Date {
     func toString(_ format: CustomDateFormat = .timeDate) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format.rawValue
+        dateFormatter.timeZone = .autoupdatingCurrent
         return dateFormatter.string(from: self)
     }
 
