@@ -147,6 +147,7 @@ extension Date {
     func toString(_ format: CustomDateFormat = .timeDate) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format.rawValue
+        dateFormatter.timeZone = .autoupdatingCurrent
         return dateFormatter.string(from: self)
     }
 

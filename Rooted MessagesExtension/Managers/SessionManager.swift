@@ -23,7 +23,7 @@ class SessionManager {
     return UserProfileData(JSONString: userDict)
   }
   var sessionStart: Date {
-    return DefaultsManager.shared.retrieveStringDefault(forKey: kSessionStart)?.convertToDate() ?? Date()
+    return DefaultsManager.shared.retrieveStringDefault(forKey: kSessionStart)?.toDate()?.date ?? Date()
   }
   private init() { }
 

@@ -1,11 +1,13 @@
 import UIKit
 import Messages
-import MapKit
-import EventKit
-import iMessageDataKit
 import SSSpinnerButton
-import CoreLocation
 import Branch
+import SwiftDate
+
+enum ResponseType {
+  case accept
+  case decline
+}
 
 class InviteDetailsVC: FormMessagesAppViewController {
 
@@ -14,13 +16,11 @@ class InviteDetailsVC: FormMessagesAppViewController {
   @IBOutlet private weak var backButton: UIButton!
   @IBOutlet private weak var actionsContainerView: UIView!
 
-  private var eventKitManager = EventKitManager()
-  private var coreDataManager = CoreDataManager()
-  private var invitesManager = MyInvitesManager()
-  private let eventStore = EKEventStore()
+  private var contentManager = RootedContentManager(managerType: .receive)
+  private var conversationManager = ConversationManager.shared
 
   private var shouldSendRespone = false
-  fileprivate var meeting: Meeting?
+  private var meeting: Meeting?
 
   // MARK: - Lifecycle methods
   static func setupViewController(meeting: Meeting) -> InviteDetailsVC {
@@ -40,13 +40,15 @@ class InviteDetailsVC: FormMessagesAppViewController {
     form
       +++ Section("Event details")
 
-      +++ Section("Title of Event")
+      +++ Section("Event Name")
       <<< LabelRow() {
         $0.tag = "meeting_name"
         if let meetingName = self.meeting?.meetingName {
           $0.title = meetingName
         }
       }
+
+      +++ Section("Event Location")
       <<< ButtonRow() {
         $0.tag = "meeting_location"
         if let meetingLocation = meeting?.meetingLocation {
@@ -56,28 +58,25 @@ class InviteDetailsVC: FormMessagesAppViewController {
         }
       }
 
-      +++ Section("Time of Event")
+      +++ Section(header: "Event Start Date/Time", footer: "Time has been converted to your time zone for your convenience.")
       <<< LabelRow() {
         $0.tag = "meeting_date"
         if let meetingTime = meeting?.meetingDate {
           $0.title  = meetingTime.readableTime
         }
       }
-      <<< LabelRow() {
-        $0.tag = "meeting_time_zone"
-        $0.title  = meeting?.meetingDate?.timeZone ?? "No time zone provided"
-    }
 
     for meetingType in meeting?.meetingType ?? [MeetingType]() {
       self.form
-      +++ ButtonRow() {
+      +++ Section("Type of Event")
+      <<< ButtonRow() {
         $0.tag = meetingType.typeOfMeeting ?? ""
         if meetingType.typeOfMeeting ?? "" == "type_of_meeting_phone" {
           $0.title = "Join by phone: \(meetingType.meetingMeta ?? "")"
         }
 
         if meetingType.typeOfMeeting ?? "" == "type_of_meeting_video" {
-          $0.title = "Join by url: \(meetingType.meetingMeta ?? "")"
+          $0.title = "Join by web conference: \(meetingType.meetingMeta ?? "")"
         }
       }.onCellSelection { cell, row in
         if let rowTag = row.tag {
@@ -143,6 +142,13 @@ class InviteDetailsVC: FormMessagesAppViewController {
       }
     }
 
+    self.form
+      +++ Section("Event Description")
+      <<< TextAreaRow("meeting_description") {
+        $0.value = self.meeting?.meetingDescription ?? "No description provided."
+        $0.textAreaMode = .readOnly
+        $0.textAreaHeight = .fixed(cellHeight: 125)
+    }
 
     if let currentUser = SessionManager.shared.currentUser, let meetingOwner = meeting?.owner, let meetingOwnerId = meetingOwner.id, meetingOwnerId == currentUser.id  {
       view.sendSubviewToBack(actionsContainerView)
@@ -163,62 +169,28 @@ class InviteDetailsVC: FormMessagesAppViewController {
     rowKeyboardSpacing = 20
   }
 
-  override func willBecomeActive(with conversation: MSConversation) {
-    super.willBecomeActive(with: conversation)
-    DispatchQueue.main.async {
-      if self.presentationStyle != .expanded {
-        self.requestPresentationStyle(.expanded)
-      }
-    }
-    activeConvo = conversation
-  }
-
-  override func didStartSending(_ message: MSMessage, conversation: MSConversation) {
-    super.didStartSending(message, conversation: conversation)
-    activeConvo = conversation
-  }
-
   // MARK: - Private member methods
-  func displayError(with title: String, and message: String) {
-    HUDFactory.showError(with: title, and: message, on: self)
-  }
-
-  private func stopAnimatingButtonAndDisplayError(with title: String, and message: String) {
-    self.acceptInviteButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-      self.displayError(with: title, and: message)
-    })
-  }
-
-  private func stopAnimatingButtonAndDisplaySuccess() {
-    self.acceptInviteButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: true, complete: {
-      self.dismiss(animated: true, completion: nil)
-    })
-  }
-
-  private func acceptInvite() {
-    acceptInviteButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
-
-
-      guard let meeting = self.meeting else {
-        return self.stopAnimatingButtonAndDisplayError(with: "Error", and: "There was an error adding event to your calendar. Please try again.")
-      }
-
-      // Insert invite into calendar
-      self.insert(meeting: meeting)
-    })
-  }
-
-  private func declineInvite() {
+  private func sendResponse(_ type: ResponseType, to meeting: Meeting) {
     let sendResponseAction = UIAlertAction(title: "Yes", style: .default, handler: { action in
-
       if self.shouldSendRespone {
-
         let okAction = UIAlertAction(title: "Ok", style: .default, handler: { action in
-          let message = MessageFactory.generateMessage(title: "I'm sorry but I will have to decline this invite.")
-          MessageFactory.send(message: message, to: self.activeConvo, of: .insert) { success in
-            NSLog("[ROOTED-IMESSAGE] InviteDetailsVC: User declined the event.")
+
+          var message: MSMessage!
+
+          switch type {
+          case .decline:
+            message = MessageFactory.Meetings.Response.generateResponse(to: meeting, withText: "I'm sorry but I will have to decline this invite.")
+          case .accept:
+            message = MessageFactory.Meetings.Response.generateResponse(to: meeting, withText: "I am confirmed. See you soon!")
           }
+
+          self.conversationManager.send(message: message, of: .insert, { (success, error) in
+            self.displaySuccess(afterAnimating: self.acceptInviteButton, completion: {
+              NSLog("[ROOTED-IMESSAGE] InviteDetailsVC: User \(type) the event.")
+            })
+          })
         })
+
         HUDFactory.displayAlert(with: "Send Response", message: "Use the close button to dismiss view and send invite response", and: [okAction], on: self)
 
       } else {
@@ -227,52 +199,42 @@ class InviteDetailsVC: FormMessagesAppViewController {
     })
 
     let noAction = UIAlertAction(title: "No", style: .default, handler: { action in
-      NSLog("[ROOTED-IMESSAGE] InviteDetailsVC: User did not decline the event.")
+      self.displaySuccess(afterAnimating: self.acceptInviteButton, completion: {
+        NSLog("[ROOTED-IMESSAGE] InviteDetailsVC: User did not \(type) the event.")
+      })
     })
 
-    HUDFactory.displayAlert(with: "Decline Event", message: "Are you sure you want to decline this event?", and: [sendResponseAction, noAction], on: self)
+    switch type {
+    case .accept:
+      HUDFactory.displayAlert(with: "Accept Event", message: "Are you sure you want to accept this event?", and: [sendResponseAction, noAction], on: self)
+    case .decline:
+      HUDFactory.displayAlert(with: "Decline Event", message: "Are you sure you want to decline this event?", and: [sendResponseAction, noAction], on: self)
+    }
   }
 
-  private func stopAnimatingButtonDisplayGenericError() {
-    self.stopAnimatingButtonAndDisplayError(with: "Error", and: "Something went wrong. Please try again.")
+  private func acceptInvite() {
+    startAnimating(acceptInviteButton) {
+      guard let mting = self.meeting else {
+        return self.displayFailure(with: "Oops!", and: "There was an error adding event to your calendar. Please try again.", afterAnimating: self.acceptInviteButton)
+      }
+      self.insert(meeting: mting)
+    }
+  }
+
+  private func declineInvite() {
+    guard let mting = meeting else { return }
+    sendResponse(.decline, to: mting)
   }
 
   private func insert(meeting: Meeting) {
-    // Send meeting object to event kit manager to save as event into calendar
-    eventKitManager.insertMeeting(meeting: meeting) { (success, error) in
-      if let _ = error {
-
-        // TODO: - Handle error
-        self.stopAnimatingButtonDisplayGenericError()
-
+    contentManager.insert(meeting) { (success, error) in
+      if let err = error {
+        self.displayFailure(with: "Oops!", and: err.localizedDescription, afterAnimating: self.acceptInviteButton)
       } else {
         if success {
-
-          if self.shouldSendRespone {
-
-            let okAction = UIAlertAction(title: "Ok", style: .default, handler: { action in
-              let message = MessageFactory.generateMessage(title: "I am confirmed. See you soon!")
-
-              MessageFactory.send(message: message,
-                                  to: ConversationManager.shared.conversation,
-                                  of: .insert, { success in
-                if success {
-
-                  self.stopAnimatingButtonAndDisplaySuccess()
-
-                } else {
-
-                  self.stopAnimatingButtonDisplayGenericError()
-
-                }
-              })
-            })
-
-            HUDFactory.displayAlert(with: "Send Response", message: "Use the close button to dismiss view and send invite response", and: [okAction], on: self)
-
-          } else {
-            self.stopAnimatingButtonAndDisplaySuccess()
-          }
+          self.sendResponse(.accept, to: meeting)
+        } else {
+          self.displayFailure(with: "Oops!", and: "Something went wrong. Please try again.", afterAnimating: self.acceptInviteButton)
         }
       }
     }
@@ -280,16 +242,12 @@ class InviteDetailsVC: FormMessagesAppViewController {
 
   // MARK: - IBActions
   @IBAction func acceptInvite(_ sender: UIButton) {
-
     BranchEvent.customEvent(withName: "event_invite_accepted")
-
     acceptInvite()
   }
 
   @IBAction func declineInvite(_ sender: UIButton) {
-
     BranchEvent.customEvent(withName: "event_invite_declined")
-
     declineInvite()
   }
 

@@ -4,8 +4,8 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>rooted.app.link</string>
-		<string>rooted-alternate.app.link</string>
+		<string>applinks:rooted.app.link</string>
+		<string>applinks:rooted-alternate.app.link</string>
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>

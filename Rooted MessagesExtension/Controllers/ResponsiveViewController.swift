@@ -26,38 +26,38 @@ class ResponsiveViewController: BaseAppViewController {
 
   func setup(collectionView: UICollectionView,
              cells: [RootedCollectionViewModel]) {
-    self.cells = cells
+    if mainCollectionViewController == nil {
+      mainCollectionViewController = collectionView
+      mainCollectionViewController?.delegate = self
+      mainCollectionViewController?.dataSource = self
+      mainCollectionViewController?.register(UINib(nibName: "CustomHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "CustomHeader")
+      mainCollectionViewController?.register(UINib(nibName: "EmptyHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "EmptyHeader")
 
-    mainCollectionViewController = collectionView
-    mainCollectionViewController?.delegate = self
-    mainCollectionViewController?.dataSource = self
-    mainCollectionViewController?.register(UINib(nibName: "CustomHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "CustomHeader")
-    mainCollectionViewController?.register(UINib(nibName: "EmptyHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "EmptyHeader")
-
-    mainCollectionViewController?.emptyDataSetView { view in
-      view.titleLabelString(NSAttributedString(string: "No Events"))
-        .detailLabelString(NSAttributedString(string: "When you create or receive an event invite, it will show up here."))
-        .image(UIImage(named: "empty"))
-        .dataSetBackgroundColor(UIColor.white)
-        .shouldDisplay(true)
-        .shouldFadeIn(true)
-        .isTouchAllowed(true)
-        .isScrollAllowed(true)
-        .didTapDataButton {
-          // Do something
+      mainCollectionViewController?.emptyDataSetView { view in
+        view.titleLabelString(NSAttributedString(string: "No Events"))
+          .detailLabelString(NSAttributedString(string: "When you create or receive an event invite, it will show up here."))
+          .image(UIImage(named: "empty"))
+          .dataSetBackgroundColor(UIColor.white)
+          .shouldDisplay(true)
+          .shouldFadeIn(true)
+          .isTouchAllowed(true)
+          .isScrollAllowed(true)
+          .didTapDataButton {
+            // Do something
+          }
+          .didTapContentView {
+            // Do something
         }
-        .didTapContentView {
-          // Do something
       }
+      registerCells(with: [RootedCollectionViewCell.identifier])
     }
-    registerCells(with: [RootedCollectionViewCell.identifier])
-    mainCollectionViewController?.reloadData()
 
-    loadSections()
+    reloadTable(with: cells)
   }
 
-  func reloadTable(withData cells: [RootedCollectionViewModel]) {
-    self.cells = cells
+  private func reloadTable(with data: [RootedCollectionViewModel]) {
+    cells.removeAll()
+    cells = data
     mainCollectionViewController?.reloadData()
     loadSections()
   }
@@ -80,7 +80,7 @@ class ResponsiveViewController: BaseAppViewController {
     switch layoutOption {
     case .horizontalList:
 
-      maincollectionviewcontroller.contentInset = UIEdgeInsets(top: 0.0, left: 0, bottom: 0.0, right: 0)
+      maincollectionviewcontroller.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
       flowLayout.headerReferenceSize = .zero
       flowLayout.minimumInteritemSpacing = 0
       flowLayout.minimumLineSpacing = 0
@@ -89,7 +89,7 @@ class ResponsiveViewController: BaseAppViewController {
 
     case .list:
 
-      flowLayout.headerReferenceSize = CGSize(width:  self.view.bounds.width, height: kListViewSectionSize)
+//      flowLayout.headerReferenceSize = CGSize(width:  self.view.bounds.width, height: kListViewSectionSize)
       flowLayout.minimumInteritemSpacing = 0
       flowLayout.minimumLineSpacing = 0
       flowLayout.itemSize = CGSize(width: self.view.bounds.width, height: 200)

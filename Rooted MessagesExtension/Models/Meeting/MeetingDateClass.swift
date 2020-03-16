@@ -10,6 +10,7 @@
 
 import Foundation
 import ObjectMapper
+import SwiftDate
 
 // MARK: - MeetingDateClass
 public class MeetingDateClass: Mappable {
@@ -47,14 +48,15 @@ public class MeetingDateClass: Mappable {
 
   public var readableTime: String {
     var string = ""
-    guard let startdate = startDate, let enddate = endDate else { return string }
-    if startdate.convertToDate(.normal).toString() == enddate.convertToDate(.normal).toString() {
-      string += startdate.convertToDate().toString(.proper)
-      string += " to \(enddate.convertToDate().toString(.timeOnly))"
+    guard let startdate = startDate?.toDate()?.date, let enddate = endDate?.toDate()?.date else { return string }
+    if startdate.toString() == enddate.toString() {
+      string += startdate.toString(.proper)
+      string += " to \(enddate.toString(.timeOnly))"
     } else {
-      string += startdate.convertToDate().toString(.abbrMonthDayTime)
-      string += " to \(enddate.convertToDate().toString(.abbrMonthDayTime))"
+      string += startdate.toString(.abbrMonthDayTime)
+      string += " to \(enddate.toString(.abbrMonthDayTime))"
     }
     return string
   }
+
 }

@@ -9,19 +9,23 @@ import Branch
 
 class MyInvitesVC: ResponsiveViewController {
 
+  @IBOutlet private weak var refreshButton: UIButton!
+  @IBOutlet private weak var segmentedControl: ScrollableSegmentedControl!
+  @IBOutlet private weak var segmentControlHeightConstraint: NSLayoutConstraint!
   @IBOutlet private weak var collectionView: UICollectionView!
-  @IBOutlet private var addButton: UIButton!
+  @IBOutlet private weak var addButton: UIButton!
 
-  private var myInvitesManager = MyInvitesManager()
+  private var dataManager = MeetingsManager()
   private var eventKitManager = EventKitManager()
   private var progressHUD: RProgressHUD?
+  private var menuSelection = 0
 
-  var anonymousUser: UserProfileData?
+  public var anonymousUser: UserProfileData?
+  public var toggleMenuButton = false
+  public var floatingMenu: FloatingMenuBtn?
 
-  var floatingMenu: FloatingMenuBtn?
-
-  var menuItems: [UIImage] {
-    return [UIImage(named: "create")!, UIImage(named: "refresh")!, UIImage(named: "addavailability")!]
+  var menuItemImages: [UIImage] {
+    return [UIImage(named: "plus")!, UIImage(named: "info")!, UIImage(named: "addavailability")!]
   }
 
   // MARK: - Lifecycle events
@@ -31,13 +35,26 @@ class MyInvitesVC: ResponsiveViewController {
     progressHUD = RProgressHUD(on: self.view)
     progressHUD!.show()
 
-    view.applyPrimaryGradient()
     addButton.applyCornerRadius()
+    addButton.backgroundColor = .gradientColor2
+
+    segmentedControl.segmentStyle = .textOnly
+    segmentedControl.insertSegment(withTitle: "Upcoming", image: nil, at: 0)
+    segmentedControl.insertSegment(withTitle: "Sent", image: nil, at: 1)
+    // TODO: - Work on editing an invite so that drafts can be done
+//    segmentedControl.insertSegment(withTitle: "Drafts", image: nil, at: 2)
+    segmentedControl.underlineHeight = 3.0
+    segmentedControl.tintColor = .darkGray
+    segmentedControl.underlineSelected = true
+    segmentedControl.selectedSegmentIndex = menuSelection
+    segmentedControl.fixedSegmentWidth = true
+
+    segmentedControl.addTarget(self, action: #selector(self.segmentSelected(sender:)), for: .valueChanged)
 
     NotificationCenter.default.addObserver(self, selector: #selector(refreshInvites), name: Notification.Name(rawValue: kNotificationMyInvitesReload), object: nil)
 
-    myInvitesManager.invitesDelegate = self
-    myInvitesManager.loadData()
+    dataManager.delegate = self
+    dataManager.loadInvites()
     
   }
 
@@ -51,15 +68,12 @@ class MyInvitesVC: ResponsiveViewController {
   }
  */
 
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-  }
-
   override func willBecomeActive(with conversation: MSConversation) {
     super.willBecomeActive(with: conversation)
 
     // Setup Branch
     let branch = Branch.getInstance()
+
     // Validate integration
     // TODO: - Comment this out before sending to production
     // branch.validateSDKIntegration()
@@ -126,7 +140,7 @@ class MyInvitesVC: ResponsiveViewController {
       guard
         let selectedmessage = ConversationManager.shared.selectedMessage,
         selectedmessage.md.string(forKey: kMessageTitleKey) != nil,
-        let meeting = DataConverter.Meetings.messageToMeeting(selectedmessage) else { return }
+        let meeting = MessageFactory.Meetings.messageToMeeting(selectedmessage) else { return }
 
       let destination = InviteDetailsVC.setupViewController(meeting: meeting)
       self.present(destination, animated: true, completion: nil)
@@ -144,9 +158,11 @@ class MyInvitesVC: ResponsiveViewController {
     case .compact, .transcript:
       self.dismiss(animated: true, completion: nil)
       self.layoutOption = .horizontalList
+      self.segmentControlHeightConstraint.constant = 0
       break
     default:
       self.layoutOption = .list
+      self.segmentControlHeightConstraint.constant = 49
       break
     }
   }
@@ -158,9 +174,11 @@ class MyInvitesVC: ResponsiveViewController {
     case .compact, .transcript:
       self.dismiss(animated: true, completion: nil)
       self.layoutOption = .horizontalList
+      self.segmentControlHeightConstraint.constant = 0
       break
     default:
       self.layoutOption = .list
+      self.segmentControlHeightConstraint.constant = 49
       break
     }
   }
@@ -173,13 +191,15 @@ class MyInvitesVC: ResponsiveViewController {
       self.toggleMenuButton = false
       self.floatingMenu?.isOpen = true
       self.floatingMenu?.toggleMenu()
+      self.segmentControlHeightConstraint.constant = 0
       break
     default:
       if toggleMenuButton {
-        self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.addButton, images: menuItems)
+        self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.addButton, images: self.menuItemImages)
         self.floatingMenu?.delegate = self
         self.floatingMenu?.toggleMenu()
       }
+      self.segmentControlHeightConstraint.constant = 49
       break
     }
   }
@@ -211,7 +231,7 @@ class MyInvitesVC: ResponsiveViewController {
   }
 
   private func share(_ invite: Meeting?) {
-    guard let subject = invite, let message = DataConverter.Meetings.meetingToMessage(subject) else {
+    guard let subject = invite, let message = MessageFactory.Meetings.meetingToMessage(subject) else {
       self.showError(title: "Error", message: "There was an error trying to share the invite into the current chat. Please try again.")
       return
     }
@@ -232,7 +252,7 @@ class MyInvitesVC: ResponsiveViewController {
 
     let alert = UIAlertController(title: kDeleteTitle, message: kDeleteMessage, preferredStyle: .alert)
     let yes = UIAlertAction(title: "Yes", style: .default, handler: { action in
-      self.myInvitesManager.deleteMeeting(subject)
+      self.dataManager.deleteInvite(subject)
     })
     let no = UIAlertAction(title: "No", style: .default, handler: { action in
       alert.dismiss(animated: true, completion: nil)
@@ -244,7 +264,7 @@ class MyInvitesVC: ResponsiveViewController {
 
   @objc
   private func inviteCountCheck() {
-    if self.myInvitesManager.maximumReached {
+    if self.dataManager.maximumReached {
 
       BranchEvent.customEvent(withName: "maximum_reached")
 
@@ -258,12 +278,28 @@ class MyInvitesVC: ResponsiveViewController {
 
   @objc
   private func refreshInvites() {
-    myInvitesManager.refreshMeetings()
+    dataManager.refreshMeetings()
   }
 
-  public var toggleMenuButton = false
+  @objc
+  private func segmentSelected(sender:ScrollableSegmentedControl) {
+    print("Segment at index \(sender.selectedSegmentIndex)  selected")
+    menuSelection = sender.selectedSegmentIndex
+
+    toggleMenuButton = false
+    floatingMenu?.isOpen = true
+    floatingMenu?.toggleMenu()
+
+    refreshInvites()
+
+  }
 
   // MARK: - IBActions
+  @IBAction func refreshAction(_ sender: UIButton) {
+    progressHUD?.show()
+    dataManager.refreshMeetings()
+  }
+
   @IBAction func addAction(_ sender: UIButton) {
     NavigationCoordinator.performExpandedNavigation(from: self) {
 
@@ -274,7 +310,7 @@ class MyInvitesVC: ResponsiveViewController {
         self.toggleMenuButton = true
         if self.presentationStyle == .expanded {
           if self.floatingMenu == nil {
-            self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.addButton, images: [UIImage(named: "create")!, UIImage(named: "refresh")!])
+            self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.addButton, images: self.menuItemImages)
             self.floatingMenu?.delegate = self
           }
           self.floatingMenu!.toggleMenu()
@@ -291,8 +327,8 @@ extension MyInvitesVC: MyInvitesDelegate {
     // Will remove invite
   }
 
-  func willRefreshInvites(_ manager: Any?) {
-    // Will refresh invites
+  func didDeleteInvite(_ manager: Any?, invite: MeetingContextWrapper){
+    // Invite was deleted
   }
 
   func didFailToLoad(_ manager: Any?, error: Error) {
@@ -303,47 +339,10 @@ extension MyInvitesVC: MyInvitesDelegate {
 
   func didFinishLoading(_ manager: Any?, invites: [MeetingContextWrapper]) {
     progressHUD?.dismiss()
-    var collectionViewModels = [RootedCollectionViewModel]()
-    let collectionViewModel = RootedCollectionViewModel(section: .sent, cells: [RootedCellViewModel]())
 
-    for invite in invites {
-      let viewModel = RootedCellViewModel(data: invite.meeting, delegate: self)
-      viewModel.delegate = self
-      viewModel.managedObject = invite.managedObject
-      collectionViewModel.cells.append(viewModel)
-    }
+    let rootedCollectionViewModel = MessageFactory.Meetings.convert(contextWrappers: invites, for: menuSelection, withDelegate: self)
 
-    collectionViewModels.append(collectionViewModel)
-    setup(collectionView: collectionView, cells: collectionViewModels)
-  }
-
-  func didDeleteInvite(_ manager: Any?, invite: MeetingContextWrapper){
-    // Invite was deleted
-  }
-
-  func didRefreshInvites(_ manager: Any?, invites: [MeetingContextWrapper]) {
-    progressHUD?.dismiss()
-    // Invites were refreshed
-    var collectionViewModels = [RootedCollectionViewModel]()
-    let collectionViewModel = RootedCollectionViewModel(section: .sent, cells: [RootedCellViewModel]())
-
-    for invite in invites {
-      let viewModel = RootedCellViewModel(data: invite.meeting, delegate: self)
-      viewModel.delegate = self
-      viewModel.managedObject = invite.managedObject
-      collectionViewModel.cells.append(viewModel)
-    }
-
-    collectionViewModels.append(collectionViewModel)
-    DispatchQueue.main.async {
-      self.reloadTable(withData: collectionViewModels)
-    }
-  }
-
-  func didFailRefreshingInvites(_ manager: Any?, error: Error) {
-    progressHUD?.dismiss()
-    RRLogger.logError(message: "didFailRefreshingInvites with an error", owner: self, error: error)
-    showError(title: "Error", message: error.localizedDescription)
+    setup(collectionView: collectionView, cells: rootedCollectionViewModel)
   }
 
 }
@@ -420,11 +419,13 @@ extension MyInvitesVC: FloatingMenuBtnAction {
         self.showCalendarError()
       }
     case 1:
-      progressHUD?.show()
-      self.myInvitesManager.refreshMeetings()
-    case 2:
+
+      self.toggleMenuButton = false
+      self.floatingMenu?.isOpen = true
+      self.floatingMenu?.toggleMenu()
+
       let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
-      let vc = sb.instantiateViewController(withIdentifier: kViewControllerAvailabilityNavigation)
+      let vc = sb.instantiateViewController(withIdentifier: "InfoVC")
       self.present(vc, animated: true, completion: nil)
     default:
       RRLogger.log(message: "Unsupported menu action", owner: self)

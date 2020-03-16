@@ -10,39 +10,6 @@ import ObjectMapper
 import Branch
 import SwiftDate
 
-private var meetingTimeLength = [
-  [
-    "id": 0,
-    "length": 30,
-    "name": "30 minutes",
-    "type": "min"
-  ],
-  [
-    "id": 1,
-    "length": 60,
-    "name": "1 hour",
-    "type": "min"
-  ],
-  [
-    "id": 2,
-    "length": 90,
-    "name": "1.5 hours",
-    "type": "min"
-  ],
-  [
-    "id": 3,
-    "length": 120,
-    "name": "2 hours",
-    "type": "min"
-  ],
-  [
-    "id": 4,
-    "length": 0,
-    "name": "Custom",
-    "type": "min"
-  ]
-]
-
 // The url which will be used to encode the current state of the app that can be reconstructed when the recipient receives the message.
 func prepareUrl() -> URL {
 //  var urlComponents = URLComponents()
@@ -79,100 +46,6 @@ func decodeURL(_ url: URL) {
 //  }
 }
 
-class MeetingModelBuilder {
-  var dictionary: [String: Any]?
-  var meeting: Meeting?
-
-  func start() -> MeetingModelBuilder {
-    self.dictionary = [String: Any]()
-    return self
-  }
-
-  func retrieve(forKey key: String) -> Any? {
-    if dictionary != nil {
-      if dictionary![key] != nil {
-        return dictionary![key]
-      } else {
-        return nil
-      }
-    } else {
-      return nil
-    }
-  }
-
-  func has(key: String) -> Bool {
-    if dictionary != nil {
-      return dictionary!.keys.contains(key)
-    } else {
-      return false
-    }
-  }
-
-  func add(key: String, value: Any) -> MeetingModelBuilder {
-    if dictionary != nil {
-      dictionary![key] = value
-      return self
-    } else {
-      return start().add(key: key, value: value)
-    }
-  }
-  func remove(key: String, value: Any) -> MeetingModelBuilder {
-    if dictionary != nil, dictionary![key] != nil {
-      dictionary!.removeValue(forKey: key)
-      return self
-    } else {
-      return self
-    }
-  }
-  func generateMeeting() -> MeetingModelBuilder {
-    if dictionary != nil {
-      var meetingDict: [String: Any] = [
-        "meeting_name": retrieve(forKey: "meeting_name") as? String ?? ""
-      ]
-
-      if let meetinglocation = retrieve(forKey: "meeting_location") as? String, let rlocation = RLocation(JSONString: meetinglocation) {
-        meetingDict["meeting_location"] = rlocation.toJSON()
-      }
-
-      if let startdate = retrieve(forKey: "start_date") as? Date, let enddate = retrieve(forKey: "end_date") as? Date {
-
-        var dateDict = [
-          "start_date": startdate.toString(),
-          "end_date": enddate.toString()
-        ]
-
-        if let timezone = retrieve(forKey: "time_zone") as? String {
-          dateDict["time_zone"] = timezone
-        }
-
-        if let dateclass = MeetingDateClass(JSON: dateDict) {
-          meetingDict["meeting_date"] = dateclass.toJSON()
-        }
-      }
-
-      if let meetingTypes = retrieve(forKey: "meeting_type") as? [[String: Any]] {
-
-        var meetingtypes = [MeetingType]()
-
-        for meetingType in meetingTypes {
-          if let meetingtype = MeetingType(JSON: meetingType) {
-            meetingtypes.append(meetingtype)
-          }
-        }
-
-        meetingDict["meeting_type"] = meetingtypes.toJSON()
-
-      }
-      meeting = Meeting(JSON: meetingDict)
-      return self
-    } else {
-      return self
-    }
-  }
-}
-
-private var meetingTime = [MeetingTimeLength]()
-
 class MessagesViewController: FormMessagesAppViewController {
 
   @IBOutlet private weak var sendToFriendsButton: SSSpinnerButton!
@@ -182,9 +55,12 @@ class MessagesViewController: FormMessagesAppViewController {
   private var isStartCalendarShowing: Bool = false
   private var isEndCalendarShowing: Bool = false
 
+  private var contentManager = RootedContentManager(managerType: .send)
+  private var conversationManager = ConversationManager.shared
+
   private var eventKitManager = EventKitManager()
   private var coreDataManager = CoreDataManager()
-  private var invitesManager = MyInvitesManager()
+  private var invitesManager = MeetingsManager()
   private let eventStore = EKEventStore()
 
   // Model
@@ -201,6 +77,17 @@ class MessagesViewController: FormMessagesAppViewController {
   private var searchCompleter = MKLocalSearchCompleter()
   private var searchResults = [MKLocalSearchCompletionWrapper]()
 
+  // Computed Properties
+  private var meetingTime: [MeetingTimeLength] {
+    var meetingTimeArray = [MeetingTimeLength]()
+    for meeting in meetingTimeLength {
+      if let meetingtimelength = MeetingTimeLength(JSON: meeting) {
+        meetingTimeArray.append(meetingtimelength)
+      }
+    }
+    return meetingTimeArray
+  }
+
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -213,18 +100,13 @@ class MessagesViewController: FormMessagesAppViewController {
     startDatePicker.optionShowTopPanel = false
     startDatePicker.optionTimeStep = .fifteenMinutes
 
-    // Load meeting times in array
-    for meeting in meetingTimeLength {
-      guard let meetingtimelength = MeetingTimeLength(JSON: meeting) else { return }
-      meetingTime.append(meetingtimelength)
-    }
     form
       +++ Section("Create Invite")
 
       +++ Section("What?")
       <<< TextRow() {
         $0.tag = "meeting_name"
-        $0.title = "Title of Event"
+        $0.title = "Event Name"
         let ruleRequiredViaClosure = RuleClosure<String> { rowValue in
           return (rowValue == nil || rowValue!.isEmpty) ? ValidationError(msg: "Field required!") : nil
         }
@@ -234,13 +116,14 @@ class MessagesViewController: FormMessagesAppViewController {
           if !row.isValid {
             cell.titleLabel?.textColor = .red
           } else {
+            // TODO: - When working on drafting feature, use this to update draft
             guard let value = row.value else { return }
             // Set the name of the meeting
             self.meetingBuilder = self.meetingBuilder.add(key: "meeting_name", value: value)
           }
         }
 
-      +++ Section("Where?")
+      +++ Section(header: "Where?", footer: "Use this optional field to provide a location for your in-person event.")
       <<< LabelRow() {
         $0.tag = "event_label"
         $0.hidden = .function(["meeting_location"], { form -> Bool in
@@ -259,7 +142,7 @@ class MessagesViewController: FormMessagesAppViewController {
       }
       <<< LocationSearchRow() {
         $0.tag = "meeting_location"
-        $0.title = "Choose location for event"
+        $0.title = "Set Address for In-Person Meeting"
         }.onChange { row in
           if let rLocation = row.value?.rLocation {
             guard let value = rLocation.toJSONString() else { return }
@@ -272,17 +155,17 @@ class MessagesViewController: FormMessagesAppViewController {
       +++ Section("Participants can join by")
       <<< PhoneRow() {
         $0.tag = "type_of_meeting_phone"
-        $0.title = "Phone/Conference Line"
+        $0.title = "Phone Call"
     }
       <<< URLRow() {
         $0.tag = "type_of_meeting_video"
-        $0.title = "URL of Video Conference"
+        $0.title = "Web Conference (URL)"
       }
 
       +++ Section("When?")
       <<< ButtonRow() {
         $0.tag = "start_date"
-        $0.title = "Start Time"
+        $0.title = "Start Date/Time"
         }.cellUpdate { cell, row in
           cell.textLabel?.textAlignment = .left
           cell.textLabel?.textColor = .darkText
@@ -291,32 +174,32 @@ class MessagesViewController: FormMessagesAppViewController {
             self!.present(self!.startDatePicker, animated: true, completion: nil)
           }
       }
-      <<< SuggestionAccessoryRow<String> {
-        $0.tag = "time_zone"
-        $0.cell.customizeCollectionViewCell = {(cell) in
-          cell.label.backgroundColor = UIColor.gradientColor2
-          cell.label.numberOfLines = 2
-          cell.label.minimumScaleFactor = 0.8
-          cell.label.textColor = UIColor.white
-        }
-        $0.filterFunction = { [unowned self] text in
-          Zones.array.map( { $0.readableString } ).filter({ $0.lowercased().contains(text.lowercased()) })
-        }
-        $0.placeholder = "Select time zone"
-        }.onChange { row in
-          if let value = row.value {
-            guard let selection = Zones.array.first(where: { zones -> Bool in
-              return zones.readableString == value
-            }) else { return }
-
-            // Set the location
-            self.meetingBuilder = self.meetingBuilder.add(key: "time_zone", value: selection.rawValue)
-          }
-        }
+//      <<< SuggestionAccessoryRow<String> {
+//        $0.tag = "time_zone"
+//        $0.cell.customizeCollectionViewCell = {(cell) in
+//          cell.label.backgroundColor = UIColor.gradientColor2
+//          cell.label.numberOfLines = 2
+//          cell.label.minimumScaleFactor = 0.8
+//          cell.label.textColor = UIColor.white
+//        }
+//        $0.filterFunction = { [unowned self] text in
+//          Zones.array.map( { $0.readableString } ).filter({ $0.lowercased().contains(text.lowercased()) })
+//        }
+//        $0.placeholder = "Event Time Zone"
+//        }.onChange { row in
+//          if let value = row.value {
+//            guard let selection = Zones.array.first(where: { zones -> Bool in
+//              return zones.readableString == value
+//            }) else { return }
+//
+//            // Set the location
+//            self.meetingBuilder = self.meetingBuilder.add(key: "time_zone", value: selection.rawValue)
+//          }
+//        }
 
       <<< PushRow<String>() {
         $0.tag = "end_date"
-        $0.title = "Event Length"
+        $0.title = "Event Duration"
         $0.disabled = .function(["start_date"], { form -> Bool in
           if let row = form.rowBy(tag: "start_date") as? ButtonRow {
             return row.value == nil
@@ -352,7 +235,7 @@ class MessagesViewController: FormMessagesAppViewController {
             self.endDatePicker.optionTimeStep = .fifteenMinutes
             self.present(self.endDatePicker, animated: true, completion: nil)
           default:
-            guard let meetingtime = meetingTime.first(where: { (meetingTime) -> Bool in
+            guard let meetingtime = self.meetingTime.first(where: { (meetingTime) -> Bool in
               return meetingTime.name ?? "" == pushRowValue
             }) else {
               guard let value = startdate.add(minutes: 60) else {
@@ -365,6 +248,11 @@ class MessagesViewController: FormMessagesAppViewController {
             return
           }
         }
+
+      +++ Section(header:"Description", footer: "Use this optional field to provide a description of your event. The circled text in the screen shot below is the event description.")
+      <<< TextAreaRow("meeting_description") {
+        $0.textAreaHeight = .dynamic(initialTextViewHeight: 50)
+    }
 
     animateScroll = true
     rowKeyboardSpacing = 20
@@ -388,8 +276,8 @@ class MessagesViewController: FormMessagesAppViewController {
     navigationController?.setNavigationBarHidden(true, animated: animated)
 
     view.bringSubviewToFront(actionsContainerView)
-    
-    eventKitManager.getCalendarPermissions { (success) in
+
+    contentManager.checkCalendarPermissions { (success) in
       if success {
         self.sendToFriendsButton.isEnabled = true
       } else {
@@ -410,8 +298,13 @@ class MessagesViewController: FormMessagesAppViewController {
     sendToFriendsButton.spinnerColor = UIColor.gradientColor2
   }
 
+  private func sendResponse(meeting: Meeting, completion: @escaping (Bool, Error?) -> Void) {
+    guard let message = MessageFactory.Meetings.meetingToMessage(meeting) else { return completion(false, RError.customError("Something went wrong while sending message. Please try again.").error) }
+    self.conversationManager.send(message: message, of: .insert, completion)
+  }
+
   private func sendToFriendsAction() {
-    sendToFriendsButton.startAnimate(spinnerType: SpinnerType.ballClipRotate, spinnercolor: UIColor.gradientColor1, spinnerSize: 20, complete: {
+    startAnimating(sendToFriendsButton) {
 
       // Check if start time exists
       if let eventlength = self.eventLength?.length, let startdate = self.meetingBuilder.retrieve(forKey: "start_date") as? Date {
@@ -448,152 +341,60 @@ class MessagesViewController: FormMessagesAppViewController {
         meetingTypeDict.append(meetingType)
       }
 
-      self.meetingBuilder.add(key: "meeting_type", value: meetingTypeDict)
+      self.meetingBuilder = self.meetingBuilder.add(key: "meeting_type", value: meetingTypeDict)
+
+      if let meetingDescription = self.form.rowBy(tag: "meeting_description") as? TextAreaRow, let value = meetingDescription.value {
+        self.meetingBuilder = self.meetingBuilder.add(key: "meeting_description", value: value)
+      }
 
       guard let _ = self.meetingBuilder.retrieve(forKey: "meeting_name") as? String,
         let _ = self.meetingBuilder.retrieve(forKey: "start_date") as? Date,
         let _ = self.meetingBuilder.retrieve(forKey: "end_date") as? Date,
         let meeting = self.meetingBuilder.generateMeeting().meeting else {
 
-        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-
-          self.showError(title: "Oops!", message: "Please fill out the entire form to create an invite.")
-        })
+          self.displayFailure(with: "Oops!", and: "Please fill out the entire form to create an invite.", afterAnimating: self.sendToFriendsButton)
 
         return
       }
 
-      self.insert(meeting: meeting)
-    })
-  }
-
-  private func insert(meeting: Meeting) {
-    // Try to convert meeting object into MSMessage object
-    guard let message = DataConverter.Meetings.meetingToMessage(meeting) else {
-      self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-
-        self.showError(title: "Incomplete Form", message: "Please fill out the entire form to create an invite.")
-      })
-      return
-    }
-    // TODO: - Track the name, location, and length of an event
-
-    // Send meeting object to event kit manager to save as event into calendar
-    eventKitManager.insertMeeting(meeting: meeting) { (success, error) in
-      if let err = error {
-        // TODO: - Handle error
-        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-
-          self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.\n\nError message: \(err.localizedDescription)")
-        })
-      } else {
-        if success {
-
-          BranchEvent.customEvent(withName: "event_added_apple_calendar")
-
-          // If inserting meeting into calendar was successful we want to save invite into core data
-          // Save invite to Core Data
-          self.saveInviteToCoreData(meeting: meeting, message: message)
-
+      self.contentManager.insert(meeting, completion: { (success, error) in
+        if let err = error {
+          self.displayFailure(with: "Oops!", and: err.localizedDescription, afterAnimating: self.sendToFriendsButton)
         } else {
-          // If inserting meeting into calendar was unsuccessful we want to save invite into core data
-          // TODO: - Handle success of false
-          self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-
-            self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.")
-          })
-        }
-      }
-    }
-  }
-
-  private func saveInviteToCoreData(meeting: Meeting, message: MSMessage) {
-    invitesManager.save(meeting: meeting) { (success, error) in
-      if let err = error {
-        // TODO: - Handle error if meeting was not saved into core data
-        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-
-          self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.\n\nError message: \(err.localizedDescription)")
-        })
-      } else {
-        if success {
-
-          let alert = UIAlertController(title: "Share Event", message: "Would you like to share event in current chat conversation?", preferredStyle: .alert)
-          let share = UIAlertAction(title: "Yes", style: .default, handler: { action in
-
-            // After saving invite into core data, send the message
-            self.send(message: message, toConversation: ConversationManager.shared.conversation, { success in
-              if success {
-
-                BranchEvent.customEvent(withName: "event_shared_conversation")
-
-                // If message was sent into the conversation dismiss the view
-                self.dismiss(animated: true, completion: nil)
+          if success {
+            self.sendResponse(meeting: meeting, completion: { (success, e) in
+              if let e = e {
+                self.displayFailure(with: "Oops!", and: e.localizedDescription, afterAnimating: self.sendToFriendsButton)
               } else {
-
-                BranchEvent.customEvent(withName: "event_shared_conversation_failed")
-
-                // TODO: - Handle error if message couldn't be sent
-                self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-
-                  self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.")
+                self.displaySuccess(afterAnimating: self.sendToFriendsButton, completion: {
+                  self.postNotification(withName: kNotificationMyInvitesReload, completion: {
+                    self.dismiss(animated: true, completion: nil)
+                  })
                 })
               }
             })
-
-          })
-          let delete = UIAlertAction(title: "No", style: .destructive, handler: { action in
-            self.dismiss(animated: true, completion: nil)
-          })
-          alert.addAction(share)
-          alert.addAction(delete)
-          self.present(alert, animated: true, completion: nil)
-
-        } else {
-          // If inserting meeting into calendar was unsuccessful we want to save invite into core data
-          // TODO: - Handle success of false
-          self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail, backToDefaults: true, complete: {
-
-            self.showError(title: "Something went wrong", message: "Something went wrong. Please try again.")
-          })
+          } else {
+            self.displayFailure(with: "Oops!", and: "Something went wrong. Please try again.", afterAnimating: self.sendToFriendsButton)
+          }
         }
-      }
-    }
-  }
-
-  private func send(message: MSMessage, toConversation conversation: MSConversation?, _ completion: @escaping (Bool) -> Void) {
-    conversation?.send(message) { (error) in
-      if let err = error {
-        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: CompletionType.fail,backToDefaults: true, complete: {
-          print("There was an error \(err.localizedDescription)")
-          completion(false)
-        })
-      } else {
-
-        NotificationCenter.default.post(name: Notification.Name(rawValue: kNotificationMyInvitesReload), object: nil, userInfo: [:])
-
-        self.sendToFriendsButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: .success, backToDefaults: true, complete: {
-          completion(true)
-        })
-      }
+      })
     }
   }
 
   // MARK: - IBActions
   @IBAction func sendToFriends(_ sender: UIButton) {
-    
     BranchEvent.customEvent(withName: "user_started_save")
-
     sendToFriendsAction()
   }
 
   @IBAction func cancelAction(_ sender: UIButton) {
-    NotificationCenter.default.post(name: Notification.Name(rawValue: kNotificationMyInvitesReload), object: nil, userInfo: [:])
-    dismiss(animated: true, completion: nil)
+    postNotification(withName: kNotificationMyInvitesReload) {
+      self.dismiss(animated: true, completion: nil)
+    }
   }
 }
 
-// MARK: -
+// MARK: - WWCalendarTimeSelectorProtocol
 extension MessagesViewController: WWCalendarTimeSelectorProtocol {
   func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, date: Date) {
 
@@ -635,13 +436,13 @@ extension MessagesViewController: WWCalendarTimeSelectorProtocol {
 
     if selector.optionIdentifier ?? "" == "end_date" {
 
-      guard let startdate = self.meetingBuilder.retrieve(forKey: "start_date") as? String else { return true }
+      guard let startdate = (self.meetingBuilder.retrieve(forKey: "start_date") as? String)?.toDate()?.date else { return true }
 
-      if date.timeIntervalSince(startdate.convertToDate(.proper)).isLess(than: 0) {
+      if date.timeIntervalSince(startdate).isLess(than: 0) {
         return false
       }
 
-      if date.timeIntervalSince(startdate.convertToDate(.proper).addingTimeInterval(60 * 60 * 24 * 7)).isLess(than: 0) {
+      if date.timeIntervalSince(startdate.addingTimeInterval(60 * 60 * 24 * 7)).isLess(than: 0) {
         return true
       }
     }
