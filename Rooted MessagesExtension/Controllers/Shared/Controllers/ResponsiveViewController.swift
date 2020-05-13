@@ -17,15 +17,17 @@ enum LayoutOption {
 class ResponsiveViewController: BaseAppViewController {
 
   private var mainCollectionViewController: UICollectionView?
-  private var cells = [RootedCollectionViewModel]()
   var layoutOption: LayoutOption = .horizontalList {
     didSet {
-      setupLayout(with: view.bounds.size)
+      DispatchQueue.main.async {
+        self.setupLayout(with: self.view.bounds.size)
+      }
     }
   }
+  
+  private var cells = [RootedCollectionViewModel]()
 
-  func setup(collectionView: UICollectionView,
-             cells: [RootedCollectionViewModel]) {
+  func setup(collectionView: UICollectionView) {
     if mainCollectionViewController == nil {
       mainCollectionViewController = collectionView
       mainCollectionViewController?.delegate = self
@@ -51,15 +53,18 @@ class ResponsiveViewController: BaseAppViewController {
       }
       registerCells(with: [RootedCollectionViewCell.identifier])
     }
-
-    reloadTable(with: cells)
   }
 
-  private func reloadTable(with data: [RootedCollectionViewModel]) {
-    cells.removeAll()
-    cells = data
-    mainCollectionViewController?.reloadData()
+  func loadCells(cells: [RootedCollectionViewModel]) {
+    self.cells = cells
     loadSections()
+    reloadData()
+  }
+
+  private func reloadData() {
+    DispatchQueue.main.async {
+      self.mainCollectionViewController?.reloadData()
+    }
   }
 
   func registerCells(with identifiers: [String]) {
@@ -97,7 +102,7 @@ class ResponsiveViewController: BaseAppViewController {
       flowLayout.scrollDirection = .vertical
     }
 
-    mainCollectionViewController?.reloadData()
+    loadCells(cells: self.cells)
   }
 
   private func loadSections() {
@@ -106,36 +111,28 @@ class ResponsiveViewController: BaseAppViewController {
       case .sent:
         break
       case .incoming:
-        for cell in cell.cells {
-//          if let folder = cell.data as? SFFolder, let properties = folder.properties, let layerID = properties.id  {
-//            let isPlottedValue: Bool = mapContext.retrieveContextContainer(layerID) != nil
-//            let _ = self.setProperties(boolean: isPlottedValue,
-//                                       onViewModel: cell)
-//          }
+        for _ in cell.cells {
+          // Do something
         }
         break
       case .today:
-        for cell in cell.cells {
-
+        for _ in cell.cells {
+          // Do something
         }
         break
       case .tomorrow:
-        for cell in cell.cells {
-          //          if let folder = cell.data as? SFFolder, let properties = folder.properties, let layerID = properties.id  {
-          //            let isPlottedValue: Bool = mapContext.retrieveContextContainer(layerID) != nil
-          //            let _ = self.setProperties(boolean: isPlottedValue,
-          //                                       onViewModel: cell)
-          //          }
+        for _ in cell.cells {
+          // Do something
         }
         break
       case .none:
-        for cell in cell.cells {
-
+        for _ in cell.cells {
+          // Do something
         }
         break
       case .custom(_):
-        for cell in cell.cells {
-
+        for _ in cell.cells {
+          // Do something
         }
         break
       }
@@ -184,19 +181,21 @@ extension ResponsiveViewController: UICollectionViewDataSource, UICollectionView
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let listViewCells = cells[indexPath.section]
     let item = listViewCells.cells[indexPath.row]
-    return configureCell(data: item, collectionView: collectionView, indexPath: indexPath)
+    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: item.configurableCellType.reuseIdentifier, for: indexPath) as? RootedCollectionViewCell else { return UICollectionViewCell() }
+    cell.configure(viewModel: item, layout: layoutOption)
+    return cell
   }
 
-  fileprivate func configureCell(data: RootedCellViewModel, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
+  private func configureCell(data: RootedCellViewModel, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: data.configurableCellType.reuseIdentifier, for: indexPath) as? RootedCollectionViewCell else { return UICollectionViewCell() }
-    cell.configure(viewModel: data, layout: self.layoutOption)
+    cell.configure(viewModel: data, layout: layoutOption)
     return cell
   }
 
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let listViewCells = cells[indexPath.section]
-    guard let item = listViewCells.cells[indexPath.row].data else { return }
-    let destination = InviteDetailsVC.setupViewController(meeting: item)
+    let item = listViewCells.cells[indexPath.row]
+    let destination = InviteDetailsViewController.setupViewController(meeting: item)
     NavigationCoordinator.performExpandedNavigation(from: self) {
       self.present(destination, animated: true, completion: nil)
     }

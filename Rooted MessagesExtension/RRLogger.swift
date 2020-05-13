@@ -18,6 +18,6 @@ class RRLogger {
   }
 
   static func logError(message: String, owner: Any, rError: RError) {
-    NSLog("[\(Bundle.main.bundleIdentifier ?? kAppName)] RRLogger - \(String(describing: owner)): \(message) Error description: \(rError.error.localizedDescription)")
+    NSLog("[\(Bundle.main.bundleIdentifier ?? kAppName)] RRLogger - \(String(describing: owner)): \(message) Error description: \(rError.localizedDescription)")
   }
 }

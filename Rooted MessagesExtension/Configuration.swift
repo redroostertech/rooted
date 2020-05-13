@@ -99,7 +99,7 @@ public let kGenericError = "Something went wrong."
 public let kLoginError = "Invalid email/password combination. Please try again."
 public let kCreatingPost = "Creating Post"
 
-// MARK : - UI + Alerts + Strings
+// MARK: - UI + Alerts + Strings
 public let kCalendarPermissions = "Calendar Permissions"
 public let kCalendarAccess = "To use Rooted, please go to your settings and enable access to your calendar."
 
@@ -114,7 +114,7 @@ public let kLoadFirstUserObservationKey = "loadFirstUserObservationKey"
 public let kAuthIsLoggedIn = "isUserLoggedIn"
 public let kAuthIsGuestUser = "isGuestUser"
 
-// MARK : - Message Object Keys
+// MARK: - Message Object Keys
 public let kMessageTitleKey = "title"
 public let kMessageSubCaptionKey = "subcaption"
 public let kMessageStartDateKey = "startDate"
@@ -148,9 +148,10 @@ public let kGoToAddInviteVC = "goToAddInviteVC"
 public let kDeleteTitle = "Delete Invite"
 public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
 public let captionString = "%@ on %@"
+public let kBackText = "Back"
 
 // MARK: - NotificationCenter Methods
-public let kNotificationMyInvitesReload = "MyInvitesVC.reload"
+public let kNotificationMyInvitesReload = "MyInvitesViewController.reload"
 public let kNotificationKeyboardWillShowNotification = "keyboardWillShowNotification"
 public let kNotificationKeyboardWillHideNotification = "keyboardWillHideNotification"
 
@@ -160,3 +161,16 @@ public let kBranchEventSharedConversationFailed = "event_shared_conversation_fai
 public let kBranchUserStartedSharingAvailability = "user_started_sharing_availability"
 public let kBranchEventAddedAppleCalendar = "event_added_apple_calendar"
 public let kBranchAvailabilityAddedCoreData = "availability_added_core_data"
+public let kBranchMaximumReached = "maximum_reached"
+public let kBranchInviteAccepted = "event_invite_accepted"
+public let kBranchMeetingStartedSave = "user_started_save"
+public let kBranchMeetingDeleteMeeting = "user_deleted_meeting"
+
+// MARK: - Session strings
+public var kSessionUser = "currentUser"
+public var kSessionStart = "sessionStart"
+public var kSessionLastLogin = "lastLogin"
+public var kSessionCart = "sessionCart" // Not in use yet
+
+// MARK: - Entities
+public var kEntityMeeting = "MeetingEntity"

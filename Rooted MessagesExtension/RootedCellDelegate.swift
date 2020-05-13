@@ -18,5 +18,5 @@ public enum ActionType {
 }
 
 public protocol RootedCellDelegate: class {
-  func performActions(_ cell: UICollectionViewCell, ofType: ActionType, on model: Any?, andManagedObject managedObject: [NSManagedObject]?)
+  func performActions(_ cell: UICollectionViewCell, ofType: ActionType, on viewModel: Any?)
 }

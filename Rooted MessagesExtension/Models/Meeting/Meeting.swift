@@ -42,6 +42,8 @@ public class Meeting: Mappable {
   public var reminders: [Reminders]?
   public var meetingType: [MeetingType]?
 
+  public var calendarId: String?
+  
   required public init?(map: Map) { }
 
   public func mapping(map: Map) {
@@ -71,6 +73,7 @@ public class Meeting: Mappable {
     files <- map["meeting_files"]
     reminders <- map["reminders"]
     meetingType <- map["meeting_type"]
+    calendarId <- map["calendar_id"]
   }
 }
 

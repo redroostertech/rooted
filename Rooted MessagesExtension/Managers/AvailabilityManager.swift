@@ -1,20 +1,25 @@
 import UIKit
+import ObjectMapper
 import CoreData
 
-protocol AvailabilityDelegate: class {
-  func willDelete(_ manager: Any?)
-  func didDelete(_ manager: Any?, objects: AvailabilityContextWrapper)
+public typealias AvailabilityManagerDataHandler = ([AvailabilityContextWrapper]?, Error?) -> Void
+public typealias AvailabilityManageResultsHandler = (Bool, Error?) -> Void
 
-  func willRefresh(_ manager: Any?)
-  func didRefresh(_ manager: Any?, objects: [AvailabilityContextWrapper])
-  func didFailRefreshing(_ manager: Any?, error: Error)
+protocol AvailabilityManagerDelegate: class {
+  func willDeleteAvailability(_ manager: Any?)
+  func didDeleteAvailability(_ manager: Any?, objects: AvailabilityContextWrapper)
 
   func didFinishLoading(_ manager: Any?, objects: [AvailabilityContextWrapper])
   func didFailToLoad(_ manager: Any?, error: Error)
 }
 
-public typealias AvailabilityManagerDataHandler = ([AvailabilityContextWrapper]?, Error?) -> Void
-public typealias AvailabilityManageResultsHandler = (Bool, Error?) -> Void
+extension AvailabilityManagerDelegate {
+  func willDeleteAvailability(_ manager: Any?) { }
+  func didDeleteAvailability(_ manager: Any?, objects: AvailabilityContextWrapper) { }
+
+  func didFinishLoading(_ manager: Any?, objects: [AvailabilityContextWrapper]) { }
+  func didFailToLoad(_ manager: Any?, error: Error) { }
+}
 
 public class AvailabilityContextWrapper {
   var object: Availability?
@@ -22,6 +27,18 @@ public class AvailabilityContextWrapper {
   init(object: Availability?, managedObject: NSManagedObject?) {
     self.object = object
     self.managedObject = managedObject
+  }
+  func getValue(for key: String) -> Any? {
+    guard let managedKeys = managedObject?.entity.attributesByName.keys else { return nil }
+    let keys = Array(managedKeys)
+    guard let dict = managedObject?.dictionaryWithValues(forKeys: keys) else { return nil }
+    return dict[key]
+  }
+}
+
+extension AvailabilityContextWrapper: Equatable {
+  public static func == (lhs: AvailabilityContextWrapper, rhs: AvailabilityContextWrapper) -> Bool {
+    return lhs.object == rhs.object
   }
 }
 
@@ -31,139 +48,138 @@ class AvailabilityManager: NSObject {
 
   // MARK: - Private Properties
   private var coreDataManager = CoreDataManager()
-  private var contextWrappers = [AvailabilityContextWrapper]()
+  private var availability = [AvailabilityContextWrapper]()
 
   // MARK: - Public properties
-  weak var delegate: AvailabilityDelegate?
+  weak var delegate: AvailabilityManagerDelegate?
 
-  // MARK: - Computed properties
-  // Entities
-  var managedObject: NSManagedObject? {
-    guard let entity = coreDataManager.availabilityEntity else { return nil }
-    let object = NSManagedObject(entity: entity, insertInto: coreDataManager.managedContext)
-    return object
+  // MARK: - Use Case: As a business, we want to limit access to creating availability beyond  a certain date than (n) based on account type
+
+  // MARK: - Use Case: Retrieve availability for user
+  func retrieveAvailability() {
+    availability.removeAll()
+    retrieveObjects { (results, error) in
+      if let err = error {
+        self.delegate?.didFailToLoad(self, error: err)
+      } else {
+        guard results != nil else {
+          self.delegate?.didFailToLoad(self, error: RError.generalError)
+          return
+        }
+        for result in results! {
+          if
+            // Check if availability object can be deserialized
+            let availability = EngagementFactory.AvailabilityFactory.coreDataToJson(result),
+            // Check that meeting has dates
+            let availabilityDates = availability.availabilityDates,
+            let firstAvailability = availabilityDates.first,
+            let firstAvailabilityDate = firstAvailability.endDate?.toDate()?.date,
+            // Check if availability has an end date greater than today
+            !firstAvailabilityDate.timeIntervalSince(Date()).isLess(than: 0) {
+            let availabilityWrapper = AvailabilityContextWrapper(object: availability, managedObject: result)
+            self.availability.append(availabilityWrapper)
+          }
+        }
+        self.delegate?.didFinishLoading(self, objects: self.availability)
+      }
+    }
   }
 
-  // MARK: - Lifecycle events
-  override init() {
-    super.init()
-  }
-
-  // MARK: - Private methods
   private func retrieveObjects(_ completion: CoreDataHandler) {
     coreDataManager.retrieve(entityName: entityName) { (objects, error) in
       completion(objects, error)
     }
   }
 
-  private func deleteObject(_ object: NSManagedObject, _ completion: CoreDataResultsHandler) {
-    coreDataManager.delete(object: object) { (success, error) in
-      completion(success, error)
+  // MARK: - Use Case: Create availability
+  func createAvailability(_ object: Availability, _ completion: ((Bool, Error?) -> Void)?) {
+    // Check if JSONString can be created from object
+    guard let jsonString = object.toJSONString() else {
+      let generalError = RError.generalError
+      self.delegate?.didFailToLoad(self, error: generalError)
+      completion?(false, generalError)
+      return
     }
-  }
-
-  // MARK: - Public methods
-  func loadData() {
-    retrieveObjects { (results, error) in
+    // Perform create method using jsonString
+    create(jsonString: jsonString) { (managedObject, error) in
       if let err = error {
         self.delegate?.didFailToLoad(self, error: err)
+        completion?(false, err)
       } else {
-        guard results != nil else {
-          self.delegate?.didFailToLoad(self, error: RError.generalError.error)
-          return
+        if let managedobject = managedObject {
+          let availabilityWrapper = AvailabilityContextWrapper(object: object, managedObject: managedobject)
+          self.availability.append(availabilityWrapper)
+          self.delegate?.didFinishLoading(self, objects: self.availability)
+          completion?(true, nil)
+        } else {
+          let generalError = RError.generalError
+          self.delegate?.didFailToLoad(self, error: generalError)
+          completion?(false, generalError)
         }
-        for result in results! {
-          if let object = DataConverter.Availabilities.coreDataToJson(result) {
-            let contextWrapper = AvailabilityContextWrapper(object: object, managedObject: result)
-            self.contextWrappers.append(contextWrapper)
-          }
-        }
-        self.delegate?.didFinishLoading(self, objects: self.contextWrappers)
       }
     }
   }
 
-  // MARK: - CRUD operations
-  // Meetings
-  func delete(_ managedObject: NSManagedObject) {
-    self.delegate?.willDelete(self)
-
-    // Check if we can convert `NSManagedObject` into a `Availability` object
-    guard let object = DataConverter.Availabilities.coreDataToJson(managedObject) else {
-      self.delegate?.didFailRefreshing(self, error: RError.generalError.error)
+  private func create(jsonString: String, _ completion: @escaping (NSManagedObject?, Error?) -> Void) {
+    guard let object = coreDataManager.availabilityManagedObject else {
+      completion(nil, RError.generalError)
       return
     }
-
-    // Remove managed object staged for deletion from contextWrapper array
-    contextWrappers.removeAll { context -> Bool in
-      if let managedobject = context.managedObject {
-        return managedobject == managedObject
-      }
-      return false
-    }
-
-    // Delete managed object from core data
-    deleteObject(managedObject) { (success, error) in
-      if let err = error, success != true {
-        self.delegate?.didFailRefreshing(self, error: err)
-      } else {
-
-        // Create a context wrapper
-        let contextWrapper = AvailabilityContextWrapper(object: object, managedObject: managedObject)
-        self.delegate?.didDelete(self, objects: contextWrapper)
-        self.delegate?.didRefresh(self, objects: self.contextWrappers)
-      }
-    }
-  }
-
-  func refresh() {
-    self.delegate?.willRefresh(self)
-
-    // Remove all context wrappers
-    contextWrappers.removeAll()
-
-    // Retrieve managed objects
-    retrieveObjects { (results, error) in
-      if let err = error {
-        self.delegate?.didFailRefreshing(self, error: err)
-      } else {
-        guard results != nil else {
-          self.delegate?.didFailRefreshing(self, error: RError.generalError.error)
-          return
-        }
-        for result in results! {
-          if let object = DataConverter.Availabilities.coreDataToJson(result) {
-            let contextWrapper = AvailabilityContextWrapper(object: object, managedObject: result)
-            self.contextWrappers.append(contextWrapper)
-          }
-        }
-        self.delegate?.didFinishLoading(self, objects: self.contextWrappers)
-      }
-    }
-  }
-
-  func save(_ object: Availability, _ completion: InvitesManageResultsHandler) {
-    guard let managedobject = self.managedObject, let objectString = object.toJSONString()  else {
-      completion(false, nil)
-      return
-    }
-
     let referenceDate = Date()
-
-    managedobject.setValuesForKeys([
+    object.setValuesForKeys([
       "id": RanStringGen(length: 10).returnString(),
-      "object": objectString,
+      "object": jsonString,
       "createdAt": referenceDate,
       "updatedAt": referenceDate
       ])
 
     do {
       try coreDataManager.managedContext.save()
-      let contextWrapper = AvailabilityContextWrapper(object: object, managedObject: managedobject)
-      contextWrappers.append(contextWrapper)
-      completion(true, nil)
+      completion(object, nil)
     } catch let error {
-      completion(false, error)
+      completion(nil, error)
     }
   }
+
+  // MARK: - Use Case: Delete availability
+  func deleteAvailability(_ managedObject: NSManagedObject) {
+    self.delegate?.willDeleteAvailability(self)
+
+    // Check if we can convert `NSManagedObject` into a `Meeting` object
+    guard let object = EngagementFactory.AvailabilityFactory.coreDataToJson(managedObject) else {
+      self.delegate?.didFailToLoad(self, error: RError.generalError)
+      return
+    }
+
+    availability.removeAll { context -> Bool in
+      if let managedobject = context.managedObject {
+        return managedobject == managedObject
+      }
+      return false
+    }
+
+    delete(invite: managedObject) { (success, error) in
+      if let err = error, success != true {
+        self.delegate?.didFailToLoad(self, error: err)
+      } else {
+        let availabilityWrapper = AvailabilityContextWrapper(object: object, managedObject: managedObject)
+        self.delegate?.didDeleteAvailability(self, objects: availabilityWrapper)
+        self.delegate?.didFinishLoading(self, objects: self.availability)
+      }
+    }
+  }
+
+  private func delete(invite: NSManagedObject, _ completion: CoreDataResultsHandler) {
+    coreDataManager.delete(object: invite) { (success, error) in
+      completion(success, error)
+    }
+  }
+
+  // UPDATE
+
+  // MARK: - Public methods
+  func refresh() {
+//    loadData()
+  }
+
 }

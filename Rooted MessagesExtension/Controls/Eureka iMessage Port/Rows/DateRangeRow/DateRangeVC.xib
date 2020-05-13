@@ -73,7 +73,6 @@
                     </state>
                     <connections>
                         <action selector="cancelAction:" destination="-1" eventType="touchUpInside" id="EeT-O7-zSk"/>
-                        <action selector="selectRange:" destination="-1" eventType="touchUpInside" id="kBQ-Qg-I6W"/>
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lJf-d7-wuv">

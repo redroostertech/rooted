@@ -33,5 +33,24 @@ public class Availability: Mappable {
     updatedAt <- map["updated_at"]
     metaInformation <- map["meta_information"]
     owner <- map["owner"]
+
+    orderAvailabilityDates()
+  }
+
+  private func orderAvailabilityDates() {
+    availabilityDates = availabilityDates?.sorted(by: { (current, next) -> Bool in
+      guard
+        let curDate = current.startDate?.toDate()?.date,
+        let nextDate = current.startDate?.toDate()?.date else {
+          return false
+        }
+        return curDate.timeIntervalSince(nextDate).isLess(than: 0)
+      })
+  }
+}
+
+extension Availability: Equatable {
+  static public func == (lhs: Availability, rhs: Availability) -> Bool {
+    return lhs.id == rhs.id
   }
 }

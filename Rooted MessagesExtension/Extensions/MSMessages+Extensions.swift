@@ -7,6 +7,8 @@ extension MSMessagesAppViewController {
             alert.dismiss(animated: true, completion: nil)
         })
         alert.addAction(defaultAction)
+      DispatchQueue.main.async {
         self.present(alert, animated: true, completion: nil)
+      }
     }
 }

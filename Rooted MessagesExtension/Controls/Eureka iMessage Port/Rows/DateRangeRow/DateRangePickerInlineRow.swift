@@ -10,10 +10,12 @@ import Foundation
 import UIKit
 
 open class DateRangeCompletionWrapper: Equatable {
+  var month: String?
   var fromDate: Date?
   var toDate: Date?
 
-  init(from: Date, to: Date) {
+  init(month: String, from: Date, to: Date) {
+    self.month = month
     fromDate = from
     toDate = to
   }
@@ -90,14 +92,15 @@ class DateRangeVC: UIViewController, TypedRowControllerType {
   // The managing container for the control
   private var container: UIView?
 
+  private var month: String?
   private var fromDate: Date?
   private var fromDatePicker: UIDatePicker?
   private var toDate: Date?
   private var toDatePicker: UIDatePicker?
 
   private var dateRange: DateRangeCompletionWrapper? {
-    if let fromdate = self.fromDate, let todate = self.toDate {
-      return DateRangeCompletionWrapper(from: fromdate, to: todate)
+    if let month = self.month, let fromdate = self.fromDate, let todate = self.toDate {
+      return DateRangeCompletionWrapper(month: month, from: fromdate, to: todate)
     }
     return nil
   }
@@ -118,12 +121,22 @@ class DateRangeVC: UIViewController, TypedRowControllerType {
   override func viewDidLoad() {
     super.viewDidLoad()
     selectRangeButton.applyCornerRadius(0.05)
+    selectRangeButton.backgroundColor = .gradientColor2
 
     selectFromRangeButton.applyCornerRadius(0.05)
     selectFromRangeButton.applyBorder(withColor: .lightGray, andThickness: 1.0)
 
     selectToRangeButton.applyCornerRadius(0.05)
     selectToRangeButton.applyBorder(withColor: .lightGray, andThickness: 1.0)
+
+    if let title = row.tag, title.components(separatedBy: "_").count > 0 {
+      let date = title.components(separatedBy: "_")[3]
+      self.month = date
+      self.updateNavigationBar(title: date)
+    }
+    updateBackButton(color: .darkText)
+    hideNavigationBarHairline()
+
   }
 
   // MARK: - Picker view methods

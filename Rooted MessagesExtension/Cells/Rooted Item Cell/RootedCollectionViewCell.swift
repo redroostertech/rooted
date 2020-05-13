@@ -71,12 +71,11 @@ class RootedCollectionViewCell: UICollectionViewCell {
   }
 
   @IBAction func viewParticipants(_ sender: UIButton) {
-    self.delegate?.performActions(self, ofType: .none, on: nil, andManagedObject: nil)
+    self.delegate?.performActions(self, ofType: .none, on: viewModel)
   }
 
   @IBAction func performAction(_ sender: UIButton) {
-    guard let viewmodel = self.viewModel, let managedobjects = viewmodel.managedObject else { return }
-    self.delegate?.performActions(self, ofType: .delete, on: meeting, andManagedObject: [managedobjects])
+    self.delegate?.performActions(self, ofType: .delete, on: viewModel)
   }
 
 }
