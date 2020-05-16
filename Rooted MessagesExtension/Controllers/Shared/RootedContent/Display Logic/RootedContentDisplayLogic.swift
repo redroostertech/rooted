@@ -22,6 +22,8 @@ protocol RootedContentDisplayLogic: class {
 
   func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel)
 
+  func onSuccessfulAvailabilitySave(viewModel: RootedContent.SaveAvailability.ViewModel)
+
 }
 
 extension RootedContentDisplayLogic {
@@ -38,4 +40,5 @@ extension RootedContentDisplayLogic {
 
   func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) { }
 
+  func onSuccessfulAvailabilitySave(viewModel: RootedContent.SaveAvailability.ViewModel) { }
 }

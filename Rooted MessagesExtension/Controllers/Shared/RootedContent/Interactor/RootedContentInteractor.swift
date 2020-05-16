@@ -25,6 +25,8 @@ protocol RootedContentBusinessLogic: class {
   func addToCalendar(request: RootedContent.AddToCalendar.Request)
   func checkMaximumMeetingsReached(request: RootedContent.CheckMaximumMeetingsReached.Request)
   func removeMeetingFromCalendar(request: RootedContent.RemoveFromCalendar.Request)
+  func retrieveAvailability(request: RootedContent.RetrieveAvailability.Request)
+  func saveAvailability(request: RootedContent.SaveAvailability.Request)
 }
 
 protocol RootedContentDataStore {
@@ -46,6 +48,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
   private var meetingsManager = MeetingsManager()
   private var coreDataManager = CoreDataManager()
   private var eventKitManager = EventKitManager()
+  private var availabilityManager = AvailabilityManager()
 
   func retrieveErrorMessage(_ error: Error) -> String {
     if let rerror = error as? RError {
@@ -54,6 +57,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
       return error.localizedDescription
     }
   }
+
   // MARK: - Use Case: Initialize session of BranchIO and handle response
   func setupBranchIO(request: RootedContent.SetupBranchIO.Request) {
     branchWorker.initSession { meeting in
@@ -218,14 +222,74 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
   }
 }
 
-// MARK: - Availability Management
 extension RootedContentInteractor {
-  // Manage Availability objects
-//  func insert(_ availability: Availability, completion: @escaping (Bool, Error?) -> Void) {
-//    self.saveToCoreData(availability: availability, completion: completion)
-//  }
-//
-//  func saveToCoreData(availability: Availability, completion: @escaping (Bool, Error?) -> Void) {
-//    AvailabilityManager().createAvailability(availability, completion)
-//  }
+  // MARK: - Use Case: Retrieve availability for user
+  func retrieveAvailability(request: RootedContent.RetrieveAvailability.Request) {
+    switch request.contentDB {
+    default:
+      availabilityManager.delegate = request.availabilityManagerDelegate
+      availabilityManager.retrieveAvailability()
+    }
+  }
+
+  // MARK: - Use Case: Save availability for user
+  func saveAvailability(request: RootedContent.SaveAvailability.Request) {
+    guard let availability = request.availability else { return }
+    branchWorker.customEvent(withName: request.branchEventID)
+    switch request.contentDB {
+    default:
+      self.availabilityManager.createAvailability(availability) { (success, error) in
+        if let err = error {
+          var response = RootedContent.DisplayError.Response()
+          response.errorMessage = self.retrieveErrorMessage(err)
+          self.presenter?.handleError(response: response)
+        } else {
+          if success {
+            var response = RootedContent.SaveAvailability.Response()
+            response.availability = availability
+            self.presenter?.onSuccessfulAvailabilitySave(response: response)
+          } else {
+            var response = RootedContent.DisplayError.Response()
+            response.errorMessage = "Something went wrong. Please try again."
+            self.presenter?.handleError(response: response)
+          }
+        }
+      }
+    }
+  }
+
+  // MARK: - Use Case: Delete availability for user
+  func deleteAvailability(request: RootedContent.DeleteAvailability.Request) {
+    guard let availabilityManagedObject = request.availability?.managedObject else { return }
+//    branchWorker.customEvent(withName: kBranchMeetingDeleteMeeting)
+    switch request.contentDB {
+    default:
+      availabilityManager.delegate = request.availabilityManagerDelegate
+      availabilityManager.deleteAvailability(availabilityManagedObject )
+    }
+  }
+}
+
+extension Sequence {
+    func groupSort(ascending: Bool = true, byDate dateKey: (Iterator.Element) -> Date) -> [[Iterator.Element]] {
+        var categories: [[Iterator.Element]] = []
+        for element in self {
+            let key = dateKey(element)
+            guard let dayIndex = categories.index(where: { $0.contains(where: { Calendar.current.isDate(dateKey($0), inSameDayAs: key) }) }) else {
+                guard let nextIndex = categories.index(where: { $0.contains(where: { dateKey($0).compare(key) == (ascending ? .orderedDescending : .orderedAscending) }) }) else {
+                    categories.append([element])
+                    continue
+                }
+                categories.insert([element], at: nextIndex)
+                continue
+            }
+
+            guard let nextIndex = categories[dayIndex].index(where: { dateKey($0).compare(key) == (ascending ? .orderedDescending : .orderedAscending) }) else {
+                categories[dayIndex].append(element)
+                continue
+            }
+            categories[dayIndex].insert(element, at: nextIndex)
+        }
+        return categories
+    }
 }

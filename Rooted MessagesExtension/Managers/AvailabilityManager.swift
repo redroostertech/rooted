@@ -71,11 +71,12 @@ class AvailabilityManager: NSObject {
             // Check if availability object can be deserialized
             let availability = EngagementFactory.AvailabilityFactory.coreDataToJson(result),
             // Check that meeting has dates
-            let availabilityDates = availability.availabilityDates,
-            let firstAvailability = availabilityDates.first,
-            let firstAvailabilityDate = firstAvailability.endDate?.toDate()?.date,
+            let availabilityDates = availability.availabilityDates
+//            let firstAvailability = availabilityDates.first,
+//            let firstAvailabilityDate = firstAvailability.endDate?.toDate()?.date,
             // Check if availability has an end date greater than today
-            !firstAvailabilityDate.timeIntervalSince(Date()).isLess(than: 0) {
+//            !firstAvailabilityDate.timeIntervalSince(Date()).isLess(than: 0)
+          {
             let availabilityWrapper = AvailabilityContextWrapper(object: availability, managedObject: result)
             self.availability.append(availabilityWrapper)
           }

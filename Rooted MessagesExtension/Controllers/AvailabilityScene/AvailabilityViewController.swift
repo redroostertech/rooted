@@ -14,7 +14,7 @@ import FSCalendar
 import SwiftDate
 import Messages
 
-class AvailabilityViewController: FormMessagesAppViewController, RootedContentDisplayLogic {
+class AvailabilityViewController: FormMessagesAppViewController, RootedContentDisplayLogic, AvailabilityManagerDelegate {
 
   // MARK: - IBOutlets
   @IBOutlet private weak var calendar: FSCalendar!
@@ -42,16 +42,9 @@ class AvailabilityViewController: FormMessagesAppViewController, RootedContentDi
   // MARK: - Private Properties
   private var interactor: RootedContentBusinessLogic?
   private var conversationManager = ConversationManager.shared
-
-//  private var contentManager = RootedContentInteractor(managerType: .send)
-//  private var dataManager = AvailabilityManager()
-
-  private var contextWrapper: AvailabilityContextWrapper?
-
-  private var datesOfAvailability: [NSManagedObject] = []
+  private var tempAvailability = [String: Any]()
 
   // Model
-  private var modelBuilder = AvailabilityModelBuilder().start()
   private var currentDate = Date()
 
   // MARK: - Lifecycle methods
@@ -83,8 +76,6 @@ class AvailabilityViewController: FormMessagesAppViewController, RootedContentDi
   override func viewDidLoad() {
     super.viewDidLoad()
     setupUI()
-//    dataManager.delegate = self
-//    dataManager.loadData()
   }
 
   override func keyboardWillShow(_ notification:Notification) {
@@ -97,22 +88,11 @@ class AvailabilityViewController: FormMessagesAppViewController, RootedContentDi
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
     DispatchQueue.main.async {
       self.navigationController?.setNavigationBarHidden(true, animated: animated)
       self.view.bringSubviewToFront(self.actionsContainerView)
     }
-
-    /*
-    contentManager.checkCalendarPermissions { success in
-      if success {
-        self.shareAvailabilityButton.isEnabled = true
-      } else {
-        self.shareAvailabilityButton.isEnabled = false
-        self.showError(title: kCalendarPermissions, message: kCalendarAccess)
-      }
-    }
-     */
+    loadTable(for: currentDate)
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -146,50 +126,6 @@ class AvailabilityViewController: FormMessagesAppViewController, RootedContentDi
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.init(rawValue: kNotificationKeyboardWillHideNotification), object: nil)
   }
 
-  private func loadTable(for date: Date) {
-    form.removeAll()
-    form
-      +++ MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
-                             header: "Edit Availability",
-                             footer: "") {
-                              $0.tag = "textfields"
-                              $0.addButtonProvider = { section in
-                                return ButtonRow(){
-                                  $0.title = "Add New Interval"
-                                  }.cellUpdate { cell, row in
-                                    cell.textLabel?.textAlignment = .left
-                                }
-                              }
-
-                              // If we select on a day and it already exists, then append the rows
-                              if self.sections.count > 0 {
-                                for dateRange in self.sections {
-                                  let dateRangeIndex = self.sections.index(of: dateRange)
-                                  $0.append(
-                                    DateRangePickerInlineRow( "availability_date_\(String(describing: dateRangeIndex))_\(date.toString(.normal))") {
-                                      $0.title = dateRange.readableString ?? "Select Availability Time Range"
-                                      $0.cell.detailTextLabel?.textColor = .clear
-                                      $0.value = dateRange
-                                    }
-                                  )
-                                }
-                              } else {
-                                $0.multivaluedRowToInsertAt = { index in
-                                  return DateRangePickerInlineRow( "availability_date_\(index)_\(self.calendar.selectedDate!.toString(.normal))") {
-                                    $0.title = "Select Availability Time Range"
-                                    $0.cell.detailTextLabel?.textColor = .clear
-                                    }.onChange { row in
-                                      guard let value = row.value else { return }
-                                      row.title = value.readableString ?? "Select Availability Time Range"
-                                      row.updateCell()
-
-                                      self.sections.append(value)
-                                  }
-                                }
-                              }
-    }
-  }
-
   // MARK: - Use Case: Check if app has access to calendar permissions
   func checkCalendarPermissions() {
     let request = RootedContent.CheckCalendarPermissions.Request()
@@ -206,6 +142,93 @@ class AvailabilityViewController: FormMessagesAppViewController, RootedContentDi
 
   private func showCalendarError() {
     self.showError(title: kCalendarPermissions, message: kCalendarAccess)
+  }
+
+  // MARK: - Use Case: Retrieve availability for user
+  func retrieveAvailability() {
+    showHUD()
+    var request = RootedContent.RetrieveAvailability.Request()
+    request.availabilityManagerDelegate = self
+    interactor?.retrieveAvailability(request: request)
+  }
+
+  func didFinishLoading(_ manager: Any?, objects: [AvailabilityContextWrapper]) {
+    loadTable(for: currentDate)
+  }
+
+  func didFailToLoad(_ manager: Any?, error: Error) {
+      showError(title: "Error", message: error.localizedDescription)
+    }
+
+  // MARK: - Use Case: Show a table where a user could view current availability as well as create availability
+  private func loadTable(for date: Date, objects: [AvailabilityContextWrapper] = [AvailabilityContextWrapper]()) {
+    form.removeAll()
+    form
+      +++ MultivaluedSection(multivaluedOptions: [.Insert, .Delete],
+                             header: "Edit Availability",
+                             footer: "") {
+                              $0.tag = "textfields"
+                              $0.addButtonProvider = { section in
+                                return ButtonRow(){
+                                  $0.title = "Add Availability"
+                                  }.cellUpdate { cell, row in
+                                    cell.textLabel?.textAlignment = .left
+                                }
+                              }
+
+                              $0.multivaluedRowToInsertAt = { index in
+                                return SplitRow<TimeRow,TimeRow>() {
+                                  $0.rowLeftPercentage = 0.5
+                                  $0.rowLeft = TimeRow(){
+                                      $0.title = "Start Time"
+                                  }
+
+                                  $0.rowRight = TimeRow(){
+                                      $0.title = "End Time"
+                                  }
+                                }.onChange({ (splitRow) in
+
+                                  // MARK: - Use Case: Save availability for user
+                                  print("Index of row inserted is \(String(describing: splitRow.indexPath?.row))")
+                                  let tagForAvailability = "availability_date_\(String(describing: splitRow.indexPath!.row))_\(date.toString(.normal).trimmingCharacters(in: .whitespacesAndNewlines))"
+                                  if
+                                    let startTimeRow = splitRow.rowLeft,
+                                    let endTimeRow = splitRow.rowRight,
+                                    let startTimeRowValue = startTimeRow.value,
+                                    let endTimeRowValue = endTimeRow.value {
+
+                                    let availabilityDict: [String: Any] = [
+                                      "id": RanStringGen(length: 10).returnString(),
+                                      "name": tagForAvailability,
+                                      "availability_dates": [
+                                          "month": date.toString(.month),
+                                          "endMonth": date.toString(.month),
+                                          "start_time": startTimeRowValue.toString(.timeOnly),
+                                          "end_time": endTimeRowValue.toString(.timeOnly)
+                                        ]
+                                    ]
+
+                                    guard let availability = Availability(JSON: availabilityDict) else {
+                                      print("Error creating availability object from dictionary")
+                                      return
+                                    }
+
+                                    var request = RootedContent.SaveAvailability.Request()
+                                    request.availability = availability
+                                    self.interactor?.saveAvailability(request: request)
+                                  }
+                                })
+                              }
+    }
+  }
+
+  func onSuccessfulAvailabilitySave(viewModel: RootedContent.SaveAvailability.ViewModel)  {
+    guard let availability = viewModel.availability else { return }
+    print("Availability was saved")
+  }
+
+  func handleError(viewModel: RootedContent.DisplayError.ViewModel) {
+//    displayFailure(with: viewModel.errorTitle, and: viewModel.errorMessage, afterAnimating: sendToFriendsButton)
   }
 
   // MARK: - IBActions
@@ -300,57 +323,44 @@ class AvailabilityViewController: FormMessagesAppViewController, RootedContentDi
 
   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
-      if let cell = tableView.cellForRow(at: indexPath) as? PushSelectorCell<DateRangeCompletionWrapper>, let title = cell.row.tag, title.components(separatedBy: "_").count > 0 {
-        let date = title.components(separatedBy: "_")[3]
-//        if var sectionsArrayValues = self.sections[date], sectionsArrayValues.indices.contains(indexPath.row) {
-//          sectionsArrayValues.remove(at: indexPath.row)
-//          self.sections[date] = sectionsArrayValues
-//        }
+      if let _ = tableView.cellForRow(at: indexPath) as? SplitRowCell<TimeRow, TimeRow> {
+
+        var oldTempAvailabilityDictionary = self.tempAvailability
+
+        print("Old availability stuff")
+        print(oldTempAvailabilityDictionary)
+
+        print("Index of row deleted is \(String(describing: indexPath.row))")
+        let tagForAvailability = "availability_date_\(String(describing: indexPath.row))_\(currentDate.toString(.normal).trimmingCharacters(in: .whitespacesAndNewlines))"
+
+        oldTempAvailabilityDictionary[tagForAvailability] = nil
+
+        // Update tags for correct row
+        self.tempAvailability.removeAll()
+
+        var index = 0
+        for oldTempAvailabilityKey in oldTempAvailabilityDictionary.keys {
+          if let oldTempAvailability = oldTempAvailabilityDictionary[oldTempAvailabilityKey] as? [String: Any] {
+            let newTagForAvailability = "availability_date_\(String(describing: index))_\(currentDate.toString(.normal).trimmingCharacters(in: .whitespacesAndNewlines))"
+            if let oldTempAvailabilityDates = oldTempAvailability["availability_dates"] {
+              self.tempAvailability[newTagForAvailability] = [
+                "name": newTagForAvailability,
+                "availability_dates": oldTempAvailabilityDates
+              ]
+            } else {
+              self.tempAvailability[newTagForAvailability] = [
+                "name": newTagForAvailability,
+              ]
+            }
+            index += 1
+          }
+        }
+        print("New availability stuff")
+        print(self.tempAvailability)
       }
     }
     super.tableView(tableView, commit: editingStyle, forRowAt: indexPath)
   }
-}
-
-// MARK: - AvailabilityDelegate
-extension AvailabilityViewController: AvailabilityDelegate {
-  func willDelete(_ manager: Any?) {
-    // Will remove invite
-  }
-
-  func didDelete(_ manager: Any?, objects: AvailabilityContextWrapper) {
-    // Invite was deleted
-  }
-
-  func didFinishLoading(_ manager: Any?, objects: [AvailabilityContextWrapper]) {
-
-    if let firstContextWrapper = objects.first {
-      contextWrapper = firstContextWrapper
-    }
-
-    for object in objects.uniqueElementsInOrder {
-      guard let availability = object.object, let dates = availability.availabilityDates else { return }
-      for date in dates {
-        guard let startdate = date.startDate?.toDate()?.date, let enddate = date.endDate?.toDate()?.date else { return }
-//        let dateRange = DateRangeCompletionWrapper(from: startdate, to: enddate)
-//        let dateRange = DateRangeCompletionWrapper(month: <#T##String#>, from: <#T##Date#>, to: <#T##Date#>)
-//        if var ranges = sections[startdate.toString(.normal)] {
-//          ranges.append(dateRange)
-//          sections[startdate.toString(.normal)] = ranges
-//        } else {
-//          sections[startdate.toString(.normal)] = [dateRange]
-//        }
-      }
-    }
-
-    loadTable(for: currentDate)
-    
-  }
-
-  func didFailToLoad(_ manager: Any?, error: Error) {
-    showError(title: "Error", message: error.localizedDescription)
-  }
-
 }
 
 // MARK: - FSCalendarDataSource, FSCalendarDelegate, UIGestureRecognizerDelegate

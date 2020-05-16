@@ -21,8 +21,11 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   public var toggleMenuButton = false
   private var menuSelection = 0
   private var menuItemImages: [UIImage] {
-    return [UIImage(named: "plus")!, UIImage(named: "info")!, UIImage(named: "addavailability")!]
+    return [UIImage(named: "plus")!, UIImage(named: "info")!]
   }
+//  private var menuItemImages: [UIImage] {
+//    return [UIImage(named: "plus")!, UIImage(named: "info")!, UIImage(named: "addavailability")!]
+//  }
 
   // MARK: - Private Properties
   private var interactor: RootedContentBusinessLogic?

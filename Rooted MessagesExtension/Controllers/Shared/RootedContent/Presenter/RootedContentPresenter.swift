@@ -24,6 +24,8 @@ protocol RootedContentPresentationLogic {
   func onSuccessfulCalendarAdd(response: RootedContent.AddToCalendar.Response)
 
   func onSuccessfulCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response)
+
+  func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response)
 }
 
 extension RootedContentPresentationLogic {
@@ -36,6 +38,8 @@ extension RootedContentPresentationLogic {
   func onSuccessfulSave(response: RootedContent.SaveMeeting.Response) { }
   func onSuccessfulCalendarAdd(response: RootedContent.AddToCalendar.Response) { }
   func onSuccessfulCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response) { }
+
+  func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response) { }
 }
 
 class RootedContentPresenter: RootedContentPresentationLogic {
@@ -98,4 +102,9 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     viewController?.onSuccessfulCalendarRemoval(viewModel: viewModel)
   }
 
+  func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response) {
+    var viewModel = RootedContent.SaveAvailability.ViewModel()
+    viewModel.availability = response.availability
+    viewController?.onSuccessfulAvailabilitySave(viewModel: viewModel)
+  }
 }

@@ -149,6 +149,56 @@ enum RootedContent {
     struct ViewModel { }
   }
 
+  // MARK: - Use Case: Retrieve availability for user
+  enum RetrieveAvailability {
+    struct Request {
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var availabilityManagerDelegate: AvailabilityManagerDelegate?
+    }
+
+    struct Response {
+
+    }
+
+    struct ViewModel {
+
+    }
+  }
+
+  // MARK: - Use Case: Create availability for user
+  enum SaveAvailability {
+    struct Request {
+      var availability: Availability?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var branchEventID = ""
+      var saveType: RootedContentManagerType = .none
+    }
+
+    struct Response {
+      var availability: Availability?
+    }
+
+    struct ViewModel {
+      var availability: Availability?
+    }
+  }
+
+  // MARK: - Use Case: Delete availability for user
+  enum DeleteAvailability {
+    struct Request {
+      var availability: AvailabilityContextWrapper?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var availabilityManagerDelegate: AvailabilityManagerDelegate?
+    }
+
+    struct Response { }
+
+    struct ViewModel { }
+  }
+
   enum DisplayError {
     struct Request { }
 
