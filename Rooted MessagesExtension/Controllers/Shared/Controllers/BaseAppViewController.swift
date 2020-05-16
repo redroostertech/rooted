@@ -12,6 +12,8 @@ import SSSpinnerButton
 
 open class BaseAppViewController: MSMessagesAppViewController {
   var appInitializer = AppInitializer.main
+  var progressHUD: RProgressHUD?
+
   var activeConvo: MSConversation? {
     didSet {
       guard
@@ -32,12 +34,17 @@ open class BaseAppViewController: MSMessagesAppViewController {
     }
   }
 
+  open override func viewDidLoad() {
+    super.viewDidLoad()
+    progressHUD = RProgressHUD(on: self.view)
+  }
+
   func displayError(with title: String, and message: String) {
     HUDFactory.showError(with: title, and: message, on: self)
   }
 
   func stopAnimating(_ spinnerButton: SSSpinnerButton, for completionType: CompletionType, completion: @escaping () -> Void) {
-    spinnerButton.stopAnimatingWithCompletionType(completionType: completionType, complete: completion)
+    spinnerButton.stopAnimationWithCompletionTypeAndBackToDefaults(completionType: completionType, backToDefaults: true, complete: completion)
   }
 
   func startAnimating(_ spinnerButton: SSSpinnerButton, completion: @escaping () -> Void) {
@@ -57,6 +64,25 @@ open class BaseAppViewController: MSMessagesAppViewController {
   func postNotification(withName name: String, andUserInfo userInfo: [String: Any]? = [:], completion: @escaping () -> Void) {
     NotificationCenter.default.post(name: Notification.Name(rawValue: name), object: nil, userInfo: userInfo)
     completion()
+  }
+
+  // MARK: - Use Case: Log activity from presentation style
+  func log(presentationStyle: MSMessagesAppPresentationStyle) {
+    switch presentationStyle {
+    case .compact:
+      RRLogger.log(message: "Presentation is transitioning to compact", owner: self)
+    case .expanded:
+      RRLogger.log(message: "Presentation is transitioning to expanded", owner: self)
+    case .transcript:
+      RRLogger.log(message: "Presentation is transitioning to transcript", owner: self)
+    }
+  }
+
+  // MARK: - Use Case: Dismiss the view
+  func dismissView() {
+    postNotification(withName: kNotificationMyInvitesReload) {
+      self.dismiss(animated: true, completion: nil)
+    }
   }
 }
 

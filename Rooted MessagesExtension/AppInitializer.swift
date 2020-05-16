@@ -15,8 +15,10 @@ public class AppInitializer {
   public var defaultsManager = DefaultsManager.shared
 
   private init() {
+    #if canImport(Firebase)
     FirebaseApp.configure()
-    print("Firebase was configured.")
+    RRLogger.log(message: "Firebase was configured", owner: self)
+    #endif
   }
 
   func initialAppLoadSegue() -> String? {

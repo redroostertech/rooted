@@ -21,19 +21,19 @@ public enum RErrorDescription: String {
   case notificationAccessDisabled = "Please provide access to your notifications to receive immediate community updates."
 }
 
-public enum RError {
+public enum RError: Error {
   case generalError
   case customError(String)
 
   //  Add additional custom errors as needed
   //  ...
 
-  var error: NSError {
+  public var localizedDescription: String {
     switch self {
     case .generalError:
-      return NSError(domain: "", code: 200, userInfo: ["localizedDescription": RErrorDescription.generalError])
+      return NSLocalizedString(RErrorDescription.generalError.rawValue, comment: "General Error")
     case .customError(let value):
-      return NSError(domain: "", code: 200, userInfo: ["localizedDescription": value])
+      return NSLocalizedString(value, comment: "Error")
     }
   }
 }

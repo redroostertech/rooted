@@ -26,7 +26,6 @@ public enum ListViewSection {
 
   case sent
 
-  // Th
   case none
   case custom(String)
 

@@ -76,12 +76,12 @@ class RegistrationForm: UIView {
 
   @IBAction func saveDisplayName(_ sender: UIButton) {
     if setDIsplayNameTextField.text == nil {
-      self.delegate?.form(self, error: RError.generalError.error)
+      self.delegate?.form(self, error: RError.generalError)
       return
     }
 
     if setDIsplayNameTextField.text == "" {
-      self.delegate?.form(self, error: RError.generalError.error)
+      self.delegate?.form(self, error: RError.generalError)
       return
     }
 

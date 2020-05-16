@@ -8,50 +8,70 @@
 
 import Foundation
 
-public var kSessionUser = "currentUser"
-public var kSessionStart = "sessionStart"
-public var kSessionLastLogin = "lastLogin"
-public var kSessionCart = "sessionCart" // Not in use yet
-
+// MARK: - Use Case: As a user, I want to be keep track of my activity in a given session
 class SessionManager {
-  static var shared = SessionManager()
+
+  // MARK: - Public properties
+  public static var shared = SessionManager()
+
+  // MARK: - Lifecycle methods
+  private init() { }
+
+  // MARK: - Use Case: As a user, I want to be keep track of my activity in a given session; app should be able to check if a session already exists.
   var sessionExists: Bool {
     return currentUser != nil
   }
+
+  // MARK: - Use Case: As a user, I want to be able to resume my activity and maintain a single reference to my user information; app needs to a ccess the `currentUser` thats stored in the `SessionManager`
   var currentUser: UserProfileData? {
     guard let userDict = DefaultsManager.shared.retrieveStringDefault(forKey: kSessionUser) else { return nil }
     return UserProfileData(JSONString: userDict)
   }
+
+  // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity
   var sessionStart: Date {
     return DefaultsManager.shared.retrieveStringDefault(forKey: kSessionStart)?.toDate()?.date ?? Date()
   }
-  private init() { }
 
+  // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity; app needs to start a session using profile data
   static func start(with user: UserProfileData) {
+
+    let defaultsManager = DefaultsManager.shared
+
+    // Check if current user is nil
     if SessionManager.shared.currentUser == nil {
-      // If session is nil, start a new session with the provided user object
+
+      // Start a new session with the provided user object
       if let userJsonString = user.toJSONString() {
-        DefaultsManager.shared.setDefault(withData: userJsonString, forKey: kSessionUser)
+        defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)
       }
+
+      // Capture the date that a new session was created
       let date = Date().toString()
-      DefaultsManager.shared.setDefault(withData: date, forKey: kSessionStart)
-      DefaultsManager.shared.setDefault(withData: date, forKey: kSessionLastLogin)
+      defaultsManager.setDefault(withData: date, forKey: kSessionStart)
+      defaultsManager.setDefault(withData: date, forKey: kSessionLastLogin)
+
     } else {
-      // If session is not nil, then session already exists.
+
+      // Session already exists.
       // Do nothing regarding the session manager
       return
+
     }
   }
 
+  // MARK: - Use Case: As a user, when I boot up my app, I want to ensure that the time of boot up or "login" is updated to the current time
   static func updateLastLogin() {
     let date = Date().toString()
     DefaultsManager.shared.setDefault(withData: date, forKey: kSessionLastLogin)
   }
 
+  // MARK: - Use Case: As a user, I want to be able to clear a session
   static func clearSession()  {
-    DefaultsManager.shared.setNilDefault(forKey: kSessionUser)
-    DefaultsManager.shared.setNilDefault(forKey: kSessionStart)
-    DefaultsManager.shared.setNilDefault(forKey: kSessionLastLogin)
-    DefaultsManager.shared.setNilDefault(forKey: kSessionCart)
+    let defaultsManager = DefaultsManager.shared
+    defaultsManager.setNilDefault(forKey: kSessionUser)
+    defaultsManager.setNilDefault(forKey: kSessionStart)
+    defaultsManager.setNilDefault(forKey: kSessionLastLogin)
+    defaultsManager.setNilDefault(forKey: kSessionCart)
   }
 }

@@ -83,9 +83,10 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
     return searchBar
   }()
 
-  private var locationManager: CLLocationManager?
+  private var locationManager = CLLocationManager()
   private var searchCompleter = MKLocalSearchCompleter()
   private var searchResults = [MKLocalSearchCompletionWrapper]()
+  private var initialAuthSet = false
 
   required public init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
@@ -105,8 +106,21 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
 
     setupView()
 
-    if CLLocationManager.authorizationStatus() == .denied || CLLocationManager.authorizationStatus() == .notDetermined {
-      self.locationManager?.requestWhenInUseAuthorization()
+    locationManager.delegate = self
+
+    switch CLLocationManager.authorizationStatus() {
+    case .denied, .restricted:
+      self.initialAuthSet = true
+      let okAction = UIAlertAction(title: "OK", style: .default, handler: { action in
+        self.onDismissCallback?(self)
+      })
+      HUDFactory.displayAlert(with: "Location Permissions", message: "To add a location to this meeting, please go to your settings and allow access to your location.", and: [okAction], on: self)
+    case .notDetermined:
+      self.initialAuthSet = true
+      self.locationManager.requestWhenInUseAuthorization()
+    default:
+      self.initialAuthSet = true
+      break
     }
   }
 
@@ -180,11 +194,13 @@ extension LocationSearchVC: MKLocalSearchCompleterDelegate {
 // MARK: - CLLocationManager delegate
 extension LocationSearchVC: CLLocationManagerDelegate {
   func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-    switch status {
-    case .denied, .notDetermined:
-      onDismissCallback?(self)
-    default:
-      break
+    if initialAuthSet {
+      switch status {
+      case .denied, .restricted:
+        onDismissCallback?(self)
+      default:
+        break
+      }
     }
   }
 }
