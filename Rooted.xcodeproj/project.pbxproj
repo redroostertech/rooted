@@ -214,6 +214,12 @@
 		D7C3B9312416762D00B22E8F /* DateRangeVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7C3B9302416762D00B22E8F /* DateRangeVC.xib */; };
 		D7C3B9392416880F00B22E8F /* CalendarViewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */; };
 		D7C9323C242173DE0022E980 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C9323B242173DE0022E980 /* Array+Extensions.swift */; };
+		D7DDDA2624715D940061C15B /* SplashPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2024715D940061C15B /* SplashPresenter.swift */; };
+		D7DDDA2724715D940061C15B /* SplashWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2124715D940061C15B /* SplashWorker.swift */; };
+		D7DDDA2824715D940061C15B /* SplashRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2224715D940061C15B /* SplashRouter.swift */; };
+		D7DDDA2924715D940061C15B /* SplashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2324715D940061C15B /* SplashModels.swift */; };
+		D7DDDA2A24715D940061C15B /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2424715D940061C15B /* SplashViewController.swift */; };
+		D7DDDA2B24715D940061C15B /* SplashInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2524715D940061C15B /* SplashInteractor.swift */; };
 		D7F1AAE9240BEE0F00210504 /* industriesJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE5240BEE0F00210504 /* industriesJson.json */; };
 		D7F1AAEA240BEE0F00210504 /* RootedJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE6240BEE0F00210504 /* RootedJson.json */; };
 		D7F1AAEB240BEE0F00210504 /* Rooted_Meetings_Response.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */; };
@@ -461,6 +467,12 @@
 		D7C3B9302416762D00B22E8F /* DateRangeVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DateRangeVC.xib; sourceTree = "<group>"; };
 		D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewRow.swift; sourceTree = "<group>"; };
 		D7C9323B242173DE0022E980 /* Array+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
+		D7DDDA2024715D940061C15B /* SplashPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashPresenter.swift; sourceTree = "<group>"; };
+		D7DDDA2124715D940061C15B /* SplashWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashWorker.swift; sourceTree = "<group>"; };
+		D7DDDA2224715D940061C15B /* SplashRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashRouter.swift; sourceTree = "<group>"; };
+		D7DDDA2324715D940061C15B /* SplashModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashModels.swift; sourceTree = "<group>"; };
+		D7DDDA2424715D940061C15B /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
+		D7DDDA2524715D940061C15B /* SplashInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashInteractor.swift; sourceTree = "<group>"; };
 		D7F1AAE5240BEE0F00210504 /* industriesJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = industriesJson.json; sourceTree = "<group>"; };
 		D7F1AAE6240BEE0F00210504 /* RootedJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RootedJson.json; sourceTree = "<group>"; };
 		D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Rooted_Meetings_Response.json; sourceTree = "<group>"; };
@@ -542,6 +554,7 @@
 		BA068C042245AD7D00A0EE9B /* Rooted MessagesExtension */ = {
 			isa = PBXGroup;
 			children = (
+				D7DDDA1124703F630061C15B /* Scenes */,
 				D787A26723E1EB41001795D3 /* GoogleService-Info.plist */,
 				BA98DD8C224ED26F0070BC39 /* Rooted MessagesExtension.entitlements */,
 				D787A26923E1EC2F001795D3 /* AppInitializer.swift */,
@@ -1096,6 +1109,27 @@
 			path = LocationSearchRow;
 			sourceTree = "<group>";
 		};
+		D7DDDA1124703F630061C15B /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				D7DDDA1F24715D720061C15B /* SplashScene */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		D7DDDA1F24715D720061C15B /* SplashScene */ = {
+			isa = PBXGroup;
+			children = (
+				D7DDDA2024715D940061C15B /* SplashPresenter.swift */,
+				D7DDDA2124715D940061C15B /* SplashWorker.swift */,
+				D7DDDA2224715D940061C15B /* SplashRouter.swift */,
+				D7DDDA2324715D940061C15B /* SplashModels.swift */,
+				D7DDDA2424715D940061C15B /* SplashViewController.swift */,
+				D7DDDA2524715D940061C15B /* SplashInteractor.swift */,
+			);
+			path = SplashScene;
+			sourceTree = "<group>";
+		};
 		D7F1AAE4240BEE0F00210504 /* JSON */ = {
 			isa = PBXGroup;
 			children = (
@@ -1409,9 +1443,11 @@
 				D79A5EBB240710C4006DAA7A /* RootedCollectionViewModel.swift in Sources */,
 				D7255F8C24134FD60048F8D8 /* Zones+Extensions.swift in Sources */,
 				D7A18AEB24063ACC0039A295 /* Configuration.swift in Sources */,
+				D7DDDA2B24715D940061C15B /* SplashInteractor.swift in Sources */,
 				D79A5F2C2407FF91006DAA7A /* DateRow.swift in Sources */,
 				D79A5F1C2407FF91006DAA7A /* SelectableSection.swift in Sources */,
 				D70741D12417198100115998 /* AvailabilityManager.swift in Sources */,
+				D7DDDA2924715D940061C15B /* SplashModels.swift in Sources */,
 				D79A5F132407FF91006DAA7A /* Helpers.swift in Sources */,
 				D701DC6923E8DBF600A45E9B /* AccountType.swift in Sources */,
 				D79A5F162407FF91006DAA7A /* HeaderFooterView.swift in Sources */,
@@ -1433,9 +1469,12 @@
 				D79A5F292407FF91006DAA7A /* TextAreaRow.swift in Sources */,
 				D79A5F7A24083038006DAA7A /* SuggestionCollectionViewCell.swift in Sources */,
 				D79A5F3A2407FF91006DAA7A /* DateInlineRow.swift in Sources */,
+				D7DDDA2824715D940061C15B /* SplashRouter.swift in Sources */,
 				D701DC6023E8DBF600A45E9B /* MeetingStatus.swift in Sources */,
+				D7DDDA2A24715D940061C15B /* SplashViewController.swift in Sources */,
 				D79A5F282407FF91006DAA7A /* SegmentedRow.swift in Sources */,
 				D70741DE241A7E7C00115998 /* RootedContentInteractor.swift in Sources */,
+				D7DDDA2624715D940061C15B /* SplashPresenter.swift in Sources */,
 				D701DC6423E8DBF600A45E9B /* Reminders.swift in Sources */,
 				D7B758C9245B302F005CD0C9 /* RootedContentPresenter.swift in Sources */,
 				D79A5F2D2407FF91006DAA7A /* SelectorRow.swift in Sources */,
@@ -1444,6 +1483,7 @@
 				BA0D0EF3224A6B7600209993 /* TextField+Extensions.swift in Sources */,
 				D701DB8423E8DBF600A45E9B /* PhoneNumber.swift in Sources */,
 				D7B758CC245B302F005CD0C9 /* RootedContentModels.swift in Sources */,
+				D7DDDA2724715D940061C15B /* SplashWorker.swift in Sources */,
 				D79A5F462407FF91006DAA7A /* SelectorAlertController.swift in Sources */,
 				D79A5F262407FF91006DAA7A /* StepperRow.swift in Sources */,
 				D7255F91241387600048F8D8 /* EmptyHeader.swift in Sources */,
