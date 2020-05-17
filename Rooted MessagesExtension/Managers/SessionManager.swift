@@ -28,6 +28,11 @@ class SessionManager {
     return UserProfileData(JSONString: userDict)
   }
 
+  var currentUserId: String? {
+    guard let userid = DefaultsManager.shared.retrieveStringDefault(forKey: kSessionUser) else { return nil }
+    return userid
+  }
+
   // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity
   var sessionStart: Date {
     return DefaultsManager.shared.retrieveStringDefault(forKey: kSessionStart)?.toDate()?.date ?? Date()

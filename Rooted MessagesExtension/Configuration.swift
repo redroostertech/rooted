@@ -168,6 +168,7 @@ public let kBranchMeetingDeleteMeeting = "user_deleted_meeting"
 
 // MARK: - Session strings
 public var kSessionUser = "currentUser"
+public var kSessionUserId = "currentUserId"
 public var kSessionStart = "sessionStart"
 public var kSessionLastLogin = "lastLogin"
 public var kSessionCart = "sessionCart" // Not in use yet
