@@ -214,6 +214,12 @@
 		D7C3B9312416762D00B22E8F /* DateRangeVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7C3B9302416762D00B22E8F /* DateRangeVC.xib */; };
 		D7C3B9392416880F00B22E8F /* CalendarViewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */; };
 		D7C9323C242173DE0022E980 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C9323B242173DE0022E980 /* Array+Extensions.swift */; };
+		D7DDDA1924703F860061C15B /* PhoneLoginPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1324703F860061C15B /* PhoneLoginPresenter.swift */; };
+		D7DDDA1A24703F860061C15B /* PhoneLoginWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1424703F860061C15B /* PhoneLoginWorker.swift */; };
+		D7DDDA1B24703F860061C15B /* PhoneLoginRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1524703F860061C15B /* PhoneLoginRouter.swift */; };
+		D7DDDA1C24703F860061C15B /* PhoneLoginModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1624703F860061C15B /* PhoneLoginModels.swift */; };
+		D7DDDA1D24703F860061C15B /* PhoneLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1724703F860061C15B /* PhoneLoginViewController.swift */; };
+		D7DDDA1E24703F860061C15B /* PhoneLoginInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1824703F860061C15B /* PhoneLoginInteractor.swift */; };
 		D7DDDA2624715D940061C15B /* SplashPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2024715D940061C15B /* SplashPresenter.swift */; };
 		D7DDDA2724715D940061C15B /* SplashWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2124715D940061C15B /* SplashWorker.swift */; };
 		D7DDDA2824715D940061C15B /* SplashRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2224715D940061C15B /* SplashRouter.swift */; };
@@ -467,6 +473,12 @@
 		D7C3B9302416762D00B22E8F /* DateRangeVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DateRangeVC.xib; sourceTree = "<group>"; };
 		D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewRow.swift; sourceTree = "<group>"; };
 		D7C9323B242173DE0022E980 /* Array+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
+		D7DDDA1324703F860061C15B /* PhoneLoginPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginPresenter.swift; sourceTree = "<group>"; };
+		D7DDDA1424703F860061C15B /* PhoneLoginWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginWorker.swift; sourceTree = "<group>"; };
+		D7DDDA1524703F860061C15B /* PhoneLoginRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginRouter.swift; sourceTree = "<group>"; };
+		D7DDDA1624703F860061C15B /* PhoneLoginModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginModels.swift; sourceTree = "<group>"; };
+		D7DDDA1724703F860061C15B /* PhoneLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginViewController.swift; sourceTree = "<group>"; };
+		D7DDDA1824703F860061C15B /* PhoneLoginInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginInteractor.swift; sourceTree = "<group>"; };
 		D7DDDA2024715D940061C15B /* SplashPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashPresenter.swift; sourceTree = "<group>"; };
 		D7DDDA2124715D940061C15B /* SplashWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashWorker.swift; sourceTree = "<group>"; };
 		D7DDDA2224715D940061C15B /* SplashRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashRouter.swift; sourceTree = "<group>"; };
@@ -1113,8 +1125,22 @@
 			isa = PBXGroup;
 			children = (
 				D7DDDA1F24715D720061C15B /* SplashScene */,
+				D7DDDA1224703F6C0061C15B /* PhoneLogin */,
 			);
 			path = Scenes;
+			sourceTree = "<group>";
+		};
+		D7DDDA1224703F6C0061C15B /* PhoneLogin */ = {
+			isa = PBXGroup;
+			children = (
+				D7DDDA1724703F860061C15B /* PhoneLoginViewController.swift */,
+				D7DDDA1824703F860061C15B /* PhoneLoginInteractor.swift */,
+				D7DDDA1324703F860061C15B /* PhoneLoginPresenter.swift */,
+				D7DDDA1424703F860061C15B /* PhoneLoginWorker.swift */,
+				D7DDDA1524703F860061C15B /* PhoneLoginRouter.swift */,
+				D7DDDA1624703F860061C15B /* PhoneLoginModels.swift */,
+			);
+			path = PhoneLogin;
 			sourceTree = "<group>";
 		};
 		D7DDDA1F24715D720061C15B /* SplashScene */ = {
@@ -1429,6 +1455,7 @@
 				D79A5F7C24083038006DAA7A /* SuggestionCollectionCell.swift in Sources */,
 				D79A5F312407FF91006DAA7A /* DecimalFormatter.swift in Sources */,
 				D79A5F372407FF91006DAA7A /* FieldsRow.swift in Sources */,
+				D7DDDA1A24703F860061C15B /* PhoneLoginWorker.swift in Sources */,
 				D79A5F362407FF91006DAA7A /* CheckRow.swift in Sources */,
 				D79A5EB9240710A3006DAA7A /* ListViewSection.swift in Sources */,
 				D79A5F1A2407FF91006DAA7A /* Operators.swift in Sources */,
@@ -1445,7 +1472,9 @@
 				D7A18AEB24063ACC0039A295 /* Configuration.swift in Sources */,
 				D7DDDA2B24715D940061C15B /* SplashInteractor.swift in Sources */,
 				D79A5F2C2407FF91006DAA7A /* DateRow.swift in Sources */,
+				D7DDDA1C24703F860061C15B /* PhoneLoginModels.swift in Sources */,
 				D79A5F1C2407FF91006DAA7A /* SelectableSection.swift in Sources */,
+				D7DDDA1D24703F860061C15B /* PhoneLoginViewController.swift in Sources */,
 				D70741D12417198100115998 /* AvailabilityManager.swift in Sources */,
 				D7DDDA2924715D940061C15B /* SplashModels.swift in Sources */,
 				D79A5F132407FF91006DAA7A /* Helpers.swift in Sources */,
@@ -1461,6 +1490,7 @@
 				D701DC5D23E8DBF600A45E9B /* Response.swift in Sources */,
 				D701DC5E23E8DBF600A45E9B /* Meeting.swift in Sources */,
 				D7B758CD245B302F005CD0C9 /* BranchWorker.swift in Sources */,
+				D7DDDA1B24703F860061C15B /* PhoneLoginRouter.swift in Sources */,
 				D7C3B92F2416696700B22E8F /* DateRangePickerInlineRow.swift in Sources */,
 				D747BAEA2411C6B200E571CF /* CustomHeader.swift in Sources */,
 				BA0D0EF4224A6B7600209993 /* UIView+Extensions+iMess.swift in Sources */,
@@ -1490,7 +1520,9 @@
 				D79A5F322407FF91006DAA7A /* Protocols.swift in Sources */,
 				D701DB8523E8DBF600A45E9B /* AgendaItem.swift in Sources */,
 				D79A5F9E240960F5006DAA7A /* WWCalendarTimeSelector.swift in Sources */,
+				D7DDDA1924703F860061C15B /* PhoneLoginPresenter.swift in Sources */,
 				D79A5F332407FF91006DAA7A /* AlertOptionsRow.swift in Sources */,
+				D7DDDA1E24703F860061C15B /* PhoneLoginInteractor.swift in Sources */,
 				D79A5F182407FF91006DAA7A /* RowControllerType.swift in Sources */,
 				D79A5F7B24083038006DAA7A /* SuggestionCell.swift in Sources */,
 				D79A5F502407FF91006DAA7A /* RuleClosure.swift in Sources */,
