@@ -6,8 +6,9 @@ import MapKit
 import NotificationCenter
 import CoreData
 import Branch
+import OnboardKit
 
-class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLogic, MeetingsManagerDelegate {
+class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLogic, MeetingsManagerDelegate, RootedCellDelegate, FloatingMenuBtnAction, AuthenticationLogic {
 
   // MARK: - IBOutlets
   @IBOutlet private weak var refreshButton: UIButton!
@@ -21,7 +22,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   public var toggleMenuButton = false
   private var menuSelection = 0
   private var menuItemImages: [UIImage] {
-    return [UIImage(named: "plus")!, UIImage(named: "info")!]
+    return [UIImage(named: "calendar-plus")!, UIImage(named: "user-outline-male-symbol-of-interface")!]
   }
 //  private var menuItemImages: [UIImage] {
 //    return [UIImage(named: "plus")!, UIImage(named: "info")!, UIImage(named: "addavailability")!]
@@ -68,10 +69,9 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   override func willBecomeActive(with conversation: MSConversation) {
     super.willBecomeActive(with: conversation)
-    setupBranchIO()
     setupManagedSession()
+    setupBranchIO()
     setupConversationManager(using: conversation)
-    checkCalendarPermissions()
   }
 
   override func didBecomeActive(with conversation: MSConversation) {
@@ -79,7 +79,6 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     log(presentationStyle: presentationStyle)
     switch presentationStyle {
     case .compact, .transcript:
-      self.dismiss(animated: true, completion: nil)
       self.layoutOption = .horizontalList
       self.segmentControlHeightConstraint.constant = 0
       break
@@ -95,7 +94,6 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     log(presentationStyle: presentationStyle)
     switch presentationStyle {
     case .compact, .transcript:
-      self.dismiss(animated: true, completion: nil)
       self.layoutOption = .horizontalList
       self.segmentControlHeightConstraint.constant = 0
       break
@@ -135,8 +133,9 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   }
 
   private func setupMenuButton() {
-    menuButton.applyCornerRadius()
-    menuButton.backgroundColor = .gradientColor2
+//    menuButton.applyCornerRadius()
+//    menuButton.imageView?.contentMode = .scaleAspectFit
+    menuButton.tintColor = .darkGray
   }
 
   private func setupSegmentedControl() {
@@ -149,26 +148,6 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     segmentedControl.selectedSegmentIndex = menuSelection
     segmentedControl.fixedSegmentWidth = true
     segmentedControl.addTarget(self, action: #selector(self.segmentSelected(sender:)), for: .valueChanged)
-  }
-
-  // MARK: - Use Case: Show toggle menu
-  func showMenu() {
-    toggleMenuButton = true
-    if self.presentationStyle == .expanded {
-      if self.floatingMenu == nil {
-        self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.menuButton, images: self.menuItemImages)
-        self.floatingMenu?.delegate = self
-      }
-      floatingMenu?.isOpen = false
-      self.floatingMenu!.toggleMenu()
-    }
-  }
-
-  // MARK: - Use Case: Dismiss toggle menu
-  func dismissMenu() {
-    toggleMenuButton = false
-    floatingMenu?.isOpen = true
-    floatingMenu?.toggleMenu()
   }
 
   // MARK: - Use Case: Initialize session of BranchIO and handle response
@@ -194,32 +173,10 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   func setupManagedSession() {
     // Authentication does not exist yet so set up a empty anonymous user
     if !SessionManager.shared.sessionExists {
-
       RRLogger.log(message: "Session does not exist, start an anonymous one.", owner: self)
-
-      /*
-      // Create an anonymous user
-      self.anonymousUser = UserProfileData.anonymousUser
-      guard self.anonymousUser != nil else { return }
-
-      // Create a random string to be used as an ID
-      anonymousUser!.id = RanStringGen(length: 25).returnString()
-
-      // Get the user's name
-      let registrationForm = RegistrationForm()
-      registrationForm.translatesAutoresizingMaskIntoConstraints = false
-      registrationForm.configure(delegate: self)
-
-      self.view.addSubview(registrationForm)
-
-      let constraints: [NSLayoutConstraint] = [
-        registrationForm.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 24.0),
-        registrationForm.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -24.0),
-        registrationForm.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 24.0),
-        registrationForm.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -24.0),
-      ]
-      NSLayoutConstraint.activate(constraints)
-     */
+      self.presentPhoneLoginViewController()
+    } else {
+      self.checkCalendarPermissions()
     }
   }
 
@@ -293,11 +250,51 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
       self.showMenu()
     }
   }
-}
 
-// MARK: - RootedCellDelegate
-extension MyInvitesViewController: RootedCellDelegate {
+  // MARK: - Use Case: Show toggle menu
+  func showMenu() {
+    toggleMenuButton = true
+    if self.presentationStyle == .expanded {
+      if self.floatingMenu == nil {
+        self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.menuButton, images: self.menuItemImages)
+        self.floatingMenu?.delegate = self
+      }
+      floatingMenu?.isOpen = false
+      self.floatingMenu!.toggleMenu()
+    }
+  }
 
+  // MARK: - Use Case: Dismiss toggle menu
+  func dismissMenu() {
+    toggleMenuButton = false
+    floatingMenu?.isOpen = true
+    floatingMenu?.toggleMenu()
+  }
+
+  // MARK: - Use Case: When a user makes a selection from the floating menu button
+  func btnClicked(tag: Int) {
+    RRLogger.log(message: "\(tag) Button in floating menu tapped", owner: self)
+
+    self.dismissMenu()
+
+    switch tag {
+    case 0:
+      // MARK: - Use Case: Check if maximum is reached and then go to create a new meeting
+      self.checkMaximumMeetingsReached()
+    case 1:
+      // MARK: - Use Case: Go to `InfoViewController`
+      self.goToInfoView()
+    case 2:
+      // MARK: - Use Case: Go to `AvailabilityNavigationViewController`
+      self.goToAvailabilityNavigationView()
+
+    default:
+      RRLogger.log(message: "Unsupported menu action", owner: self)
+      break
+    }
+  }
+
+  // MARK: - RootedCellDelegate
   // MARK: - Use Case: As a user, I would like to perform additional actions on items in the table view
   func performActions(_ cell: UICollectionViewCell, ofType: ActionType, on viewModel: Any?) {
     guard let viewmodel = viewModel as? RootedCellViewModel else { return }
@@ -401,65 +398,8 @@ extension MyInvitesViewController: RootedCellDelegate {
     print("Did delete invite")
     showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
   }
-}
 
-// MARK: - FloatingMenuBtnAction
-extension MyInvitesViewController: FloatingMenuBtnAction {
-  func btnClicked(tag: Int) {
-    RRLogger.log(message: "\(tag) Button in floating menu tapped", owner: self)
-
-    self.dismissMenu()
-
-    switch tag {
-    case 0:
-      // MARK: - Use Case: Check if maximum is reached and then go to create a new meeting
-      self.checkMaximumMeetingsReached()
-    case 1:
-      // MARK: - Use Case: Go to `InfoViewController`
-      self.goToInfoView()
-    case 2:
-      // MARK: - Use Case: Go to `AvailabilityNavigationViewController`
-      self.goToAvailabilityNavigationView()
-
-    default:
-      RRLogger.log(message: "Unsupported menu action", owner: self)
-      break
-    }
-  }
-
-  // MARK: - Use Case: Go to add an meeting view
-  func goToCreateNewMeetingView() {
-    let request = RootedContent.CreateNewMeeting.Request()
-    interactor?.goToCreateNewMeetingView(request: request)
-  }
-
-  func handleError(viewModel: RootedContent.DisplayError.ViewModel) {
-    showError(title: viewModel.errorTitle, message: viewModel.errorMessage)
-  }
-
-  func presentCreateNewMeetingView(viewModel: RootedContent.CreateNewMeeting.ViewModel) {
-    let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
-    let vc = sb.instantiateViewController(withIdentifier: kViewControllerMessagesNavigation)
-    present(vc, animated: true, completion: nil)
-  }
-
-  // MARK: - Use Case: Go to `InfoViewController`
-  func goToInfoView() {
-    let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
-    let vc = sb.instantiateViewController(withIdentifier: "InfoViewController")
-    present(vc, animated: true, completion: nil)
-  }
-
-  // MARK: - Use Case: Go to `AvailabilityNavigationViewController`
-  func goToAvailabilityNavigationView() {
-    let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
-    let vc = sb.instantiateViewController(withIdentifier: "AvailabilityNavigationViewController")
-    present(vc, animated: true, completion: nil)
-  }
-}
-
-// MARK: - RootedFormDelegate
-extension MyInvitesViewController: RootedFormDelegate {
+  // MARK: - RootedFormDelegate
   func didReturn(_ form: RegistrationForm, textField: UITextField) {
     guard anonymousUser != nil else { return }
     // Start session with anonymous user when input is done
@@ -485,6 +425,71 @@ extension MyInvitesViewController: RootedFormDelegate {
   func didCancel(_ form: RegistrationForm) {
     // Do something when user input for form is cancelled
   }
+
+
+  // MARK: - Routing Logic
+  // MARK: - Use Case: Go to add an meeting view
+  func goToCreateNewMeetingView() {
+    let request = RootedContent.CreateNewMeeting.Request()
+    interactor?.goToCreateNewMeetingView(request: request)
+  }
+
+  func handleError(viewModel: RootedContent.DisplayError.ViewModel) {
+    showError(title: viewModel.errorTitle, message: viewModel.errorMessage)
+  }
+
+  func presentCreateNewMeetingView(viewModel: RootedContent.CreateNewMeeting.ViewModel) {
+    let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
+    let destinationVC = sb.instantiateViewController(withIdentifier: kViewControllerMessagesNavigation) as! UINavigationController
+    present(destinationVC, animated: true, completion: nil)
+  }
+
+  // MARK: - Use Case: Go to `InfoViewController`
+  func goToInfoView() {
+    let request = RootedContent.InfoView.Request()
+    interactor?.goToInfoView(request: request)
+  }
+
+  func presentInfoView(viewModel: RootedContent.InfoView.ViewModel) {
+    let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
+    let destinationVC = sb.instantiateViewController(withIdentifier: kSettingsNavigationController) as! UINavigationController
+    present(destinationVC, animated: true, completion: nil)
+  }
+
+  // MARK: - Use Case: Go to `AvailabilityNavigationViewController`
+  func goToAvailabilityNavigationView() {
+    let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
+    let destinationVC = sb.instantiateViewController(withIdentifier: kViewControllerAvailabilityNavigation) as! AvailabilityViewController
+    present(destinationVC, animated: true, completion: nil)
+  }
+
+  // MARK: - Use Case: Check if user is logged in and if not, show login screen
+  func presentPhoneLoginViewController() {
+    let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
+
+    let middleVC = sb.instantiateViewController(withIdentifier: kPhoneLoginViewController) as! PhoneLoginViewController
+    var middleVCDS = middleVC.router!.dataStore!
+    middleVCDS.authenticationLogicDelegate = self
+
+    let leftVC = sb.instantiateViewController(withIdentifier: kRegistrationViewController) as! RegistrationViewController
+    var leftVCDS = leftVC.router!.dataStore!
+
+    let snapContainer = SnapContainerViewController.containerViewWith(leftVC,
+                                                                      middleVC: middleVC)
+
+    self.present(snapContainer, animated: true, completion: nil)
+
+  }
+
+  // MARK: - Use Case: On Successful login resume setting up the view controller
+  func onSucessfulLogin(_ sender: PhoneLoginViewController, uid: String?) {
+    getCalendarPermissions()
+  }
+
+  // MARK: - Use Case: On failed login attempt, resume setting up the view controller
+  func handleFailedLogin(_ sender: PhoneLoginViewController, reason: String) {
+    // Don't do anything yet
+  }
 }
 
 // Reusable components
@@ -504,6 +509,45 @@ extension MyInvitesViewController {
   }
 
   // MARK: - Use Case: Check if app has access to calendar permissions
+  func getCalendarPermissions() {
+    let request = RootedContent.CheckCalendarPermissions.Request()
+    interactor?.getCalendarPermissions(request: request)
+  }
+
+  func handleCalendarPermissionsCheck(viewModel: RootedContent.CheckCalendarPermissions.ViewModel) {
+    if viewModel.isGranted {
+      self.retrieveMeetings()
+    } else {
+      let appearance = OnboardViewController.AppearanceConfiguration(tintColor: .systemBlue,
+                                                                     titleColor: .black,
+                                                                     textColor: .black,
+                                                                     backgroundColor: .white,
+                                                                     imageContentMode: .scaleAspectFit,
+                                                                     titleFont:UIFont.boldSystemFont(ofSize: 32.0),
+                                                                     textFont: UIFont.boldSystemFont(ofSize: 17.0),
+                                                                     advanceButtonStyling: { button in
+
+                                                                      button.setTitleColor(.systemBlue, for: .normal)
+                                                                      button.titleLabel?.font = UIFont.systemFont(ofSize: 16.0, weight: .semibold)
+      }) { button in
+        button.setTitleColor(.lightGray, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16.0, weight: .semibold)
+      }
+      let page = OnboardPage(title: "Welcome to Rooted!",
+                                 imageName: "calendar",
+                                 description: "Grant access to your calendar to start creating and receiving meeting invites that sync to your calendar, set reminders and keep up with your schedule.",
+                                 advanceButtonTitle: "Decide Later",
+                                 actionButtonTitle: "Enable Calendar Access",
+                                 action: { [weak self] completion in
+                                  self?.checkCalendarPermissions()
+                                  self?.dismiss(animated: true, completion: nil)
+      })
+      let onboardingViewController = OnboardViewController(pageItems: [page],
+                                                           appearanceConfiguration: appearance)
+      onboardingViewController.presentFrom(self, animated: true)
+    }
+  }
+
   func checkCalendarPermissions() {
     let request = RootedContent.CheckCalendarPermissions.Request()
     interactor?.checkCalendarPermissions(request: request)

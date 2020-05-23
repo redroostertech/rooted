@@ -19,7 +19,8 @@ class SessionManager {
 
   // MARK: - Use Case: As a user, I want to be keep track of my activity in a given session; app should be able to check if a session already exists.
   var sessionExists: Bool {
-    return currentUser != nil
+//    return currentUser != nil
+    return currentUserId != nil
   }
 
   // MARK: - Use Case: As a user, I want to be able to resume my activity and maintain a single reference to my user information; app needs to a ccess the `currentUser` thats stored in the `SessionManager`
@@ -29,7 +30,7 @@ class SessionManager {
   }
 
   var currentUserId: String? {
-    guard let userid = DefaultsManager.shared.retrieveStringDefault(forKey: kSessionUser) else { return nil }
+    guard let userid = DefaultsManager.shared.retrieveStringDefault(forKey: kSessionUserId) else { return nil }
     return userid
   }
 
@@ -50,6 +51,31 @@ class SessionManager {
       if let userJsonString = user.toJSONString() {
         defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)
       }
+
+      // Capture the date that a new session was created
+      let date = Date().toString()
+      defaultsManager.setDefault(withData: date, forKey: kSessionStart)
+      defaultsManager.setDefault(withData: date, forKey: kSessionLastLogin)
+
+    } else {
+
+      // Session already exists.
+      // Do nothing regarding the session manager
+      return
+
+    }
+  }
+
+  // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity; app needs to start a session using profile data
+  static func start(with id: String) {
+
+    let defaultsManager = DefaultsManager.shared
+
+    // Check if current user is nil
+    if SessionManager.shared.currentUser == nil {
+
+      // Start a new session with the provided user id
+      defaultsManager.setDefault(withData: id, forKey: kSessionUserId)
 
       // Capture the date that a new session was created
       let date = Date().toString()

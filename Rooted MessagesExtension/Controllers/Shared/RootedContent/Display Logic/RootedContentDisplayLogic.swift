@@ -10,11 +10,15 @@ import Foundation
 
 protocol RootedContentDisplayLogic: class {
   func showHUD()
+  func presentPhoneLoginViewController()
 
   func handleBranchIOResponse(viewModel: RootedContent.SetupBranchIO.ViewModel)
   func handleCalendarPermissions(viewModel: RootedContent.CheckCalendarPermissions.ViewModel)
+  func handleCalendarPermissionsCheck(viewModel: RootedContent.CheckCalendarPermissions.ViewModel)
+
   func handleMaximumLimitReached(viewModel: RootedContent.CheckMaximumMeetingsReached.ViewModel)
   func presentCreateNewMeetingView(viewModel: RootedContent.CreateNewMeeting.ViewModel)
+  func presentInfoView(viewModel: RootedContent.InfoView.ViewModel)
   func handleError(viewModel: RootedContent.DisplayError.ViewModel)
 
   func onSuccessfulSave(viewModel: RootedContent.SaveMeeting.ViewModel)
@@ -28,11 +32,14 @@ protocol RootedContentDisplayLogic: class {
 
 extension RootedContentDisplayLogic {
   func showHUD() { }
+  func presentPhoneLoginViewController() { }
 
   func handleBranchIOResponse(viewModel: RootedContent.SetupBranchIO.ViewModel) { }
   func handleCalendarPermissions(viewModel: RootedContent.CheckCalendarPermissions.ViewModel) { }
+  func handleCalendarPermissionsCheck(viewModel: RootedContent.CheckCalendarPermissions.ViewModel) { }
   func handleMaximumLimitReached(viewModel: RootedContent.CheckMaximumMeetingsReached.ViewModel) { }
   func presentCreateNewMeetingView(viewModel: RootedContent.CreateNewMeeting.ViewModel) { }
+  func presentInfoView(viewModel: RootedContent.InfoView.ViewModel) { }
   func handleError(viewModel: RootedContent.DisplayError.ViewModel) { }
 
   func onSuccessfulSave(viewModel: RootedContent.SaveMeeting.ViewModel) { }

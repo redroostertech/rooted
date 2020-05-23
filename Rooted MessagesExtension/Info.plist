@@ -50,5 +50,7 @@
 	<string>key_live_npNUJjsLcUnbq6xSqRwS9mmjvsbMMu0R</string>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 </dict>
 </plist>

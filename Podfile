@@ -27,5 +27,6 @@ target 'Rooted MessagesExtension' do
   pod 'SwiftDate', '~> 5.0'
   pod 'FSCalendar'
   pod 'PhoneNumberKit', '~> 3.1'
+  pod 'OnboardKit'
 
 end

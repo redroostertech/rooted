@@ -18,6 +18,7 @@ enum RootedContentManagerType {
 protocol RootedContentBusinessLogic: class {
   func setupBranchIO(request: RootedContent.SetupBranchIO.Request)
   func checkCalendarPermissions(request: RootedContent.CheckCalendarPermissions.Request)
+  func getCalendarPermissions(request: RootedContent.CheckCalendarPermissions.Request)
   func retrieveMeetings(request: RootedContent.RetrieveMeetings.Request)
   func deleteMeeting(request: RootedContent.DeleteMeeting.Request)
   func goToCreateNewMeetingView(request: RootedContent.CreateNewMeeting.Request)
@@ -27,6 +28,7 @@ protocol RootedContentBusinessLogic: class {
   func removeMeetingFromCalendar(request: RootedContent.RemoveFromCalendar.Request)
   func retrieveAvailability(request: RootedContent.RetrieveAvailability.Request)
   func saveAvailability(request: RootedContent.SaveAvailability.Request)
+  func goToInfoView(request: RootedContent.InfoView.Request)
 }
 
 protocol RootedContentDataStore {
@@ -35,7 +37,6 @@ protocol RootedContentDataStore {
 }
 
 class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStore {
-
   // MARK: - Presenter
   var presenter: RootedContentPresentationLogic?
 
@@ -70,6 +71,15 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
   }
 
   // MARK: - Use Case: Check if app has access to calendar permissions
+  func getCalendarPermissions(request: RootedContent.CheckCalendarPermissions.Request) {
+    var response = RootedContent.CheckCalendarPermissions.Response()
+    eventKitManager.checkCalendarPermissions { granted in
+      response.isGranted = granted
+      self.isCalendarPermissionGranted = granted
+      self.presenter?.handleCalendarPermissionsCheck(response: response)
+    }
+  }
+
   func checkCalendarPermissions(request: RootedContent.CheckCalendarPermissions.Request) {
     var response = RootedContent.CheckCalendarPermissions.Response()
     eventKitManager.getCalendarPermissions { granted in
@@ -81,15 +91,19 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
 
   // MARK: - Use Case: As a business, we want to limit access to creating more than (n) meetings based on account type
   func checkMaximumMeetingsReached(request: RootedContent.CheckMaximumMeetingsReached.Request) {
-    var response = RootedContent.CheckMaximumMeetingsReached.Response()
-    meetingsManager.didUserReachMaximumInvites { success in
-      if success {
-        self.branchWorker.customEvent(withName: kBranchMaximumReached)
-        response.isMaximumumReached = true
-        self.presenter?.handleMaximumLimitReached(response: response)
-      } else {
-        response.isMaximumumReached = false
-        self.presenter?.handleMaximumLimitReached(response: response)
+    if !SessionManager.shared.sessionExists {
+      self.presenter?.onPresentPhoneLoginViewController()
+    } else {
+      var response = RootedContent.CheckMaximumMeetingsReached.Response()
+      meetingsManager.didUserReachMaximumInvites { success in
+        if success {
+          self.branchWorker.customEvent(withName: kBranchMaximumReached)
+          response.isMaximumumReached = true
+          self.presenter?.handleMaximumLimitReached(response: response)
+        } else {
+          response.isMaximumumReached = false
+          self.presenter?.handleMaximumLimitReached(response: response)
+        }
       }
     }
   }
@@ -98,8 +112,8 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
   func retrieveMeetings(request: RootedContent.RetrieveMeetings.Request) {
     switch request.contentDB {
     default:
-      meetingsManager.delegate = request.meetingManagerDelegate
-      meetingsManager.retrieveMeetings()
+      self.meetingsManager.delegate = request.meetingManagerDelegate
+      self.meetingsManager.retrieveMeetings()
     }
   }
 
@@ -138,8 +152,22 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
 
   // MARK: - Use Case: Go to add an meeting view
   func goToCreateNewMeetingView(request: RootedContent.CreateNewMeeting.Request) {
-    let response = RootedContent.CreateNewMeeting.Response()
-    presenter?.presentCreateNewMeetingView(response: response)
+    if !SessionManager.shared.sessionExists {
+      self.presenter?.onPresentPhoneLoginViewController()
+    } else {
+      let response = RootedContent.CreateNewMeeting.Response()
+      self.presenter?.presentCreateNewMeetingView(response: response)
+    }
+  }
+
+  // MARK: - Use Case: Go to `InfoViewController`
+  func goToInfoView(request: RootedContent.InfoView.Request) {
+    if !SessionManager.shared.sessionExists {
+      self.presenter?.onPresentPhoneLoginViewController()
+    } else {
+      let response = RootedContent.InfoView.Response()
+      self.presenter?.presentInfoView(response: response)
+    }
   }
 
   // MARK: - Use Case: As a user, when I create a meeting, I want to do the following:

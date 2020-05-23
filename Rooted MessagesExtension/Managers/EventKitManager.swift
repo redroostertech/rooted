@@ -28,6 +28,13 @@ class EventKitManager: NSObject {
   }
 
   // MARK: - Public methods
+  func checkCalendarPermissions(_ completion: @escaping (Bool) -> Void) {
+    switch EKEventStore.authorizationStatus(for: .event) {
+    case .authorized: completion(true)
+    default: completion(false)
+    }
+  }
+
   // MARK: - Use Case: Handle the retrieval od calendar permissions
   func getCalendarPermissions(_ completion: @escaping (Bool) -> Void) {
     switch EKEventStore.authorizationStatus(for: .event) {

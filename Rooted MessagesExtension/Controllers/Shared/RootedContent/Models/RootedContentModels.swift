@@ -86,6 +86,15 @@ enum RootedContent {
     struct ViewModel { }
   }
 
+  // MARK: - Use Case: Go to info view
+  enum InfoView {
+    struct Request { }
+
+    struct Response { }
+
+    struct ViewModel { }
+  }
+
   // MARK: - Use Case: Add meeting to calendar
   enum AddToCalendar {
     struct Request {
@@ -198,7 +207,7 @@ enum RootedContent {
 
     struct ViewModel { }
   }
-
+  
   enum DisplayError {
     struct Request { }
 

@@ -220,12 +220,22 @@
 		D7DDDA1C24703F860061C15B /* PhoneLoginModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1624703F860061C15B /* PhoneLoginModels.swift */; };
 		D7DDDA1D24703F860061C15B /* PhoneLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1724703F860061C15B /* PhoneLoginViewController.swift */; };
 		D7DDDA1E24703F860061C15B /* PhoneLoginInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA1824703F860061C15B /* PhoneLoginInteractor.swift */; };
-		D7DDDA2624715D940061C15B /* SplashPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2024715D940061C15B /* SplashPresenter.swift */; };
-		D7DDDA2724715D940061C15B /* SplashWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2124715D940061C15B /* SplashWorker.swift */; };
-		D7DDDA2824715D940061C15B /* SplashRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2224715D940061C15B /* SplashRouter.swift */; };
-		D7DDDA2924715D940061C15B /* SplashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2324715D940061C15B /* SplashModels.swift */; };
-		D7DDDA2A24715D940061C15B /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2424715D940061C15B /* SplashViewController.swift */; };
-		D7DDDA2B24715D940061C15B /* SplashInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2524715D940061C15B /* SplashInteractor.swift */; };
+		D7DDDA2D247172EE0061C15B /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2C247172EE0061C15B /* APIService.swift */; };
+		D7DDDA35247327FD0061C15B /* RegistrationPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA2F247327FD0061C15B /* RegistrationPresenter.swift */; };
+		D7DDDA36247327FD0061C15B /* RegistrationWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA30247327FD0061C15B /* RegistrationWorker.swift */; };
+		D7DDDA37247327FD0061C15B /* RegistrationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA31247327FD0061C15B /* RegistrationRouter.swift */; };
+		D7DDDA38247327FD0061C15B /* RegistrationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA32247327FD0061C15B /* RegistrationModels.swift */; };
+		D7DDDA39247327FD0061C15B /* RegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA33247327FD0061C15B /* RegistrationViewController.swift */; };
+		D7DDDA3A247327FD0061C15B /* RegistrationInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA34247327FD0061C15B /* RegistrationInteractor.swift */; };
+		D7DDDA4D24780B3F0061C15B /* SweetAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA4C24780B3D0061C15B /* SweetAlert.swift */; };
+		D7DDDA50247833280061C15B /* SnapContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA4E247833270061C15B /* SnapContainerViewController.swift */; };
+		D7DDDA51247833280061C15B /* VerticalScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA4F247833270061C15B /* VerticalScrollViewController.swift */; };
+		D7DDDA59247943F70061C15B /* SettingsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA53247943F70061C15B /* SettingsPresenter.swift */; };
+		D7DDDA5A247943F70061C15B /* SettingsWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA54247943F70061C15B /* SettingsWorker.swift */; };
+		D7DDDA5B247943F70061C15B /* SettingsRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA55247943F70061C15B /* SettingsRouter.swift */; };
+		D7DDDA5C247943F70061C15B /* SettingsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA56247943F70061C15B /* SettingsModels.swift */; };
+		D7DDDA5D247943F70061C15B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA57247943F70061C15B /* SettingsViewController.swift */; };
+		D7DDDA5E247943F70061C15B /* SettingsInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA58247943F70061C15B /* SettingsInteractor.swift */; };
 		D7F1AAE9240BEE0F00210504 /* industriesJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE5240BEE0F00210504 /* industriesJson.json */; };
 		D7F1AAEA240BEE0F00210504 /* RootedJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE6240BEE0F00210504 /* RootedJson.json */; };
 		D7F1AAEB240BEE0F00210504 /* Rooted_Meetings_Response.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */; };
@@ -479,12 +489,22 @@
 		D7DDDA1624703F860061C15B /* PhoneLoginModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginModels.swift; sourceTree = "<group>"; };
 		D7DDDA1724703F860061C15B /* PhoneLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginViewController.swift; sourceTree = "<group>"; };
 		D7DDDA1824703F860061C15B /* PhoneLoginInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLoginInteractor.swift; sourceTree = "<group>"; };
-		D7DDDA2024715D940061C15B /* SplashPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashPresenter.swift; sourceTree = "<group>"; };
-		D7DDDA2124715D940061C15B /* SplashWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashWorker.swift; sourceTree = "<group>"; };
-		D7DDDA2224715D940061C15B /* SplashRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashRouter.swift; sourceTree = "<group>"; };
-		D7DDDA2324715D940061C15B /* SplashModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashModels.swift; sourceTree = "<group>"; };
-		D7DDDA2424715D940061C15B /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
-		D7DDDA2524715D940061C15B /* SplashInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashInteractor.swift; sourceTree = "<group>"; };
+		D7DDDA2C247172EE0061C15B /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		D7DDDA2F247327FD0061C15B /* RegistrationPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationPresenter.swift; sourceTree = "<group>"; };
+		D7DDDA30247327FD0061C15B /* RegistrationWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationWorker.swift; sourceTree = "<group>"; };
+		D7DDDA31247327FD0061C15B /* RegistrationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationRouter.swift; sourceTree = "<group>"; };
+		D7DDDA32247327FD0061C15B /* RegistrationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationModels.swift; sourceTree = "<group>"; };
+		D7DDDA33247327FD0061C15B /* RegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
+		D7DDDA34247327FD0061C15B /* RegistrationInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationInteractor.swift; sourceTree = "<group>"; };
+		D7DDDA4C24780B3D0061C15B /* SweetAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SweetAlert.swift; sourceTree = "<group>"; };
+		D7DDDA4E247833270061C15B /* SnapContainerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapContainerViewController.swift; sourceTree = "<group>"; };
+		D7DDDA4F247833270061C15B /* VerticalScrollViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerticalScrollViewController.swift; sourceTree = "<group>"; };
+		D7DDDA53247943F70061C15B /* SettingsPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPresenter.swift; sourceTree = "<group>"; };
+		D7DDDA54247943F70061C15B /* SettingsWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWorker.swift; sourceTree = "<group>"; };
+		D7DDDA55247943F70061C15B /* SettingsRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRouter.swift; sourceTree = "<group>"; };
+		D7DDDA56247943F70061C15B /* SettingsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModels.swift; sourceTree = "<group>"; };
+		D7DDDA57247943F70061C15B /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		D7DDDA58247943F70061C15B /* SettingsInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsInteractor.swift; sourceTree = "<group>"; };
 		D7F1AAE5240BEE0F00210504 /* industriesJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = industriesJson.json; sourceTree = "<group>"; };
 		D7F1AAE6240BEE0F00210504 /* RootedJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RootedJson.json; sourceTree = "<group>"; };
 		D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Rooted_Meetings_Response.json; sourceTree = "<group>"; };
@@ -566,6 +586,8 @@
 		BA068C042245AD7D00A0EE9B /* Rooted MessagesExtension */ = {
 			isa = PBXGroup;
 			children = (
+				D7DDDA4E247833270061C15B /* SnapContainerViewController.swift */,
+				D7DDDA4F247833270061C15B /* VerticalScrollViewController.swift */,
 				D7DDDA1124703F630061C15B /* Scenes */,
 				D787A26723E1EB41001795D3 /* GoogleService-Info.plist */,
 				BA98DD8C224ED26F0070BC39 /* Rooted MessagesExtension.entitlements */,
@@ -597,6 +619,7 @@
 				D747BAE92411C6B200E571CF /* CustomHeader.xib */,
 				D7255F8F241387600048F8D8 /* EmptyHeader.swift */,
 				D7255F90241387600048F8D8 /* EmptyHeader.xib */,
+				D7DDDA2C247172EE0061C15B /* APIService.swift */,
 			);
 			path = "Rooted MessagesExtension";
 			sourceTree = "<group>";
@@ -695,6 +718,7 @@
 		D75711F123D8813600BDD6A0 /* Controls */ = {
 			isa = PBXGroup;
 			children = (
+				D7DDDA4C24780B3D0061C15B /* SweetAlert.swift */,
 				D706F15F24210C0700C40130 /* TagListView */,
 				D70741D22417809200115998 /* ScrollableSegmentedControl.swift */,
 				D747BABD240FF76500E571CF /* EmptyDataSet */,
@@ -1124,13 +1148,14 @@
 		D7DDDA1124703F630061C15B /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
-				D7DDDA1F24715D720061C15B /* SplashScene */,
-				D7DDDA1224703F6C0061C15B /* PhoneLogin */,
+				D7DDDA52247943750061C15B /* Settings */,
+				D7DDDA2E247327CE0061C15B /* Registration */,
+				D7DDDA1224703F6C0061C15B /* Login */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
 		};
-		D7DDDA1224703F6C0061C15B /* PhoneLogin */ = {
+		D7DDDA1224703F6C0061C15B /* Login */ = {
 			isa = PBXGroup;
 			children = (
 				D7DDDA1724703F860061C15B /* PhoneLoginViewController.swift */,
@@ -1140,20 +1165,33 @@
 				D7DDDA1524703F860061C15B /* PhoneLoginRouter.swift */,
 				D7DDDA1624703F860061C15B /* PhoneLoginModels.swift */,
 			);
-			path = PhoneLogin;
+			path = Login;
 			sourceTree = "<group>";
 		};
-		D7DDDA1F24715D720061C15B /* SplashScene */ = {
+		D7DDDA2E247327CE0061C15B /* Registration */ = {
 			isa = PBXGroup;
 			children = (
-				D7DDDA2024715D940061C15B /* SplashPresenter.swift */,
-				D7DDDA2124715D940061C15B /* SplashWorker.swift */,
-				D7DDDA2224715D940061C15B /* SplashRouter.swift */,
-				D7DDDA2324715D940061C15B /* SplashModels.swift */,
-				D7DDDA2424715D940061C15B /* SplashViewController.swift */,
-				D7DDDA2524715D940061C15B /* SplashInteractor.swift */,
+				D7DDDA2F247327FD0061C15B /* RegistrationPresenter.swift */,
+				D7DDDA30247327FD0061C15B /* RegistrationWorker.swift */,
+				D7DDDA31247327FD0061C15B /* RegistrationRouter.swift */,
+				D7DDDA32247327FD0061C15B /* RegistrationModels.swift */,
+				D7DDDA33247327FD0061C15B /* RegistrationViewController.swift */,
+				D7DDDA34247327FD0061C15B /* RegistrationInteractor.swift */,
 			);
-			path = SplashScene;
+			path = Registration;
+			sourceTree = "<group>";
+		};
+		D7DDDA52247943750061C15B /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				D7DDDA53247943F70061C15B /* SettingsPresenter.swift */,
+				D7DDDA54247943F70061C15B /* SettingsWorker.swift */,
+				D7DDDA55247943F70061C15B /* SettingsRouter.swift */,
+				D7DDDA56247943F70061C15B /* SettingsModels.swift */,
+				D7DDDA57247943F70061C15B /* SettingsViewController.swift */,
+				D7DDDA58247943F70061C15B /* SettingsInteractor.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		D7F1AAE4240BEE0F00210504 /* JSON */ = {
@@ -1358,10 +1396,12 @@
 				D701DC6123E8DBF600A45E9B /* Media.swift in Sources */,
 				D79A5F252407FF91006DAA7A /* LabelRow.swift in Sources */,
 				BA0D0EF5224A6B7600209993 /* UIColors+Extensions.swift in Sources */,
+				D7DDDA35247327FD0061C15B /* RegistrationPresenter.swift in Sources */,
 				D701DC5023E8DBF600A45E9B /* Success.swift in Sources */,
 				D75711EB23D811E000BDD6A0 /* DateTimePicker.swift in Sources */,
 				D79A5EB12406D439006DAA7A /* ResponsiveViewController.swift in Sources */,
 				D701DB8323E8DBF600A45E9B /* UserType.swift in Sources */,
+				D7DDDA5C247943F70061C15B /* SettingsModels.swift in Sources */,
 				D747BAC7240FF77100E571CF /* EmptyDataSetSource.swift in Sources */,
 				D79A5F5B240811FD006DAA7A /* SplitRowCell.swift in Sources */,
 				BA0D0EF8224ADCE200209993 /* Invites.xcdatamodeld in Sources */,
@@ -1376,6 +1416,7 @@
 				D79A5F232407FF91006DAA7A /* MultipleSelectorRow.swift in Sources */,
 				D79A5F2B2407FF91006DAA7A /* ListCheckRow.swift in Sources */,
 				D79A5F7824083038006DAA7A /* SuggestionTableViewCell.swift in Sources */,
+				D7DDDA2D247172EE0061C15B /* APIService.swift in Sources */,
 				D79A5F422407FF91006DAA7A /* TriplePickerRow.swift in Sources */,
 				D79A5EC324071117006DAA7A /* ListableCellType.swift in Sources */,
 				D79A5F1B2407FF91006DAA7A /* Validation.swift in Sources */,
@@ -1384,6 +1425,7 @@
 				D701DC6A23E8DBF600A45E9B /* DataDashboardSection.swift in Sources */,
 				D79A5FA1240960F5006DAA7A /* Duration.swift in Sources */,
 				D79A5F2F2407FF91006DAA7A /* DateFieldRow.swift in Sources */,
+				D7DDDA37247327FD0061C15B /* RegistrationRouter.swift in Sources */,
 				BA1314DE225C07370089EDE0 /* EventKitManager.swift in Sources */,
 				D744F2D32416DC3B00F14CA8 /* Availability.swift in Sources */,
 				D79A5F3C2407FF91006DAA7A /* DatePickerRow.swift in Sources */,
@@ -1397,6 +1439,7 @@
 				D706F15E242094E700C40130 /* UIImage+Extensions.swift in Sources */,
 				D7B758D7245B70D6005CD0C9 /* RootedContentDisplayLogic.swift in Sources */,
 				D701DC6323E8DBF600A45E9B /* Action.swift in Sources */,
+				D7DDDA36247327FD0061C15B /* RegistrationWorker.swift in Sources */,
 				D79A5F4B2407FF91006DAA7A /* RuleLength.swift in Sources */,
 				D79A5F4C2407FF91006DAA7A /* RuleRequired.swift in Sources */,
 				D79A5F412407FF91006DAA7A /* SwitchRow.swift in Sources */,
@@ -1419,6 +1462,7 @@
 				D701DC4F23E8DBF600A45E9B /* UserProfileData.swift in Sources */,
 				D79A5EAB2406B070006DAA7A /* RRLogger.swift in Sources */,
 				D706F16724210C0700C40130 /* TagListView.swift in Sources */,
+				D7DDDA38247327FD0061C15B /* RegistrationModels.swift in Sources */,
 				D79A5F4F2407FF91006DAA7A /* RuleRegExp.swift in Sources */,
 				BA0D0EF2224A6B7600209993 /* String+Extension.swift in Sources */,
 				D7255F9424154C460048F8D8 /* AvailabilityViewController.swift in Sources */,
@@ -1434,6 +1478,7 @@
 				D79A5F1D2407FF91006DAA7A /* Section.swift in Sources */,
 				D7B758C2245B26DD005CD0C9 /* NavigationCoordinator.swift in Sources */,
 				D79A5F9A240960F5006DAA7A /* NSDateComponents+Timepiece.swift in Sources */,
+				D7DDDA59247943F70061C15B /* SettingsPresenter.swift in Sources */,
 				D79A5F112407FF91006DAA7A /* InlineRowType.swift in Sources */,
 				D79A5F432407FF91006DAA7A /* PushRow.swift in Sources */,
 				D79A5F212407FF91006DAA7A /* Row.swift in Sources */,
@@ -1441,6 +1486,7 @@
 				D701DC6823E8DBF600A45E9B /* Poll.swift in Sources */,
 				D7A18AED24063B330039A295 /* BaseAppViewController.swift in Sources */,
 				D79A5F492407FF91006DAA7A /* RuleEqualsToRow.swift in Sources */,
+				D7DDDA5B247943F70061C15B /* SettingsRouter.swift in Sources */,
 				D701DC5F23E8DBF600A45E9B /* MeetingDateClass.swift in Sources */,
 				D701DC5C23E8DBF600A45E9B /* DataClass.swift in Sources */,
 				D706F16524210C0700C40130 /* CloseButton.swift in Sources */,
@@ -1462,6 +1508,7 @@
 				D747BAC6240FF77100E571CF /* EmptyDataSetView+Extension.swift in Sources */,
 				D79A5F302407FF91006DAA7A /* FieldRow.swift in Sources */,
 				D79A5F382407FF91006DAA7A /* DoublePickerInputRow.swift in Sources */,
+				D7DDDA5E247943F70061C15B /* SettingsInteractor.swift in Sources */,
 				D79A5F1F2407FF91006DAA7A /* SelectableRowType.swift in Sources */,
 				BA98DD4E224EC2AD0070BC39 /* MyInvitesViewController.swift in Sources */,
 				D79A5F3D2407FF91006DAA7A /* ActionSheetRow.swift in Sources */,
@@ -1470,13 +1517,12 @@
 				D79A5EBB240710C4006DAA7A /* RootedCollectionViewModel.swift in Sources */,
 				D7255F8C24134FD60048F8D8 /* Zones+Extensions.swift in Sources */,
 				D7A18AEB24063ACC0039A295 /* Configuration.swift in Sources */,
-				D7DDDA2B24715D940061C15B /* SplashInteractor.swift in Sources */,
 				D79A5F2C2407FF91006DAA7A /* DateRow.swift in Sources */,
 				D7DDDA1C24703F860061C15B /* PhoneLoginModels.swift in Sources */,
+				D7DDDA51247833280061C15B /* VerticalScrollViewController.swift in Sources */,
 				D79A5F1C2407FF91006DAA7A /* SelectableSection.swift in Sources */,
 				D7DDDA1D24703F860061C15B /* PhoneLoginViewController.swift in Sources */,
 				D70741D12417198100115998 /* AvailabilityManager.swift in Sources */,
-				D7DDDA2924715D940061C15B /* SplashModels.swift in Sources */,
 				D79A5F132407FF91006DAA7A /* Helpers.swift in Sources */,
 				D701DC6923E8DBF600A45E9B /* AccountType.swift in Sources */,
 				D79A5F162407FF91006DAA7A /* HeaderFooterView.swift in Sources */,
@@ -1494,26 +1540,25 @@
 				D7C3B92F2416696700B22E8F /* DateRangePickerInlineRow.swift in Sources */,
 				D747BAEA2411C6B200E571CF /* CustomHeader.swift in Sources */,
 				BA0D0EF4224A6B7600209993 /* UIView+Extensions+iMess.swift in Sources */,
+				D7DDDA39247327FD0061C15B /* RegistrationViewController.swift in Sources */,
 				D75711EA23D811E000BDD6A0 /* StepCollectionViewFlowLayout.swift in Sources */,
 				D79A5F7624083038006DAA7A /* SuggestionTableCell.swift in Sources */,
+				D7DDDA4D24780B3F0061C15B /* SweetAlert.swift in Sources */,
 				D79A5F292407FF91006DAA7A /* TextAreaRow.swift in Sources */,
 				D79A5F7A24083038006DAA7A /* SuggestionCollectionViewCell.swift in Sources */,
 				D79A5F3A2407FF91006DAA7A /* DateInlineRow.swift in Sources */,
-				D7DDDA2824715D940061C15B /* SplashRouter.swift in Sources */,
 				D701DC6023E8DBF600A45E9B /* MeetingStatus.swift in Sources */,
-				D7DDDA2A24715D940061C15B /* SplashViewController.swift in Sources */,
 				D79A5F282407FF91006DAA7A /* SegmentedRow.swift in Sources */,
 				D70741DE241A7E7C00115998 /* RootedContentInteractor.swift in Sources */,
-				D7DDDA2624715D940061C15B /* SplashPresenter.swift in Sources */,
 				D701DC6423E8DBF600A45E9B /* Reminders.swift in Sources */,
 				D7B758C9245B302F005CD0C9 /* RootedContentPresenter.swift in Sources */,
 				D79A5F2D2407FF91006DAA7A /* SelectorRow.swift in Sources */,
 				D79A5F152407FF91006DAA7A /* RowProtocols.swift in Sources */,
 				D79A5EAD2406B2A7006DAA7A /* Error.swift in Sources */,
+				D7DDDA5D247943F70061C15B /* SettingsViewController.swift in Sources */,
 				BA0D0EF3224A6B7600209993 /* TextField+Extensions.swift in Sources */,
 				D701DB8423E8DBF600A45E9B /* PhoneNumber.swift in Sources */,
 				D7B758CC245B302F005CD0C9 /* RootedContentModels.swift in Sources */,
-				D7DDDA2724715D940061C15B /* SplashWorker.swift in Sources */,
 				D79A5F462407FF91006DAA7A /* SelectorAlertController.swift in Sources */,
 				D79A5F262407FF91006DAA7A /* StepperRow.swift in Sources */,
 				D7255F91241387600048F8D8 /* EmptyHeader.swift in Sources */,
@@ -1524,6 +1569,7 @@
 				D79A5F332407FF91006DAA7A /* AlertOptionsRow.swift in Sources */,
 				D7DDDA1E24703F860061C15B /* PhoneLoginInteractor.swift in Sources */,
 				D79A5F182407FF91006DAA7A /* RowControllerType.swift in Sources */,
+				D7DDDA5A247943F70061C15B /* SettingsWorker.swift in Sources */,
 				D79A5F7B24083038006DAA7A /* SuggestionCell.swift in Sources */,
 				D79A5F502407FF91006DAA7A /* RuleClosure.swift in Sources */,
 				D7A18AEF24063BB00039A295 /* DefaultsManager.swift in Sources */,
@@ -1532,6 +1578,7 @@
 				D79A5F2E2407FF91006DAA7A /* DateInlineFieldRow.swift in Sources */,
 				D7F1AAEE240C393100210504 /* RandomStringGenerator.swift in Sources */,
 				D747BADD2411404100E571CF /* FloatingMenuBtn.swift in Sources */,
+				D7DDDA3A247327FD0061C15B /* RegistrationInteractor.swift in Sources */,
 				D79A5F102407FF91006DAA7A /* Cell.swift in Sources */,
 				D79A5F402407FF91006DAA7A /* ButtonRow.swift in Sources */,
 				D79A5F9C240960F5006DAA7A /* Int+Timepiece.swift in Sources */,
@@ -1541,6 +1588,7 @@
 				D7C9323C242173DE0022E980 /* Array+Extensions.swift in Sources */,
 				BA1314DC225BFCE50089EDE0 /* CoreDataManager.swift in Sources */,
 				D787A26423E1C4D8001795D3 /* Dictionary+Extensions.swift in Sources */,
+				D7DDDA50247833280061C15B /* SnapContainerViewController.swift in Sources */,
 				D79A5F192407FF91006DAA7A /* RowType.swift in Sources */,
 				D79A5F142407FF91006DAA7A /* BaseRow.swift in Sources */,
 				D79A5F7724083038006DAA7A /* String+SuggestionValue.swift in Sources */,

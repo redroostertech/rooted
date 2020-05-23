@@ -137,6 +137,11 @@ public let kStoryboardMain = "MainInterface"
 public let kViewControllerAvailability = "AvailabilityViewController"
 public let kViewControllerAvailabilityNavigation = "AvailabilityNavigationViewController"
 public let kViewControllerMessagesNavigation = "MessagesNavigationController"
+public let kMyInvitesViewController = "MyInvitesViewController"
+public let kPhoneLoginViewController = "PhoneLoginViewController"
+public let kRegistrationViewController = "RegistrationViewController"
+public let kInfoViewController = "InfoViewController"
+public let kSettingsNavigationController = "SettingsNavigationController"
 
 // MARK: - Segues
 public let kGoToDashboardSegue = "goToDashboard"
