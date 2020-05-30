@@ -25,9 +25,12 @@ protocol RootedContentDisplayLogic: class {
   func onSuccessfulCalendarAdd(viewModel: RootedContent.AddToCalendar.ViewModel)
 
   func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel)
+  func onFailedCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel)
 
   func onSuccessfulAvailabilitySave(viewModel: RootedContent.SaveAvailability.ViewModel)
 
+  func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel)
+  func onDidDeleteMeeting(viewModel: RootedContent.DeleteMeeting.ViewModel)
 }
 
 extension RootedContentDisplayLogic {
@@ -46,6 +49,10 @@ extension RootedContentDisplayLogic {
   func onSuccessfulCalendarAdd(viewModel: RootedContent.AddToCalendar.ViewModel) { }
 
   func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) { }
+  func onFailedCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) { }
 
   func onSuccessfulAvailabilitySave(viewModel: RootedContent.SaveAvailability.ViewModel) { }
+
+  func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) { }
+  func onDidDeleteMeeting(viewModel: RootedContent.DeleteMeeting.ViewModel) { }
 }

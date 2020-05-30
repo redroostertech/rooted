@@ -140,7 +140,7 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
               }
 
               if rowTag == "type_of_meeting_video" {
-                if let url = URL(string: "https://\(meetingType.meetingMeta ?? "")") {
+                if let url = URL(string: "zoomus://\(meetingType.meetingMeta ?? "")") {
                   // technique that works rather than self.extensionContext.open
 //                  var responder = self as UIResponder?
                   /* old approach using openURL which has now been deprecated
@@ -181,12 +181,46 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
             $0.textAreaHeight = .fixed(cellHeight: 125)
         }
 
-        if let currentUser = SessionManager.shared.currentUser, let meetingOwner = meeting?.data?.owner, let meetingOwnerId = meetingOwner.id, meetingOwnerId == currentUser.id  {
+    if let meetingAgendaItems = meeting?.data?.agendaItems {
+      var section = Section("Agenda Items")
+      for agendaItem in meetingAgendaItems {
+        if let agendaItemName = agendaItem.itemName {
+          let row = LabelRow(agendaItemName, { labelRow in
+            labelRow.title = agendaItemName
+          })
+          section += [row]
+        }
+      }
+
+      // Append Rows into a Section
+      self.form += [section]
+
+    }
+
+    if let currentUser = SessionManager.shared.currentUser, let meetingOwner = meeting?.data?.owner?.first, let meetingOwnerId = meetingOwner.id, meetingOwnerId == currentUser.id  {
           view.sendSubviewToBack(actionsContainerView)
         } else {
           view.bringSubviewToFront(actionsContainerView)
           self.form
-            +++ Section()
+            +++ Section { section in
+                section.header = {
+                  var header = HeaderFooterView<UIView>(.callback({
+                      let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 32))
+                      return view
+                  }))
+                  header.height = { 32 }
+                  return header
+                }()
+
+              section.footer = {
+                var header = HeaderFooterView<UIView>(.callback({
+                    let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 75))
+                    return view
+                }))
+                header.height = { 75 }
+                return header
+              }()
+            }
               <<< SwitchRow() {
                 $0.tag = "sending_a_response"
                 $0.title = "Send a response?"

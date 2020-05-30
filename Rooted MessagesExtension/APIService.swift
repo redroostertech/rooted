@@ -16,11 +16,13 @@ private let liveURL = "https://rooted.herokuapp.com/"
 enum Api_V2 {
   case Analytics
   case Auth
+  case Core
 
   var bucket: String {
     switch self {
     case .Auth: return "auth/"
     case .Analytics: return "analytics/"
+    case .Core: return "core/"
     }
   }
 }

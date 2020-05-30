@@ -19,8 +19,7 @@ public let maximumInvites = 3
 public let kPagination : UInt = 10
 public let kMaxConcurrentImageDownloads = 2
 
-public var isLive = false
-public var isLocal = false
+public var isDebug = true
 
 public let kLocalBaseURL = "http://localhost:3000/"
 public let kTestBaseURL = "https://rooted-test-web.herokuapp.com/"
@@ -180,3 +179,20 @@ public var kSessionCart = "sessionCart" // Not in use yet
 
 // MARK: - Entities
 public var kEntityMeeting = "MeetingEntity"
+
+// MARK: - Form tags
+public var kFormEmailAddress = "emailAddress"
+public var kFormEmailPlaceholder = "Enter your email here"
+public var kFormPassword = "password"
+public var kFormPasswordPlaceholder = "Enter your Password"
+public var kFormPhoneNumber = "phoneNumber"
+public var kFormPhoneNumberPlaceholder = "Enter your phone number"
+public var kFormFullname = "fullName"
+public var kFormFullnamePlaceholder = "Provide your full name"
+public var kFormCountryCode = "countryCode"
+
+// MARK: - Debug Credentials
+public var kDebugEmail = "mwestbrooksjr@gmail.com"
+public var kDebugPassword = "abc123456"
+public var kDebugFullName = "John Doe"
+public var kDebugPhone = "9082178274"

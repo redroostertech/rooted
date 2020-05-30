@@ -69,11 +69,28 @@ enum RootedContent {
     }
 
     struct Response {
-
+      var meetings: [MeetingContextWrapper]?
     }
 
     struct ViewModel {
+      var meetings: [MeetingContextWrapper]?
+    }
+  }
 
+  // MARK: - Use Case: Retrieve meetings for user
+  enum RetrieveSentMeetings {
+    struct Request {
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var meetingManagerDelegate: MeetingsManagerDelegate?
+    }
+
+    struct Response {
+      var meetings: [MeetingContextWrapper]?
+    }
+
+    struct ViewModel {
+      var meetings: [MeetingContextWrapper]?
     }
   }
 
@@ -137,10 +154,12 @@ enum RootedContent {
 
     struct Response {
       var meeting: RootedCellViewModel?
+      var errorMessage: String = ""
     }
 
     struct ViewModel {
       var meeting: RootedCellViewModel?
+      var errorMessage: String = ""
     }
   }
 
@@ -153,9 +172,13 @@ enum RootedContent {
       var meetingManagerDelegate: MeetingsManagerDelegate?
     }
 
-    struct Response { }
+    struct Response {
+      var meeting: RootedCellViewModel?
+    }
 
-    struct ViewModel { }
+    struct ViewModel {
+      var meeting: RootedCellViewModel?
+    }
   }
 
   // MARK: - Use Case: Retrieve availability for user

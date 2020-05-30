@@ -12,20 +12,33 @@
 
 import UIKit
 
-protocol RegistrationPresentationLogic
-{
-  func presentSomething(response: Registration.Something.Response)
+protocol RegistrationPresentationLogic {
+  func onSuccessfulRegistration(response: Registration.RegisterViaEmailAndPassword.Response)
+  func startUserSession(response: Registration.SetSession.Response)
+  func handleError(response: Registration.HandleError.Response)
 }
 
-class RegistrationPresenter: RegistrationPresentationLogic
-{
+class RegistrationPresenter: RegistrationPresentationLogic {
   weak var viewController: RegistrationDisplayLogic?
-  
-  // MARK: Do something
-  
-  func presentSomething(response: Registration.Something.Response)
-  {
-    let viewModel = Registration.Something.ViewModel()
-    viewController?.displaySomething(viewModel: viewModel)
+
+  func onSuccessfulRegistration(response: Registration.RegisterViaEmailAndPassword.Response) {
+    var viewModel = Registration.RegisterViaEmailAndPassword.ViewModel()
+    viewModel.userId = response.userId
+    viewModel.userData = response.userData
+    viewController?.onSuccessfulRegistration(viewModel: viewModel)
+  }
+
+  func startUserSession(response: Registration.SetSession.Response) {
+    var viewModel = Registration.SetSession.ViewModel()
+    viewModel.userId = response.userId
+    viewController?.onSuccessfulSessionSet(viewModel: viewModel)
+  }
+
+  func handleError(response: Registration.HandleError.Response) {
+    var viewModel = Registration.HandleError.ViewModel()
+    viewModel.error = response.error
+    viewModel.errorMessage = response.errorMessage
+    viewModel.errorTitle = response.errorTitle
+    viewController?.handleError(viewModel: viewModel)
   }
 }

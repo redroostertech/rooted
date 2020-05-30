@@ -87,12 +87,12 @@ class EngagementFactory {
       var meetingContextWrappers = [MeetingContextWrapper]()
 
       switch menuSelection {
-      case 1:
-        meetingContextWrappers = contextWrappers.filter { meetingContextWrapper -> Bool in
-          guard let meeting = meetingContextWrapper.meeting, let dashboardSectionId = meeting.dashboardSectionId else { return false }
-          return dashboardSectionId == menuSelection
-        }
-        break
+//      case 1:
+//        meetingContextWrappers = contextWrappers.filter { meetingContextWrapper -> Bool in
+//          guard let meeting = meetingContextWrapper.meeting, let dashboardSectionId = meeting.dashboardSectionId else { return false }
+//          return dashboardSectionId == menuSelection
+//        }
+//        break
       default:
         meetingContextWrappers = contextWrappers
         break

@@ -28,5 +28,6 @@ target 'Rooted MessagesExtension' do
   pod 'FSCalendar'
   pod 'PhoneNumberKit', '~> 3.1'
   pod 'OnboardKit'
+  pod 'FormTextField'
 
 end

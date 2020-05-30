@@ -18,7 +18,7 @@ public class Coordinates: Mappable {
   required public init?(map: Map) { }
 
   public func mapping(map: Map) {
-    long <- map["long"]
-    lat <- map["lat"]
+    long <- map["address_long"]
+    lat <- map["address_lat"]
   }
 }

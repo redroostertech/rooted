@@ -33,6 +33,7 @@ class PhoneLoginInteractor: PhoneLoginBusinessLogic, PhoneLoginDataStore {
       var error = PhoneLogin.HandleError.Response()
       error.errorMessage = "Please provide account credentials"
       error.errorTitle = "Oops!"
+      self.presenter?.handleError(response: error)
       return
     }
     let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
@@ -71,6 +72,7 @@ class PhoneLoginInteractor: PhoneLoginBusinessLogic, PhoneLoginDataStore {
                                     if let data = resultsDict["data"] as? [String: Any] {
                                       var response = PhoneLogin.LoginViaEmailAndPassword.Response()
                                       response.userId = data["uid"] as? String ?? ""
+                                      response.userData = UserProfileData(JSON: (data["user"] as? [[String: Any]])?.first ?? [:])
                                       self.presenter?.onSuccessfulEmailAndPasswordLogin(response: response)
                                     } else {
                                       var error = PhoneLogin.HandleError.Response()
@@ -90,8 +92,13 @@ class PhoneLoginInteractor: PhoneLoginBusinessLogic, PhoneLoginDataStore {
 
   func startUserSession(request: PhoneLogin.SetSession.Request) {
     if let userid = request.userId {
-      SessionManager.start(with: userid)
       var response = PhoneLogin.SetSession.Response()
+      if let user = request.userData {
+        SessionManager.start(with: user)
+        response.userData = user
+      } else {
+        SessionManager.start(with: userid)
+      }
       response.userId = userid
       self.presenter?.startUserSession(response: response)
     } else {

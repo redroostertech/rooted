@@ -12,30 +12,102 @@
 
 import UIKit
 
-protocol RegistrationBusinessLogic
-{
-  func doSomething(request: Registration.Something.Request)
+protocol RegistrationBusinessLogic {
+  func registerViaEmailAndPassword(request: Registration.RegisterViaEmailAndPassword.Request)
+  func startUserSession(request: Registration.SetSession.Request)
 }
 
-protocol RegistrationDataStore
-{
-  //var name: String { get set }
+protocol RegistrationDataStore {
+  var authenticationLogicDelegate: AuthenticationLogic? { get set }
 }
 
-class RegistrationInteractor: RegistrationBusinessLogic, RegistrationDataStore
-{
+class RegistrationInteractor: RegistrationBusinessLogic, RegistrationDataStore {
   var presenter: RegistrationPresentationLogic?
   var worker: RegistrationWorker?
-  //var name: String = ""
-  
-  // MARK: Do something
-  
-  func doSomething(request: Registration.Something.Request)
-  {
-    worker = RegistrationWorker()
-    worker?.doSomeWork()
-    
-    let response = Registration.Something.Response()
-    presenter?.presentSomething(response: response)
+
+  var authenticationLogicDelegate: AuthenticationLogic?
+
+  // MARK: - Use Case: When a user provides their email, full name, phone number and a password, try to create an account them in via Firebase
+  func registerViaEmailAndPassword(request: Registration.RegisterViaEmailAndPassword.Request) {
+    guard let email = request.email, let password = request.password, let fullName = request.fullName, let phoneNumber = request.phoneNumber else {
+      var error = Registration.HandleError.Response()
+      error.errorMessage = "Please provide account credentials"
+      error.errorTitle = "Oops!"
+      self.presenter?.handleError(response: error)
+      return
+    }
+    let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
+    let params: [String: String] = [
+      "action": "email_registration",
+      "email": email,
+      "password": password,
+      "full_name": fullName,
+      "phone_number_string": phoneNumber
+    ]
+    let apiService = Api()
+    apiService.performRequest(path: path,
+                              method: .post,
+                              parameters: params) { (results, error) in
+
+                                guard error == nil else {
+                                  RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                  var error = Registration.HandleError.Response()
+                                  error.errorMessage = "Something went wrong. Please try again."
+                                  error.errorTitle = "Oops!"
+                                  self.presenter?.handleError(response: error)
+                                  return
+                                }
+
+                                guard let resultsDict = results as? [String: Any] else {
+                                  RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                  var error = Registration.HandleError.Response()
+                                  error.errorMessage = "Something went wrong. Please try again."
+                                  error.errorTitle = "Oops!"
+                                  self.presenter?.handleError(response: error)
+                                  return
+                                }
+
+                                RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                if let success = resultsDict["success"] as? Bool {
+                                  if success {
+                                    if let data = resultsDict["data"] as? [String: Any] {
+                                      var response = Registration.RegisterViaEmailAndPassword.Response()
+                                      response.userId = data["uid"] as? String ?? ""
+                                      response.userData = UserProfileData(JSON: (data["user"] as? [[String: Any]])?.first ?? [:])
+                                      self.presenter?.onSuccessfulRegistration(response: response)
+                                    } else {
+                                      var error = Registration.HandleError.Response()
+                                      error.errorMessage = "Something went wrong. Please try again."
+                                      error.errorTitle = "Oops!"
+                                      self.presenter?.handleError(response: error)
+                                    }
+                                  } else {
+                                    var error = Registration.HandleError.Response()
+                                    error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
+                                    error.errorTitle = "Oops!"
+                                    self.presenter?.handleError(response: error)
+                                  }
+                                }
+    }
+  }
+
+  func startUserSession(request: Registration.SetSession.Request) {
+    if let userid = request.userId {
+      var response = Registration.SetSession.Response()
+      if let user = request.userData {
+        SessionManager.start(with: user)
+        response.userData = user
+      } else {
+        SessionManager.start(with: userid)
+      }
+      response.userId = userid
+      self.presenter?.startUserSession(response: response)
+    } else {
+      var error = Registration.HandleError.Response()
+      error.errorMessage = "Something went wrong. Please try again."
+      error.errorTitle = "Oops!"
+      self.presenter?.handleError(response: error)
+    }
   }
 }

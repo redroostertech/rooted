@@ -15,6 +15,15 @@ import UIKit
 protocol AuthenticationLogic: class {
   func onSucessfulLogin(_ sender: PhoneLoginViewController, uid: String?)
   func handleFailedLogin(_ sender: PhoneLoginViewController, reason: String)
+  func onSucessfulRegistration(_ sender: RegistrationViewController, uid: String?)
+  func handleFailedRegistration(_ sender: RegistrationViewController, reason: String)
+}
+
+extension AuthenticationLogic {
+  func onSucessfulLogin(_ sender: PhoneLoginViewController, uid: String?) { }
+  func handleFailedLogin(_ sender: PhoneLoginViewController, reason: String) { }
+  func onSucessfulRegistration(_ sender: RegistrationViewController, uid: String?) { }
+  func handleFailedRegistration(_ sender: RegistrationViewController, reason: String) { }
 }
 
 protocol PhoneLoginDisplayLogic: class {
@@ -26,11 +35,10 @@ protocol PhoneLoginDisplayLogic: class {
   func handleError(viewModel: PhoneLogin.HandleError.ViewModel)
 }
 
-class PhoneLoginViewController: BaseAppViewController, PhoneLoginDisplayLogic, UITextFieldDelegate {
+class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplayLogic, UITextFieldDelegate {
 
-  @IBOutlet var emailAddressTextField: UITextField!
-  @IBOutlet var passwordTextField: UITextField!
   @IBOutlet var loginButton: UIButton!
+  @IBOutlet weak var upArrowButton: UIButton!
 
   var interactor: PhoneLoginBusinessLogic?
   var router: (NSObjectProtocol & PhoneLoginRoutingLogic & PhoneLoginDataPassing)?
@@ -64,23 +72,56 @@ class PhoneLoginViewController: BaseAppViewController, PhoneLoginDisplayLogic, U
   // MARK: View lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
-    emailAddressTextField.delegate = self
-    emailAddressTextField.addLeftPadding(withWidth: 10.0)
-    passwordTextField.delegate = self
-    passwordTextField.addLeftPadding(withWidth: 10.0)
     loginButton.applyCornerRadius()
-  }
 
-  func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-    NavigationCoordinator.performExpandedNavigation(from: self) {
-      // Adjust view
-    }
-    return true
-  }
+    form +++ Section()
+      <<< EmailRow(kFormEmailAddress) {
+        $0.placeholder = kFormEmailPlaceholder
+        $0.add(rule: RuleRequired())
+        $0.add(rule: RuleEmail())
+        $0.validationOptions = .validatesAlways
+        
+        if isDebug {
+          $0.value = kDebugEmail
+        }
+      }.cellUpdate { cell, row in
+        NavigationCoordinator.performExpandedNavigation(from: self) {
+          // Adjust view
+          if !row.isValid {
+            cell.textField.textColor = .systemRed
+            self.loginButton.isEnabled = false
+            self.loginButton.isUserInteractionEnabled = false
+          } else {
+            cell.textField.textColor = .black
+            self.loginButton.isEnabled = true
+            self.loginButton.isUserInteractionEnabled = true
+          }
+        }
+      }
 
-  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    textField.resignFirstResponder()
-    return true
+      <<< PasswordRow(kFormPassword) {
+        $0.placeholder = kFormPasswordPlaceholder
+        $0.add(rule: RuleRequired())
+        $0.validationOptions = .validatesAlways
+
+        if isDebug {
+          $0.value = kDebugPassword
+        }
+        
+      }.cellUpdate { cell, row in
+        NavigationCoordinator.performExpandedNavigation(from: self) {
+          // Adjust view
+          if !row.isValid {
+            cell.textField.textColor = .systemRed
+            self.loginButton.isEnabled = false
+            self.loginButton.isUserInteractionEnabled = false
+          } else {
+            cell.textField.textColor = .black
+            self.loginButton.isEnabled = true
+            self.loginButton.isUserInteractionEnabled = true
+          }
+        }
+      }
   }
 
   @IBAction func loginAction(_ sender: UIButton) {
@@ -91,19 +132,20 @@ class PhoneLoginViewController: BaseAppViewController, PhoneLoginDisplayLogic, U
   func loginViaEmailAndPassword() {
     showHUD()
     var request = PhoneLogin.LoginViaEmailAndPassword.Request()
-    request.email = emailAddressTextField.text
-    request.password = passwordTextField.text
+    request.email = (form.rowBy(tag: kFormEmailAddress) as? EmailRow)?.value ?? ""
+    request.password = (form.rowBy(tag: kFormPassword) as? PasswordRow)?.value ?? ""
     interactor?.loginViaEmailAndPassword(request: request)
   }
 
   func onSuccessfulEmailAndPasswordLogin(viewModel: PhoneLogin.LoginViaEmailAndPassword.ViewModel) {
     dismissHUD()
-    startUserSession(with: viewModel.userId)
+    startUserSession(with: viewModel.userId, and: viewModel.userData)
   }
 
-  func startUserSession(with userId: String?) {
+  func startUserSession(with userId: String?, and userData: UserProfileData?) {
     var request = PhoneLogin.SetSession.Request()
     request.userId = userId
+    request.userData = userData
     interactor?.startUserSession(request: request)
   }
 
@@ -117,7 +159,12 @@ class PhoneLoginViewController: BaseAppViewController, PhoneLoginDisplayLogic, U
 
   func handleError(viewModel: PhoneLogin.HandleError.ViewModel) {
     dismissHUD()
-    let _ = SweetAlert().showAlert(on: self, title: viewModel.errorTitle ?? "Oops", subTitle: viewModel.errorMessage ?? "Something went wrong. Please try again.", style: .error, buttonTitle: "OK", buttonColor: .systemOrange)
+    let _ = SweetAlert().showAlert(on: self,
+                                   title: viewModel.errorTitle ?? "Oops",
+                                   subTitle: viewModel.errorMessage ?? "Something went wrong. Please try again.",
+                                   style: .error,
+                                   buttonTitle: "OK",
+                                   buttonColor: .systemOrange)
   }
 }
 

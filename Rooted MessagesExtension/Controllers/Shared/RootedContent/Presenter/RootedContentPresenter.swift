@@ -23,11 +23,14 @@ protocol RootedContentPresentationLogic {
   func presentCreateNewMeetingView(response: RootedContent.CreateNewMeeting.Response)
   func presentInfoView(response: RootedContent.InfoView.Response)
 
+  func onDidFinishLoading(response: RootedContent.RetrieveMeetings.Response)
+  func onDidDeleteMeeting(response: RootedContent.DeleteMeeting.Response)
   func handleError(response: RootedContent.DisplayError.Response)
   func onSuccessfulSave(response: RootedContent.SaveMeeting.Response)
   func onSuccessfulCalendarAdd(response: RootedContent.AddToCalendar.Response)
 
   func onSuccessfulCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response)
+  func onFailedCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response)
 
   func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response)
 
@@ -43,11 +46,15 @@ extension RootedContentPresentationLogic {
   func presentCreateNewMeetingView(response: RootedContent.CreateNewMeeting.Response) { }
   func presentInfoView(response: RootedContent.InfoView.Response) { }
 
+  func onDidFinishLoading(response: RootedContent.RetrieveMeetings.Response) { }
+  func onDidDeleteMeeting(response: RootedContent.DeleteMeeting.Response) { }
+
   func handleError(response: RootedContent.DisplayError.Response) { }
 
   func onSuccessfulSave(response: RootedContent.SaveMeeting.Response) { }
   func onSuccessfulCalendarAdd(response: RootedContent.AddToCalendar.Response) { }
   func onSuccessfulCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response) { }
+  func onFailedCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response) { }
 
   func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response) { }
 }
@@ -118,6 +125,12 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     viewController?.onSuccessfulCalendarAdd(viewModel: viewModel)
   }
 
+  func onFailedCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response) {
+    var viewModel = RootedContent.RemoveFromCalendar.ViewModel()
+    viewModel.errorMessage = response.errorMessage
+    viewController?.onFailedCalendarRemoval(viewModel: viewModel)
+  }
+
   func onSuccessfulCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response) {
     var viewModel = RootedContent.RemoveFromCalendar.ViewModel()
     viewModel.meeting = response.meeting
@@ -132,5 +145,17 @@ class RootedContentPresenter: RootedContentPresentationLogic {
 
   func onPresentPhoneLoginViewController() {
     viewController?.presentPhoneLoginViewController()
+  }
+
+  func onDidFinishLoading(response: RootedContent.RetrieveMeetings.Response) {
+    var viewModel = RootedContent.RetrieveMeetings.ViewModel()
+    viewModel.meetings = response.meetings
+    viewController?.onDidFinishLoading(viewModel: viewModel)
+  }
+
+  func onDidDeleteMeeting(response: RootedContent.DeleteMeeting.Response) {
+    var viewModel = RootedContent.DeleteMeeting.ViewModel()
+    viewModel.meeting = response.meeting
+    viewController?.onDidDeleteMeeting(viewModel: viewModel)
   }
 }

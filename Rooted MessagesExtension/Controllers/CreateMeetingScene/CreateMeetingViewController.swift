@@ -312,8 +312,48 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
           +++ Section(header:"Description", footer: "Use this optional field to provide a description of your event. The circled text in the screen shot below is the event description.")
           <<< TextAreaRow("meeting_description") {
-            $0.textAreaHeight = .dynamic(initialTextViewHeight: 50)
+            $0.textAreaHeight = .dynamic(initialTextViewHeight: 75)
         }
+
+    +++ MultivaluedSection { section in
+        section.header = {
+          var header = HeaderFooterView<UIView>(.callback({
+              let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 32))
+              return view
+          }))
+          header.title = "Create Agenda"
+          header.height = { 32 }
+          return header
+        }()
+      
+      section.footer = {
+        var header = HeaderFooterView<UIView>(.callback({
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 75))
+            return view
+        }))
+        header.title = "Add items to the agenda"
+        header.height = { 75 }
+        return header
+      }()
+
+      section.multivaluedOptions = [.Reorder, .Insert, .Delete]
+      section.tag = "agenda_items"
+      section.addButtonProvider = { section in
+          return ButtonRow(){
+              $0.title = "Add Item"
+              }.cellUpdate { cell, row in
+                  cell.textLabel?.textAlignment = .left
+          }
+      }
+      section.multivaluedRowToInsertAt = { index in
+          return NameRow() {
+              $0.placeholder = "Agenda Item"
+          }
+      }
+      section <<< NameRow() {
+          $0.placeholder = "Agenda Item"
+      }
+    }
   }
 
   // MARK: - Use Case: Start animating button
@@ -386,6 +426,30 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
       self.meetingBuilder = self.meetingBuilder.add(key: "meeting_description", value: value)
     }
 
+    // Check Agenda Items
+    if let agendaItemsSection = self.form.sectionBy(tag: "agenda_items") as? MultivaluedSection {
+      var agendaItems: [[String: Any]] = []
+      var order = 0
+      for agendaItemRow in agendaItemsSection.allRows {
+        if let row = agendaItemRow as? NameRow, let value = row.value {
+          let item: [String: Any] = [
+            "item_name": value,
+            "order": order
+          ]
+          agendaItems.append(item)
+          order += 1
+        }
+      }
+
+      if agendaItems.count > 0 {
+        self.meetingBuilder = self.meetingBuilder.add(key: "agenda_items", value: agendaItems)
+      }
+    }
+
+    if let meetingOwner = SessionManager.shared.currentUser?.uid {
+      self.meetingBuilder = self.meetingBuilder.add(key: "owner_id", value: meetingOwner)
+    }
+
     guard let _ = meetingBuilder.retrieve(forKey: "meeting_name") as? String,
       let _ = meetingBuilder.retrieve(forKey: "start_date") as? Date,
       let _ = meetingBuilder.retrieve(forKey: "end_date") as? Date,
@@ -416,6 +480,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
     request.meeting = meeting
     request.branchEventID = kBranchMeetingStartedSave
     request.saveType = .send
+    request.contentDB = .remote
     interactor?.saveMeeting(request: request)
   }
 

@@ -75,16 +75,15 @@ public class RLocation: Mappable, SuggestionValue {
 
   public func mapping(map: Map) {
     name <- map["name"]
-    address1 <- map["address_1"]
-    address2 <- map["address_2"]
-    address3 <- map["address_3"]
-    address4 <- map["address_4"]
-    city <- map["city"]
-    state <- map["state"]
-    stateSh <- map["state_sh"]
-    country <- map["country"]
-    zipCode <- map["zip_code"]
-    coordinates <- map["coordinates"]
+    address1 <- map["address_line_1"]
+    address2 <- map["address_line_2"]
+    address3 <- map["address_line_3"]
+    address4 <- map["address_line_4"]
+    city <- map["address_city"]
+    state <- map["address_state"]
+    country <- map["address_country"]
+    zipCode <- map["address_zip"]
+    coordinates <- map["address_coordinates"]
     metaInformation <- map["meta_information"]
   }
 

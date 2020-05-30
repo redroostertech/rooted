@@ -34,29 +34,13 @@ class ResponsiveViewController: BaseAppViewController {
       mainCollectionViewController?.dataSource = self
       mainCollectionViewController?.register(UINib(nibName: "CustomHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "CustomHeader")
       mainCollectionViewController?.register(UINib(nibName: "EmptyHeader", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "EmptyHeader")
-
-      mainCollectionViewController?.emptyDataSetView { view in
-        view.titleLabelString(NSAttributedString(string: "No Events"))
-          .detailLabelString(NSAttributedString(string: "When you create or receive an event invite, it will show up here."))
-          .image(UIImage(named: "empty"))
-          .dataSetBackgroundColor(UIColor.white)
-          .shouldDisplay(true)
-          .shouldFadeIn(true)
-          .isTouchAllowed(true)
-          .isScrollAllowed(true)
-          .didTapDataButton {
-            // Do something
-          }
-          .didTapContentView {
-            // Do something
-        }
-      }
       registerCells(with: [RootedCollectionViewCell.identifier])
     }
   }
 
   func loadCells(cells: [RootedCollectionViewModel]) {
-    self.cells = cells
+    self.cells.removeAll()
+    self.cells.append(contentsOf: cells)
     loadSections()
     reloadData()
   }
@@ -92,14 +76,47 @@ class ResponsiveViewController: BaseAppViewController {
       flowLayout.itemSize = CGSize(width: 250, height: 150)
       flowLayout.scrollDirection = .horizontal
 
+      maincollectionviewcontroller.emptyDataSetView { view in
+        view.titleLabelString(NSAttributedString(string: "Welcome"))
+        .detailLabelString(NSAttributedString(string: "Using the menu icon, expand the app to get started"))
+          .image(UIImage(named: "empty"))
+          .dataSetBackgroundColor(UIColor.white)
+          .shouldDisplay(true)
+          .shouldFadeIn(true)
+          .isTouchAllowed(true)
+          .isScrollAllowed(true)
+          .didTapDataButton {
+            // Do something
+          }
+          .didTapContentView {
+            // Do something
+        }
+      }
+
     case .list:
 
-//      flowLayout.headerReferenceSize = CGSize(width:  self.view.bounds.width, height: kListViewSectionSize)
       flowLayout.minimumInteritemSpacing = 0
       flowLayout.minimumLineSpacing = 0
       flowLayout.itemSize = CGSize(width: self.view.bounds.width, height: 200)
       flowLayout.sectionInset = UIEdgeInsets(top: 0.0, left: 0, bottom: 0.0, right: 0)
       flowLayout.scrollDirection = .vertical
+
+      maincollectionviewcontroller.emptyDataSetView { view in
+        view.titleLabelString(NSAttributedString(string: "No Events"))
+        .detailLabelString(NSAttributedString(string: "When you create or receive an event invite, it will show up here."))
+          .image(UIImage(named: "empty"))
+          .dataSetBackgroundColor(UIColor.white)
+          .shouldDisplay(true)
+          .shouldFadeIn(true)
+          .isTouchAllowed(true)
+          .isScrollAllowed(true)
+          .didTapDataButton {
+            // Do something
+          }
+          .didTapContentView {
+            // Do something
+        }
+      }
     }
 
     loadCells(cells: self.cells)

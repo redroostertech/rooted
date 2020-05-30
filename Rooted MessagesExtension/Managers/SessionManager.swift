@@ -19,8 +19,8 @@ class SessionManager {
 
   // MARK: - Use Case: As a user, I want to be keep track of my activity in a given session; app should be able to check if a session already exists.
   var sessionExists: Bool {
-//    return currentUser != nil
-    return currentUserId != nil
+    return currentUser != nil
+//    return currentUserId != nil
   }
 
   // MARK: - Use Case: As a user, I want to be able to resume my activity and maintain a single reference to my user information; app needs to a ccess the `currentUser` thats stored in the `SessionManager`

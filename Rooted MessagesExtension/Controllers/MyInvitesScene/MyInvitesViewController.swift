@@ -22,7 +22,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   public var toggleMenuButton = false
   private var menuSelection = 0
   private var menuItemImages: [UIImage] {
-    return [UIImage(named: "calendar-plus")!, UIImage(named: "user-outline-male-symbol-of-interface")!]
+    return [UIImage(named: "calendar-plus-sm")!, UIImage(named: "user-outline-male-symbol-of-interface-sm")!]
   }
 //  private var menuItemImages: [UIImage] {
 //    return [UIImage(named: "plus")!, UIImage(named: "info")!, UIImage(named: "addavailability")!]
@@ -60,7 +60,6 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     presenter.viewController = viewController
   }
 
-
   override func viewDidLoad() {
     super.viewDidLoad()
     setupUI()
@@ -69,7 +68,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   override func willBecomeActive(with conversation: MSConversation) {
     super.willBecomeActive(with: conversation)
-    setupManagedSession()
+//    setupManagedSession()
     setupBranchIO()
     setupConversationManager(using: conversation)
   }
@@ -121,6 +120,8 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
         self.floatingMenu?.toggleMenu()
       }
       self.segmentControlHeightConstraint.constant = 49
+      self.setupManagedSession()
+
       break
     }
   }
@@ -133,9 +134,10 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   }
 
   private func setupMenuButton() {
-//    menuButton.applyCornerRadius()
-//    menuButton.imageView?.contentMode = .scaleAspectFit
-    menuButton.tintColor = .darkGray
+    menuButton.applyCornerRadius()
+    menuButton.imageView?.contentMode = .scaleAspectFit
+    menuButton.backgroundColor = .systemOrange
+    menuButton.tintColor = .white
   }
 
   private func setupSegmentedControl() {
@@ -171,13 +173,15 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   // MARK: - Use Case: Set up a managed session
   func setupManagedSession() {
-    // Authentication does not exist yet so set up a empty anonymous user
-    if !SessionManager.shared.sessionExists {
-      RRLogger.log(message: "Session does not exist, start an anonymous one.", owner: self)
-      self.presentPhoneLoginViewController()
-    } else {
-      self.checkCalendarPermissions()
-    }
+    NavigationCoordinator.performExpandedNavigation(from: self, {
+      // Authentication does not exist yet so set up a empty anonymous user
+      if !SessionManager.shared.sessionExists {
+        RRLogger.log(message: "Session does not exist, start an anonymous one.", owner: self)
+        self.presentPhoneLoginViewController()
+      } else {
+        self.checkCalendarPermissions()
+      }
+    })
   }
 
   // MARK: - Use Case: Set up conversation manager
@@ -201,6 +205,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     showHUD()
     var request = RootedContent.RetrieveMeetings.Request()
     request.meetingManagerDelegate = self
+    request.contentDB = .remote
     interactor?.retrieveMeetings(request: request)
   }
 
@@ -217,12 +222,32 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     loadCells(cells: rootedCollectionViewModel)
   }
 
+  func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) {
+    dismissHUD()
+    guard let meetings = viewModel.meetings else { return }
+    let rootedCollectionViewModel = EngagementFactory.Meetings.convert(contextWrappers: meetings, for: menuSelection, withDelegate: self)
+    loadCells(cells: rootedCollectionViewModel)
+  }
+
   // MARK: - Use Case: App should handle selection within `ScrollableSegmentedControl` to update the type of meeting data that is displayed in the table view
   @objc
   private func segmentSelected(sender: ScrollableSegmentedControl) {
     menuSelection = sender.selectedSegmentIndex
     dismissMenu()
-    refreshMeetings()
+    switch menuSelection {
+    case 1:
+      self.retrieveSentMeetings()
+    default:
+      self.retrieveMeetings()
+    }
+  }
+
+  func retrieveSentMeetings() {
+    showHUD()
+    var request = RootedContent.RetrieveSentMeetings.Request()
+    request.meetingManagerDelegate = self
+    request.contentDB = .remote
+    interactor?.retrieveSentMeetings(request: request)
   }
 
   // MARK: - IBActions
@@ -233,7 +258,12 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   @objc
   private func refreshMeetings() {
-    retrieveMeetings()
+    switch menuSelection {
+    case 1:
+      self.retrieveSentMeetings()
+    default:
+      self.retrieveMeetings()
+    }
   }
 
   // MARK: - Use Case: When a user taps on the menu button, the floating menu button should toggle show/hide
@@ -241,6 +271,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     NavigationCoordinator.performExpandedNavigation(from: self) {
       self.toggleMenu()
     }
+//    openInMessagingURL(urlString: "https://zoom.us/wc/93599844792/start")
   }
 
   private func toggleMenu() {
@@ -315,8 +346,8 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
         alert.addAction(share)
 
         // MARK: - Use Case: Delete a meeting from the table view
-        let delete = UIAlertAction(title: "Remove from Calendar", style: .destructive, handler: { action in
-          self.removeFromCalendar(viewmodel)
+        let delete = UIAlertAction(title: "Delete Meeting", style: .destructive, handler: { action in
+          self.delete(viewmodel)
         })
         alert.addAction(delete)
 
@@ -355,19 +386,36 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   // MARK: - Use Case: Remove meeting from users calendar
   private func removeFromCalendar(_ meeting: RootedCellViewModel?) {
     guard let subject = meeting else {
-      self.showError(title: "Error", message: "There was an error trying to remove the meeting. Please try again.")
+      RRLogger.log(message: "There was an error trying to remove the meeting. Please try again.", owner: self)
       return
     }
+    var request = RootedContent.RemoveFromCalendar.Request()
+    request.meeting = subject
+    self.interactor?.removeMeetingFromCalendar(request: request)
+  }
 
+  func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
+    RRLogger.log(message: "Successfully removed meeting from calendar", owner: self)
+  }
+
+  func onFailedCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
+    RRLogger.log(message: "Failed to remove meeting from calendar. Error message: \(viewModel.errorMessage)", owner: self)
+  }
+
+  // MARK: - Use Case: Delete a meeting from the table view
+  private func delete(_ meeting: RootedCellViewModel?) {
     // MARK: - Use Case: Show a confirmation to the user due to the action not being able to be undone
     let alert = UIAlertController(title: kDeleteTitle, message: kDeleteMessage, preferredStyle: .alert)
 
     // MARK: - Use Case: Delete a meeting from local storage and remove from calendar
     let yes = UIAlertAction(title: "Yes", style: .default, handler: { action in
+      self.showHUD()
 
-      var request = RootedContent.RemoveFromCalendar.Request()
-      request.meeting = subject
-      self.interactor?.removeMeetingFromCalendar(request: request)
+      var request = RootedContent.DeleteMeeting.Request()
+      request.meetingManagerDelegate = self
+      request.meeting = meeting
+      request.contentDB = .remote
+      self.interactor?.deleteMeeting(request: request)
 
     })
     alert.addAction(yes)
@@ -381,51 +429,21 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     self.present(alert, animated: true, completion: nil)
   }
 
-  func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
-    print("Removed from calendar")
-    delete(viewModel.meeting)
-  }
+  func onDidDeleteMeeting(viewModel: RootedContent.DeleteMeeting.ViewModel) {
+    dismissHUD()
+    showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
 
-  // MARK: - Use Case: Delete a meeting from the table view
-  private func delete(_ meeting: RootedCellViewModel?) {
-    var request = RootedContent.DeleteMeeting.Request()
-    request.meetingManagerDelegate = self
-    request.meeting = meeting
-    self.interactor?.deleteMeeting(request: request)
+    // Try to remove from Calendar
+    removeFromCalendar(viewModel.meeting)
+
+    // Refresh
+    refreshMeetings()
   }
 
   func didDeleteInvite(_ manager: Any?, invite: MeetingContextWrapper) {
     print("Did delete invite")
     showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
   }
-
-  // MARK: - RootedFormDelegate
-  func didReturn(_ form: RegistrationForm, textField: UITextField) {
-    guard anonymousUser != nil else { return }
-    // Start session with anonymous user when input is done
-    SessionManager.start(with: anonymousUser!)
-  }
-
-  func didBeginEditing(_ form: RegistrationForm, textField: UITextField) {
-    NavigationCoordinator.performExpandedNavigation(from: self) {
-      // Do something when user did start providing input
-    }
-  }
-
-  func valueFrom(_ form: RegistrationForm, key: String, value: Any?) {
-    guard anonymousUser != nil, let val = value as? String else { return }
-    // Set full name for anonymous users of value
-    anonymousUser!.fullName = val
-  }
-
-  func form(_ form: RegistrationForm, error: Error) {
-    showError(title: "Error", message: error.localizedDescription)
-  }
-
-  func didCancel(_ form: RegistrationForm) {
-    // Do something when user input for form is cancelled
-  }
-
 
   // MARK: - Routing Logic
   // MARK: - Use Case: Go to add an meeting view
@@ -435,6 +453,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   }
 
   func handleError(viewModel: RootedContent.DisplayError.ViewModel) {
+    dismissHUD()
     showError(title: viewModel.errorTitle, message: viewModel.errorMessage)
   }
 

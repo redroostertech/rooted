@@ -37,25 +37,30 @@ enum PhoneLogin {
     struct Response {
       var success: Bool?
       var userId: String?
+      var userData: UserProfileData?
     }
 
     struct ViewModel {
       var success: Bool?
       var userId: String?
+      var userData: UserProfileData?
     }
   }
 
   enum SetSession {
     struct Request {
       var userId: String?
+      var userData: UserProfileData?
     }
 
     struct Response {
       var userId: String!
+      var userData: UserProfileData?
     }
 
     struct ViewModel {
       var userId: String!
+      var userData: UserProfileData?
     }
   }
 

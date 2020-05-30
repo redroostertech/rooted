@@ -236,6 +236,7 @@
 		D7DDDA5C247943F70061C15B /* SettingsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA56247943F70061C15B /* SettingsModels.swift */; };
 		D7DDDA5D247943F70061C15B /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA57247943F70061C15B /* SettingsViewController.swift */; };
 		D7DDDA5E247943F70061C15B /* SettingsInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DDDA58247943F70061C15B /* SettingsInteractor.swift */; };
+		D7DF8CFB24801550005C116A /* CountryData.json in Resources */ = {isa = PBXBuildFile; fileRef = D7DF8CFA24801550005C116A /* CountryData.json */; };
 		D7F1AAE9240BEE0F00210504 /* industriesJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE5240BEE0F00210504 /* industriesJson.json */; };
 		D7F1AAEA240BEE0F00210504 /* RootedJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE6240BEE0F00210504 /* RootedJson.json */; };
 		D7F1AAEB240BEE0F00210504 /* Rooted_Meetings_Response.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */; };
@@ -505,6 +506,7 @@
 		D7DDDA56247943F70061C15B /* SettingsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModels.swift; sourceTree = "<group>"; };
 		D7DDDA57247943F70061C15B /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		D7DDDA58247943F70061C15B /* SettingsInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsInteractor.swift; sourceTree = "<group>"; };
+		D7DF8CFA24801550005C116A /* CountryData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CountryData.json; sourceTree = "<group>"; };
 		D7F1AAE5240BEE0F00210504 /* industriesJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = industriesJson.json; sourceTree = "<group>"; };
 		D7F1AAE6240BEE0F00210504 /* RootedJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RootedJson.json; sourceTree = "<group>"; };
 		D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Rooted_Meetings_Response.json; sourceTree = "<group>"; };
@@ -593,6 +595,7 @@
 				BA98DD8C224ED26F0070BC39 /* Rooted MessagesExtension.entitlements */,
 				D787A26923E1EC2F001795D3 /* AppInitializer.swift */,
 				D7A18AEA24063ACC0039A295 /* Configuration.swift */,
+				D7DF8CFA24801550005C116A /* CountryData.json */,
 				D701DA8523E8DBF400A45E9B /* Models */,
 				D75711F323D8817200BDD6A0 /* Resources */,
 				D75711F623D8818900BDD6A0 /* Managers */,
@@ -1310,6 +1313,7 @@
 				D7F1AAEB240BEE0F00210504 /* Rooted_Meetings_Response.json in Resources */,
 				D7255F92241387600048F8D8 /* EmptyHeader.xib in Resources */,
 				D7F1AAEC240BEE0F00210504 /* Rooted_User_Response.json in Resources */,
+				D7DF8CFB24801550005C116A /* CountryData.json in Resources */,
 				D747BAEB2411C6B200E571CF /* CustomHeader.xib in Resources */,
 				D787A26823E1EB41001795D3 /* GoogleService-Info.plist in Resources */,
 				D7C3B9312416762D00B22E8F /* DateRangeVC.xib in Resources */,

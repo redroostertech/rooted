@@ -24,6 +24,7 @@ class PhoneLoginPresenter: PhoneLoginPresentationLogic {
   func onSuccessfulEmailAndPasswordLogin(response: PhoneLogin.LoginViaEmailAndPassword.Response) {
     var viewModel = PhoneLogin.LoginViaEmailAndPassword.ViewModel()
     viewModel.userId = response.userId
+    viewModel.userData = response.userData
     viewController?.onSuccessfulEmailAndPasswordLogin(viewModel: viewModel)
   }
 

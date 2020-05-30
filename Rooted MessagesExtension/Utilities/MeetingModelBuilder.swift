@@ -94,6 +94,26 @@ class MeetingModelBuilder {
         meetingDict["meeting_type"] = meetingtypes.toJSON()
 
       }
+
+      if let meetingAgendas = retrieve(forKey: "agenda_items") as? [[String: Any]] {
+        var agendaItems = [AgendaItem]()
+
+        for agendaItem in meetingAgendas {
+          if let item = AgendaItem(JSON: agendaItem) {
+            agendaItems.append(item)
+          }
+        }
+        meetingDict["agenda_items"] = agendaItems.toJSON()
+      }
+
+      if let meetingDescription = retrieve(forKey: "meeting_description") as? String {
+        meetingDict["meeting_description"] = meetingDescription
+      }
+
+      if let meetingOwner = retrieve(forKey: "owner_id") as? String {
+        meetingDict["owner_id"] = meetingOwner
+      }
+
       meetingDict["id"] = RanStringGen(length: 26).returnString()
       meetingDict["dashboard_section_id"] = 1
       meeting = Meeting(JSON: meetingDict)

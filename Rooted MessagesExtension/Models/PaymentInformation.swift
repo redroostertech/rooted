@@ -13,7 +13,7 @@ import ObjectMapper
 
 // MARK: - PaymentInformation
 public class PaymentInformation: Mappable {
-  public var customerId, lastFour, brand: String?
+  public var customerId, lastFour, brand, preferredCurrency: String?
   public var shippingInformation, billingInformation: RLocation?
   public var createdAt, updatedAt: String?
   public var metaInformation: [String: Any]?
@@ -29,5 +29,6 @@ public class PaymentInformation: Mappable {
     createdAt <- map["created_at"]
     updatedAt <- map["updated_at"]
     metaInformation <- map["meta_information"]
+    preferredCurrency <- map["preferred_currency"]
   }
 }

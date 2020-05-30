@@ -84,5 +84,21 @@ open class BaseAppViewController: MSMessagesAppViewController {
       self.dismiss(animated: true, completion: nil)
     }
   }
+
+  // MARK: - Use Case: Open a url
+  func openInMessagingURL(urlString: String) {
+    if let url = URL(string:urlString) {
+      let context = NSExtensionContext()
+      context.open(url, completionHandler: nil)
+      var responder = self as UIResponder?
+
+      while (responder != nil) {
+        if responder?.responds(to: Selector("openURL:")) == true{
+          responder?.perform(Selector("openURL:"), with: url)
+        }
+        responder = responder!.next
+      }
+    }
+  }
 }
 

@@ -13,8 +13,8 @@ import ObjectMapper
 
 // MARK: - AccountType
 public class AccountType: DataClass {
-  public var maxDashboardSectionsCount: Int?
-  public var createdAt, updatedAt: String?
+  public var maxDashboardSectionsCount, yearlyFee, monthlyFee, maximumEventsCount: Int?
+  public var createdAt, updatedAt, key, yearlySubscriptionId, monthlySubscriptionId: String?
 
   required public init?(map: Map) {
     super.init(map: map)
@@ -22,8 +22,14 @@ public class AccountType: DataClass {
 
   public override func mapping(map: Map) {
     super.mapping(map: map)
+    id <- map["id"]
+    yearlyFee <- map["yearly_fee"]
+    yearlySubscriptionId <- map["yearly_subscription_id"]
+    monthlyFee <- map["monthly_fee"]
+    monthlySubscriptionId <- map["monthly_subscription_id"]
     maxDashboardSectionsCount <- map["max_dashboard_sections_count"]
     createdAt <- map["created_at"]
     updatedAt <- map["updated_at"]
+    key <- map["key"]
   }
 }
