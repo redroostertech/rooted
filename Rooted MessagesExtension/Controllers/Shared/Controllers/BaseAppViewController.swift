@@ -39,8 +39,8 @@ open class BaseAppViewController: MSMessagesAppViewController {
     progressHUD = RProgressHUD(on: self.view)
   }
 
-  func displayError(with title: String, and message: String) {
-    HUDFactory.showError(with: title, and: message, on: self)
+  func displayError(with title: String, and message: String, withCompletion completion: (()->Void)? = nil) {
+    HUDFactory.showError(with: title, and: message, on: self, withCompletion: completion)
   }
 
   func stopAnimating(_ spinnerButton: SSSpinnerButton, for completionType: CompletionType, completion: @escaping () -> Void) {

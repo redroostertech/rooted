@@ -64,6 +64,20 @@ enum PhoneLogin {
     }
   }
 
+  enum ForgotPassword {
+    struct Request {
+      var email: String!
+    }
+
+    struct Response {
+      var emailSent: Bool!
+    }
+
+    struct ViewModel {
+      var emailSent: Bool!
+    }
+  }
+
   enum HandleError {
     struct Request { }
 

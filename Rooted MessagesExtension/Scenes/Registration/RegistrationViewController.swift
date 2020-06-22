@@ -59,6 +59,8 @@ class RegistrationViewController: FormMessagesAppViewController, RegistrationDis
     super.viewDidLoad()
     createAccountButton.applyCornerRadius()
 
+    self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+
     form +++ Section()
       <<< EmailRow(kFormEmailAddress) {
         $0.placeholder = kFormEmailPlaceholder

@@ -13,8 +13,8 @@ import ObjectMapper
 
 // MARK: - UserProfileData
 public class UserProfileData: Mappable {
-  public var id, uid, key: String?
-  public var firstName, lastName, fullName, phoneNumber: String?
+  public var id, uid, key, token: String?
+  public var firstName, lastName, fullName, phoneNumber, email: String?
   public var jobTitle, companyName, bio: String?
   public var cardOnFile, initialSetup: Bool?
 
@@ -36,6 +36,8 @@ public class UserProfileData: Mappable {
     id <- map["id"]
     uid <- map["uid"]
     key <- map["key"]
+    token <- map["token"]
+    email <- map["email_address"]
     phoneNumber <- map["phone_number"]
     jobTitle <- map["job_title"]
     companyName <- map["company_name"]

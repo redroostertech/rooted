@@ -11,35 +11,35 @@
 //
 
 import UIKit
+import CoreLocation
+import WebKit
 
-protocol SettingsDisplayLogic: class
-{
-  func displaySomething(viewModel: Settings.Something.ViewModel)
+protocol SettingsDisplayLogic: class {
+  func onSuccessfullLogout(viewModel: Settings.LogoutUser.ViewModel)
+  func onFailedLogout(viewModel: Settings.LogoutUser.ViewModel)
+  func handleError(viewModel: Settings.DisplayError.ViewModel)
 }
 
-class SettingsViewController: UIViewController, SettingsDisplayLogic
-{
+class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogic {
+
+  @IBOutlet private weak var actionsContainerView: UIView!
+
   var interactor: SettingsBusinessLogic?
   var router: (NSObjectProtocol & SettingsRoutingLogic & SettingsDataPassing)?
 
   // MARK: Object lifecycle
-  
-  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)
-  {
+  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     setup()
   }
   
-  required init?(coder aDecoder: NSCoder)
-  {
+  required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
     setup()
   }
   
   // MARK: Setup
-  
-  private func setup()
-  {
+  private func setup() {
     let viewController = self
     let interactor = SettingsInteractor()
     let presenter = SettingsPresenter()
@@ -51,39 +51,192 @@ class SettingsViewController: UIViewController, SettingsDisplayLogic
     router.viewController = viewController
     router.dataStore = interactor
   }
-  
-  // MARK: Routing
-  
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?)
-  {
-    if let scene = segue.identifier {
-      let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
-      if let router = router, router.responds(to: selector) {
-        router.perform(selector, with: segue)
-      }
+
+  // MARK: View lifecycle
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    DispatchQueue.main.async {
+      self.navigationController?.setNavigationBarHidden(true, animated: animated)
+      self.view.bringSubviewToFront(self.actionsContainerView)
     }
   }
   
-  // MARK: View lifecycle
-  
-  override func viewDidLoad()
-  {
+  override func viewDidLoad() {
     super.viewDidLoad()
-    doSomething()
+
+    guard let loggedInUser = SessionManager.shared.currentUser else { return }
+    // Section 1:
+    // Full Name
+    // Email Address
+    // Change Password
+    // Allow Calendar Access
+    // Allow Location Access
+
+    // Section 2
+    // About Rooted
+    // Privacy Policy
+
+    // Section 3
+    // Logout
+    // Footer: Version Number
+    form
+    +++ Section("Account Settings")
+      <<< LabelRow() {
+        $0.title = "Full Name"
+        $0.value = loggedInUser.fullName ?? ""
+    }
+
+      <<< LabelRow() {
+        $0.title = "Email Address"
+        $0.value = loggedInUser.email ?? ""
+    }
+
+      <<< LabelRow() {
+          $0.title = "Default Calendar"
+        $0.value = EventKitManager.defaultRootedCalendar
+      }
+
+//      <<< ButtonRow("Default Calendar") {
+//          $0.title = $0.tag
+//          $0.presentationMode = .show(controllerProvider: .callback(builder: {
+//            let destinationVC = EventKitManager().showCalendarChooser()
+//
+//            // customization
+//            destinationVC.showsDoneButton = true
+//            destinationVC.showsCancelButton = true
+//
+//            // dont forget the delegate
+//            destinationVC.delegate = self
+//            return destinationVC
+//          }), onDismiss: nil)
+//      }
+
+      <<< SwitchRow() {
+        $0.tag = "calendarAccessRow"
+        $0.title = "Allow Calendar Access"
+        $0.value = EventKitManager.authStatus
+        $0.onChange { row in
+          let okAction = UIAlertAction(title: "OK", style: .cancel, handler: { action in
+          })
+          HUDFactory.displayAlert(with: "Calendar Permissions", message: "To update the your calendar permissions go to your settings app and allow access to your calendar.", and: [okAction], on: self)
+//          if row.value == true {
+//            EventKitManager().getCalendarPermissions { access in
+//              (form?.rowBy(tag: "calendarAccessRow") as! SwitchRow).value = access
+//            }
+//          } else {
+//
+//          }
+//          if let bundleId = Bundle.main.bundleIdentifier {
+//            self.openInMessagingURL(urlString: "\(UIApplication.openSettingsURLString)&path=LOCATION_SERVICES/\(bundleId)")
+//          }
+        }
+    }
+
+      <<< SwitchRow() {
+        $0.title = "Allow Location Access"
+        $0.value = CLLocationManager.authorizationStatus() == .authorizedAlways || CLLocationManager.authorizationStatus() == .authorizedWhenInUse
+        $0.onChange { row in
+          let okAction = UIAlertAction(title: "OK", style: .cancel, handler: { action in
+          })
+          HUDFactory.displayAlert(with: "Location Permissions", message: "To update the your location permissions to add a location to meeting, go to your settings app and allow access to your location.", and: [okAction], on: self)
+//          if $0.value == true {
+//            EventKitManager().getCalendarPermissions { access in
+//              (form?.rowBy(tag: "calendarAccessRow") as! SwitchRow).value = access
+//            }
+//          } else {
+//
+//          }
+//          if let bundleId = Bundle.main.bundleIdentifier {
+//            self.openInMessagingURL(urlString: "\(UIApplication.openSettingsURLString)&path=LOCATION_SERVICES/\(bundleId)")
+//          }
+        }
+    }
+
+    +++ Section()
+      <<< ButtonRow("About Rooted") {
+        $0.title = $0.tag
+        $0.presentationMode = .show(controllerProvider: .callback(builder: {
+          let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
+          let destinationVC = sb.instantiateViewController(withIdentifier: kInfoViewController) as! InfoViewController
+          return destinationVC
+        }), onDismiss: nil)
+    }
+      <<< ButtonRow("Privacy Policy") {
+      $0.title = $0.tag
+        $0.presentationMode = .popover(controllerProvider: .callback(builder: {
+        let destinationVC = UIViewController()
+        let webView = WKWebView(frame: destinationVC.view.frame)
+        let urlRequest = URLRequest(url: URL(string: "https://termsfeed.com/terms-conditions/72b8fed5b38e082d48c9889e4d1276a9")!)
+        webView.load(urlRequest)
+        destinationVC.view.addSubview(webView)
+        return destinationVC 
+      }), onDismiss: nil)
+    }
+
+      +++ Section(footer: "Rooted was created and is maintained by the folks over at RedRooster Technologies Inc.\n\nVersion: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")")
+      <<< LabelRow() {
+        $0.title = "Logout"
+    }.onCellSelection { [weak self] _, _ in
+      // MARK: - Use Case: Show an alert for a user to perform more actions
+      let alert = UIAlertController(title: "Logout", message: "You are about to logout. Are you sure?", preferredStyle: .alert)
+
+      // MARK: - Use Case: User wants to logout
+      let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { action in
+        // Logout
+        self?.logout()
+      })
+      alert.addAction(yesAction)
+
+      // MARK: - Use Case: Delete a meeting from the table view
+      let cancelAction = UIAlertAction(title: "No", style: .cancel, handler: { action in
+        // Dismiss View
+      })
+      alert.addAction(cancelAction)
+
+      // Show the alert
+      self?.present(alert, animated: true, completion: nil)
+    }
   }
-  
-  // MARK: Do something
-  
-  //@IBOutlet weak var nameTextField: UITextField!
-  
-  func doSomething()
-  {
-    let request = Settings.Something.Request()
-    interactor?.doSomething(request: request)
+
+  func logout() {
+    showHUD()
+    let request = Settings.LogoutUser.Request()
+    interactor?.logoutUser(request: request)
   }
-  
-  func displaySomething(viewModel: Settings.Something.ViewModel)
-  {
-    //nameTextField.text = viewModel.name
+
+  func onSuccessfullLogout(viewModel: Settings.LogoutUser.ViewModel) {
+    dismissHUD()
+    dismiss(animated: true, completion: nil)
+  }
+
+  func onFailedLogout(viewModel: Settings.LogoutUser.ViewModel) {
+    dismissHUD()
+  }
+
+  func handleError(viewModel: Settings.DisplayError.ViewModel) {
+    dismissHUD()
+    showError(title: viewModel.errorTitle, message: viewModel.errorMessage)
+  }
+
+  // MARK: - Use Case: Accept the meeting, save it locally, and add it to your calendar
+  @IBAction func back(_ sender: UIButton) {
+    dismissView()
+  }
+}
+
+// Reusable components
+extension SettingsViewController {
+  // MARK: - Use Case: Show ProgressHUD
+  func showHUD() {
+    DispatchQueue.main.async {
+      self.progressHUD?.show()
+    }
+  }
+
+  // MARK: - Use Case: Dismiss ProgressHUD
+  func dismissHUD() {
+    DispatchQueue.main.async {
+      self.progressHUD?.dismiss()
+    }
   }
 }

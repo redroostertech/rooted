@@ -15,6 +15,7 @@ import UIKit
 protocol PhoneLoginBusinessLogic {
   func loginViaEmailAndPassword(request: PhoneLogin.LoginViaEmailAndPassword.Request)
   func startUserSession(request: PhoneLogin.SetSession.Request)
+  func forgotPassword(request: PhoneLogin.ForgotPassword.Request)
 }
 
 protocol PhoneLoginDataStore {
@@ -106,6 +107,66 @@ class PhoneLoginInteractor: PhoneLoginBusinessLogic, PhoneLoginDataStore {
       error.errorMessage = "Something went wrong. Please try again."
       error.errorTitle = "Oops!"
       self.presenter?.handleError(response: error)
+    }
+  }
+
+  func forgotPassword(request: PhoneLogin.ForgotPassword.Request) {
+    guard let email = request.email else {
+      var error = PhoneLogin.HandleError.Response()
+      error.errorMessage = "Please provide account credential"
+      error.errorTitle = "Oops!"
+      self.presenter?.handleError(response: error)
+      return
+    }
+    let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
+    let params: [String: String] = [
+      "action": "forgot_password",
+      "email": email,
+    ]
+    let apiService = Api()
+    apiService.performRequest(path: path,
+                              method: .post,
+                              parameters: params) { (results, error) in
+
+                                guard error == nil else {
+                                  RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                  var error = PhoneLogin.HandleError.Response()
+                                  error.errorMessage = "Something went wrong. Please try again."
+                                  error.errorTitle = "Oops!"
+                                  self.presenter?.handleError(response: error)
+                                  return
+                                }
+
+                                guard let resultsDict = results as? [String: Any] else {
+                                  RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                  var error = PhoneLogin.HandleError.Response()
+                                  error.errorMessage = "Something went wrong. Please try again."
+                                  error.errorTitle = "Oops!"
+                                  self.presenter?.handleError(response: error)
+                                  return
+                                }
+
+                                RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                if let success = resultsDict["success"] as? Bool {
+                                  if success {
+                                    if let data = resultsDict["data"] as? [String: Any] {
+                                      var response = PhoneLogin.ForgotPassword.Response()
+                                      response.emailSent = data["email_sent"] as? Bool ?? false
+                                      self.presenter?.onSuccessfulForgotPassword(response: response)
+                                    } else {
+                                      var error = PhoneLogin.HandleError.Response()
+                                      error.errorMessage = "Something went wrong. Please try again."
+                                      error.errorTitle = "Oops!"
+                                      self.presenter?.handleError(response: error)
+                                    }
+                                  } else {
+                                    var error = PhoneLogin.HandleError.Response()
+                                    error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
+                                    error.errorTitle = "Oops!"
+                                    self.presenter?.handleError(response: error)
+                                  }
+                                }
     }
   }
 }

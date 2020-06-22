@@ -47,10 +47,10 @@ class EngagementFactory {
       }
 
       let message = MSMessage()
-      var subcaption = ""
+      var subcaption = meeting.meetingDescription ?? ""
 
       let layout = MSMessageTemplateLayout()
-      layout.caption = String(format: captionString, arguments: [meetingname, startdate.toString(.rooted)])
+      layout.caption = String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
 
       message.md.set(value: meetingname, forKey: kMessageTitleKey)
       message.md.set(value: startdate.toString(.rooted), forKey: kMessageStartDateKey)

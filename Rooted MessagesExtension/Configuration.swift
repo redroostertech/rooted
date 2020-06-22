@@ -141,6 +141,7 @@ public let kPhoneLoginViewController = "PhoneLoginViewController"
 public let kRegistrationViewController = "RegistrationViewController"
 public let kInfoViewController = "InfoViewController"
 public let kSettingsNavigationController = "SettingsNavigationController"
+public let kSettingsViewController = "SettingsViewController"
 
 // MARK: - Segues
 public let kGoToDashboardSegue = "goToDashboard"
@@ -151,7 +152,7 @@ public let kGoToAddInviteVC = "goToAddInviteVC"
 // MARK: - User Experience Strings
 public let kDeleteTitle = "Delete Invite"
 public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
-public let captionString = "%@ on %@"
+public let kCaptionString = "ROOTED INVITATION: %@ on %@"
 public let kBackText = "Back"
 
 // MARK: - NotificationCenter Methods

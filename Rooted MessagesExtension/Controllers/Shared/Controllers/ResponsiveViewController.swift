@@ -27,6 +27,13 @@ class ResponsiveViewController: BaseAppViewController {
   
   private var cells = [RootedCollectionViewModel]()
 
+  var emptyDataSource: EmptyDataSetSource? {
+    didSet {
+      guard let emptydatasource = self.emptyDataSource else { return }
+      mainCollectionViewController?.emptyDataSetSource = emptydatasource
+    }
+  }
+
   func setup(collectionView: UICollectionView) {
     if mainCollectionViewController == nil {
       mainCollectionViewController = collectionView
@@ -41,6 +48,12 @@ class ResponsiveViewController: BaseAppViewController {
   func loadCells(cells: [RootedCollectionViewModel]) {
     self.cells.removeAll()
     self.cells.append(contentsOf: cells)
+    loadSections()
+    reloadData()
+  }
+
+  func clearTable() {
+    self.cells.removeAll()
     loadSections()
     reloadData()
   }
@@ -79,7 +92,7 @@ class ResponsiveViewController: BaseAppViewController {
       maincollectionviewcontroller.emptyDataSetView { view in
         view.titleLabelString(NSAttributedString(string: "Welcome"))
         .detailLabelString(NSAttributedString(string: "Using the menu icon, expand the app to get started"))
-          .image(UIImage(named: "empty"))
+          .image(UIImage(named: "Rooted-sm"))
           .dataSetBackgroundColor(UIColor.white)
           .shouldDisplay(true)
           .shouldFadeIn(true)

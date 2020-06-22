@@ -104,6 +104,7 @@ class MeetingModelBuilder {
           }
         }
         meetingDict["agenda_items"] = agendaItems.toJSON()
+        RRLogger.log(message: "Agenda Items:\n\(agendaItems.toJSON())", owner: self)
       }
 
       if let meetingDescription = retrieve(forKey: "meeting_description") as? String {

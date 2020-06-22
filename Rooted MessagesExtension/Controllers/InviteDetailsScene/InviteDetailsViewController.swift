@@ -3,13 +3,14 @@ import Messages
 import SSSpinnerButton
 import Branch
 import SwiftDate
+import OnboardKit
 
 enum ResponseType {
   case accept
   case decline
 }
 
-class InviteDetailsViewController: FormMessagesAppViewController, RootedContentDisplayLogic, MeetingsManagerDelegate {
+class InviteDetailsViewController: FormMessagesAppViewController, RootedContentDisplayLogic, MeetingsManagerDelegate, AuthenticationLogic {
 
   // MARK: - IBOutlets
   @IBOutlet private weak var acceptInviteButton: SSSpinnerButton!
@@ -54,16 +55,17 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
     super.viewDidLoad()
     setupUI()
     checkCalendarPermissions()
+    retrieveMeetingById()
   }
 
   // MARK: - Use Case: Setup the UI for the view
   private func setupUI() {
     backButton.applyCornerRadius()
     acceptInviteButton.applyCornerRadius()
-    setupForm()
+    view.bringSubviewToFront(actionsContainerView)
   }
 
-  private func setupForm() {
+  private func loadFormWith(meeting: Meeting) {
     // Set up form
         form
           +++ Section("Event details")
@@ -71,15 +73,23 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
           +++ Section("Event Name")
           <<< LabelRow() {
             $0.tag = "meeting_name"
-            if let meetingName = self.meeting?.data?.meetingName {
+            if let meetingName = meeting.meetingName {
               $0.title = meetingName
+            }
+          }
+
+          +++ Section("Organized by")
+          <<< LabelRow() {
+            $0.tag = "meeting_owner"
+            if let meetingOwner = meeting.owner?.first {
+              $0.title = meetingOwner.fullName ?? ""
             }
           }
 
           +++ Section("Event Location")
           <<< ButtonRow() {
             $0.tag = "meeting_location"
-            if let meetingLocation = meeting?.data?.meetingLocation {
+            if let meetingLocation = meeting.meetingLocation {
               $0.title = meetingLocation.readableWhereString
             } else {
               $0.title = "No location provided"
@@ -89,12 +99,12 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
           +++ Section(header: "Event Start Date/Time", footer: "Time has been converted to your time zone for your convenience.")
           <<< LabelRow() {
             $0.tag = "meeting_date"
-            if let meetingTime = meeting?.data?.meetingDate {
+            if let meetingTime = meeting.meetingDate {
               $0.title  = meetingTime.readableTime
             }
           }
 
-        for meetingType in meeting?.data?.meetingType ?? [MeetingType]() {
+        for meetingType in meeting.meetingType ?? [MeetingType]() {
           self.form
           +++ Section("Type of Event")
           <<< ButtonRow() {
@@ -176,12 +186,12 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
         self.form
           +++ Section("Event Description")
           <<< TextAreaRow("meeting_description") {
-            $0.value = self.meeting?.data?.meetingDescription ?? "No description provided."
+            $0.value = meeting.meetingDescription ?? "No description provided."
             $0.textAreaMode = .readOnly
             $0.textAreaHeight = .fixed(cellHeight: 125)
         }
 
-    if let meetingAgendaItems = meeting?.data?.agendaItems {
+    if let meetingAgendaItems = meeting.agendaItems {
       var section = Section("Agenda Items")
       for agendaItem in meetingAgendaItems {
         if let agendaItemName = agendaItem.itemName {
@@ -197,41 +207,75 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
 
     }
 
-    if let currentUser = SessionManager.shared.currentUser, let meetingOwner = meeting?.data?.owner?.first, let meetingOwnerId = meetingOwner.id, meetingOwnerId == currentUser.id  {
-          view.sendSubviewToBack(actionsContainerView)
-        } else {
-          view.bringSubviewToFront(actionsContainerView)
-          self.form
-            +++ Section { section in
-                section.header = {
-                  var header = HeaderFooterView<UIView>(.callback({
-                      let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 32))
-                      return view
-                  }))
-                  header.height = { 32 }
-                  return header
-                }()
+    if let currentUser = SessionManager.shared.currentUser, let meetingOwnerId = meeting.ownerId, meetingOwnerId == currentUser.uid  {
+      // Handle functionality here
+    } else {
+      self.form
+        +++ Section { section in
+            section.header = {
+              var header = HeaderFooterView<UIView>(.callback({
+                  let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 32))
+                  return view
+              }))
+              header.height = { 32 }
+              return header
+            }()
 
-              section.footer = {
-                var header = HeaderFooterView<UIView>(.callback({
-                    let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 75))
-                    return view
-                }))
-                header.height = { 75 }
-                return header
-              }()
-            }
-              <<< SwitchRow() {
-                $0.tag = "sending_a_response"
-                $0.title = "Send a response?"
-                }.onChange { [weak self] row in
-                  guard let responseValue = row.value else { return }
-                  self?.shouldSendRespone = responseValue
-            }
+          section.footer = {
+            var header = HeaderFooterView<UIView>(.callback({
+                let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 75))
+                return view
+            }))
+            header.height = { 75 }
+            return header
+          }()
         }
+          <<< SwitchRow() {
+            $0.tag = "sending_a_response"
+            $0.title = "Send a response?"
+            }.onChange { [weak self] row in
+              guard let responseValue = row.value else { return }
+              self?.shouldSendRespone = responseValue
+      }
+    }
 
-        animateScroll = true
-        rowKeyboardSpacing = 20
+    self.form
+      +++ Section()
+
+    animateScroll = true
+    rowKeyboardSpacing = 20
+  }
+
+  // MARK: - Use Case: Retrieve meeting by ID from server
+  func retrieveMeetingById() {
+    showHUD()
+    var request = RootedContent.RetrieveMeetingById.Request()
+    request.meetingId = self.meeting?.data?.id
+    request.meetingManagerDelegate = self
+    request.contentDB = .remote
+    interactor?.retrieveMeetingById(request: request)
+  }
+
+  func didFailToLoad(_ manager: Any?, error: Error) {
+    dismissHUD()
+    self.displayError(with: "Something went wrong!", and: "Event was either canceled or deleted. Please contact event organizer", withCompletion: {
+      self.dismiss(animated: true, completion: nil)
+    })
+  }
+
+  func didFinishLoading(_ manager: Any?, invites: [MeetingContextWrapper]) {
+    // Do something here
+  }
+
+  func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) {
+    dismissHUD()
+    guard let meeting = viewModel.meetings?.first?.meeting else {
+      self.displayError(with: "Something went wrong!", and: "Event was either canceled or deleted. Please contact event organizer", withCompletion: {
+        self.dismiss(animated: true, completion: nil)
+      })
+      return
+    }
+    loadFormWith(meeting: meeting)
   }
 
   // MARK: - Use Case: Check if app has access to calendar permissions
@@ -290,12 +334,28 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
     saveMeeting(meeting: meeting)
   }
 
+  // MARK: - Use Case: Accept meeting and add user as a participant
+  func acceptMeeting(meeting: Meeting) {
+    var request = RootedContent.AcceptMeeting.Request()
+    request.meeting = meeting
+    request.branchEventID = kBranchInviteAccepted
+    request.saveType = .receive
+    request.contentDB = .remote
+    interactor?.acceptMeeting(request: request)
+  }
+
+  func onSuccessfulAcceptance(viewModel: RootedContent.AcceptMeeting.ViewModel) {
+    guard let meeting = viewModel.meeting else { return }
+    sendResponse(.accept, to: meeting)
+  }
+
   // MARK: - Use Case: Save meeting to datastore
   func saveMeeting(meeting: Meeting) {
     var request = RootedContent.SaveMeeting.Request()
     request.meeting = meeting
     request.branchEventID = kBranchInviteAccepted
     request.saveType = .receive
+    request.contentDB = .remote
     interactor?.saveMeeting(request: request)
   }
 
@@ -408,5 +468,39 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
       NSLog("[ROOTED-IMESSAGE] InviteDetailsVC: User opted out of sending a response")
     })
     HUDFactory.displayAlert(with: "Propose a New Time", message: "Would you like to propose a new time for the meeting?", and: [sendResponseAction, noAction], on: self)
+  }
+
+  // MARK: - Use Case: Check if user is logged in and if not, show login screen
+  func presentPhoneLoginViewController() {
+    dismissHUD()
+    showError(title: "Login In", message: "You are not logged in. Please do so and try again.", style: .alert, defaultButtonText: "OK")
+  }
+
+  // MARK: - Use Case: On Successful login resume setting up the view controller
+  func onSucessfulLogin(_ sender: PhoneLoginViewController, uid: String?) {
+    sender.dismiss()
+    retrieveMeetingById()
+  }
+
+  // MARK: - Use Case: On failed login attempt, resume setting up the view controller
+  func handleFailedLogin(_ sender: PhoneLoginViewController, reason: String) {
+    // Don't do anything yet
+  }
+}
+
+// Reusable components
+extension InviteDetailsViewController {
+  // MARK: - Use Case: Show ProgressHUD
+  func showHUD() {
+    DispatchQueue.main.async {
+      self.progressHUD?.show()
+    }
+  }
+
+  // MARK: - Use Case: Dismiss ProgressHUD
+  func dismissHUD() {
+    DispatchQueue.main.async {
+      self.progressHUD?.dismiss()
+    }
   }
 }

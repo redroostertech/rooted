@@ -29,5 +29,7 @@ target 'Rooted MessagesExtension' do
   pod 'PhoneNumberKit', '~> 3.1'
   pod 'OnboardKit'
   pod 'FormTextField'
-
+  pod 'WordPress-Editor-iOS'
+  pod 'Gridicons'
+  
 end

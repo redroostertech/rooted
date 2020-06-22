@@ -35,8 +35,8 @@ public class Meeting: Mappable {
   public var meetingResponseIds: [Int]?
   public var createdAt, updatedAt: String?
 
-  public var owner: [UserProfileShortData]?
-  public var participants: [UserProfileShortData]?
+  public var owner: [UserProfileData]?
+  public var participants: [UserProfileData]?
   public var agendaItems: [AgendaItem]?
   public var files: [Media]?
   public var reminders: [Reminders]?
@@ -45,6 +45,7 @@ public class Meeting: Mappable {
   public var calendarId: String?
 
   public var meetingAgendaItems: [String]?
+  public var isChatEnabled: String?
   
   required public init?(map: Map) { }
 
@@ -79,6 +80,7 @@ public class Meeting: Mappable {
     meetingType <- map["meeting_type"]
     calendarId <- map["calendar_id"]
     meetingAgendaItems <- map["agenda_items_strings"]
+    isChatEnabled <- map["is_chat_enabled"]
   }
 }
 

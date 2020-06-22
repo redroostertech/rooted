@@ -11,6 +11,7 @@
 //
 
 import UIKit
+import OnboardKit
 
 protocol AuthenticationLogic: class {
   func onSucessfulLogin(_ sender: PhoneLoginViewController, uid: String?)
@@ -28,23 +29,50 @@ extension AuthenticationLogic {
 
 protocol PhoneLoginDisplayLogic: class {
   func onSuccessfulEmailAndPasswordLogin(viewModel: PhoneLogin.LoginViaEmailAndPassword.ViewModel)
-
+  func onSuccessfulForgotPassword(viewModel: PhoneLogin.ForgotPassword.ViewModel)
   func onSuccessfulSessionSet(viewModel: PhoneLogin.SetSession.ViewModel)
 
   /// Handle any and all scenarios when something goes wrong
   func handleError(viewModel: PhoneLogin.HandleError.ViewModel)
 }
 
+let kSubtitleSignInYourAccount = "Sign-in to your account"
+let kSubtitleForgotYourPassword = "Forgot your password?"
+let kButtonLogin = "Login"
+let kButtonCancel = "Go back to Login"
+let kButtonCreateNewPassword = "Create New Password"
+let kButtonForgotPassword = kSubtitleForgotYourPassword
+
 class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplayLogic, UITextFieldDelegate {
 
   @IBOutlet var loginButton: UIButton!
-  @IBOutlet weak var upArrowButton: UIButton!
+  @IBOutlet weak var forgotPasswordButton: UIButton!
+  @IBOutlet weak var subTitleLabel: UILabel!
 
   var interactor: PhoneLoginBusinessLogic?
   var router: (NSObjectProtocol & PhoneLoginRoutingLogic & PhoneLoginDataPassing)?
 
+  var isLogin: Bool! {
+    didSet {
+      self.form.removeAll()
+      switch self.isLogin {
+      case true:
+        self.subTitleLabel.text = kSubtitleSignInYourAccount
+        self.forgotPasswordButton.setTitle(kButtonForgotPassword, for: .normal)
+        self.loginButton.setTitle(kButtonLogin, for: .normal)
+        self.loadForm()
+      case false:
+        self.subTitleLabel.text = kSubtitleForgotYourPassword
+        self.forgotPasswordButton.setTitle(kButtonCancel, for: .normal)
+        self.loginButton.setTitle(kButtonCreateNewPassword, for: .normal)
+        self.loadForm()
+      case .none, .some(_):
+        break
+      }
+    }
+  }
+
   // MARK: Object lifecycle
-  
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     setup()
@@ -73,33 +101,39 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
   override func viewDidLoad() {
     super.viewDidLoad()
     loginButton.applyCornerRadius()
+    isLogin = true
+  }
+
+  func loadForm() {
+    self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
 
     form +++ Section()
-      <<< EmailRow(kFormEmailAddress) {
-        $0.placeholder = kFormEmailPlaceholder
-        $0.add(rule: RuleRequired())
-        $0.add(rule: RuleEmail())
-        $0.validationOptions = .validatesAlways
-        
-        if isDebug {
-          $0.value = kDebugEmail
-        }
-      }.cellUpdate { cell, row in
-        NavigationCoordinator.performExpandedNavigation(from: self) {
-          // Adjust view
-          if !row.isValid {
-            cell.textField.textColor = .systemRed
-            self.loginButton.isEnabled = false
-            self.loginButton.isUserInteractionEnabled = false
-          } else {
-            cell.textField.textColor = .black
-            self.loginButton.isEnabled = true
-            self.loginButton.isUserInteractionEnabled = true
-          }
+    <<< EmailRow(kFormEmailAddress) {
+      $0.placeholder = kFormEmailPlaceholder
+      $0.add(rule: RuleRequired())
+      $0.add(rule: RuleEmail())
+      $0.validationOptions = .validatesAlways
+
+      if isDebug {
+        $0.value = kDebugEmail
+      }
+    }.cellUpdate { cell, row in
+      NavigationCoordinator.performExpandedNavigation(from: self) {
+        // Adjust view
+        if !row.isValid {
+          cell.textField.textColor = .systemRed
+          self.loginButton.isEnabled = false
+          self.loginButton.isUserInteractionEnabled = false
+        } else {
+          cell.textField.textColor = .black
+          self.loginButton.isEnabled = true
+          self.loginButton.isUserInteractionEnabled = true
         }
       }
+    }
 
-      <<< PasswordRow(kFormPassword) {
+    if isLogin {
+      form.last! <<< PasswordRow(kFormPassword) {
         $0.placeholder = kFormPasswordPlaceholder
         $0.add(rule: RuleRequired())
         $0.validationOptions = .validatesAlways
@@ -107,7 +141,7 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
         if isDebug {
           $0.value = kDebugPassword
         }
-        
+
       }.cellUpdate { cell, row in
         NavigationCoordinator.performExpandedNavigation(from: self) {
           // Adjust view
@@ -122,10 +156,38 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
           }
         }
       }
+    }
   }
 
   @IBAction func loginAction(_ sender: UIButton) {
-    loginViaEmailAndPassword()
+    if isLogin {
+      self.loginViaEmailAndPassword()
+    } else {
+      self.forgotPassword()
+    }
+  }
+
+  // MARK: - Use Case: When a user forgets their password, send a request to retrieve new password
+  @IBAction func forgotPasswordAction(_ sender: UIButton) {
+    // Update UI
+    if isLogin {
+      isLogin = false
+    } else {
+      isLogin = true
+    }
+  }
+
+  func forgotPassword() {
+    showHUD()
+    var request = PhoneLogin.ForgotPassword.Request()
+    request.email = (form.rowBy(tag: kFormEmailAddress) as? EmailRow)?.value ?? ""
+    interactor?.forgotPassword(request: request)
+  }
+
+  func onSuccessfulForgotPassword(viewModel: PhoneLogin.ForgotPassword.ViewModel) {
+    dismissHUD()
+    displayError(with: "Forgot Password", and: "Successfully requested a new password.")
+    isLogin = true
   }
 
   // MARK: - Use Case: When a user provides their email and a password, try to log them in via Firebase

@@ -77,6 +77,23 @@ enum RootedContent {
     }
   }
 
+  // MARK: - Use Case: Retrieve meeting by ID for user
+  enum RetrieveMeetingById {
+    struct Request {
+      var meetingId: String?
+      var contentDB: RootedContentDB = .local
+      var meetingManagerDelegate: MeetingsManagerDelegate?
+    }
+
+    struct Response {
+      var meetings: [MeetingContextWrapper]?
+    }
+
+    struct ViewModel {
+      var meetings: [MeetingContextWrapper]?
+    }
+  }
+
   // MARK: - Use Case: Retrieve meetings for user
   enum RetrieveSentMeetings {
     struct Request {
@@ -229,6 +246,25 @@ enum RootedContent {
     struct Response { }
 
     struct ViewModel { }
+  }
+
+  // MARK: - Use Case: As a user I want to accpet a meeting I receive
+  enum AcceptMeeting {
+    struct Request {
+      var meeting: Meeting?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var branchEventID = ""
+      var saveType: RootedContentManagerType = .none
+    }
+
+    struct Response {
+      var meeting: Meeting?
+    }
+
+    struct ViewModel {
+      var meeting: Meeting?
+    }
   }
   
   enum DisplayError {

@@ -11,16 +11,22 @@ class EventKitManager: NSObject {
 
   override init() {
     super.init()
-    if UserDefaults.standard.string(forKey: "EventTrackerPrimaryCalendar") == nil {
-      createRootedCalendar()
-    }
+    setCalendar()
   }
 
   // MARK: - Private properties
   private let eventStore = EKEventStore()
 
-  static var calendarIdentifier: String {
+  static var calendarTitle: String {
     return "Rooted Calendar"
+  }
+
+  static var authStatus: Bool {
+    switch EKEventStore.authorizationStatus(for: .event) {
+    case .authorized: return true
+    case .denied, .notDetermined: return false
+    default: return false
+    }
   }
 
   static var calendarType: EKCalendarType {
@@ -51,16 +57,23 @@ class EventKitManager: NSObject {
     }
   }
 
-  // MARK: - Use Case: Set and create a `Rooted` calendar
-  func setCalendar() {
-    if UserDefaults.standard.string(forKey: "EventTrackerPrimaryCalendar") == nil {
-      createRootedCalendar()
-    }
+  // MARK: - Use Case: Retrieve default calendar
+  static var defaultRootedCalendar: String {
+    return UserDefaults.standard.string(forKey: "EventTrackerPrimaryCalendar") ?? "None"
   }
 
-  private func createRootedCalendar() {
+  // MARK: - Use Case: Set and create a `Rooted` calendar
+  func setCalendar() {
+    let calendars = eventStore.calendars(for: .event)
+    for abc in calendars {
+      if abc.title == EventKitManager.calendarTitle {
+        UserDefaults.standard.set(EventKitManager.calendarTitle, forKey: "EventTrackerPrimaryCalendar")
+        UserDefaults.standard.set(abc.calendarIdentifier, forKey: "EventTrackerPrimaryCalendarIdentifier")
+        return
+      }
+    }
     let newCalendar = EKCalendar(for: .event, eventStore: eventStore)
-    newCalendar.title = EventKitManager.calendarIdentifier
+    newCalendar.title = EventKitManager.calendarTitle
     newCalendar.source = eventStore.defaultCalendarForNewEvents?.source
     do {
       try eventStore.saveCalendar(newCalendar, commit: true)
@@ -83,9 +96,9 @@ class EventKitManager: NSObject {
 
   private func addToCalendar(meeting: Meeting, title: String, startDate: Date, endDate: Date, location: RLocation?, _ completion: @escaping (Meeting?, Bool, Error?) -> Void) {
 
-    if let calendarIdentifier = UserDefaults.standard.string(forKey: "EventTrackerPrimaryCalendar"), let calendar = eventStore.calendar(withIdentifier: calendarIdentifier) {
+    if let calendarIdentifier = UserDefaults.standard.string(forKey: "EventTrackerPrimaryCalendarIdentifier"), let calendar = eventStore.calendar(withIdentifier: calendarIdentifier) {
       let event = EKEvent(eventStore: eventStore)
-      event.title = title
+      event.title = "ROOTED INVITATION: \(title)"
       event.startDate = startDate
       event.endDate = endDate
       if let loc = location, let name = loc.name, let mapItem = loc.mapItem {
@@ -98,7 +111,7 @@ class EventKitManager: NSObject {
     } else {
       if let calendar = eventStore.defaultCalendarForNewEvents {
         let event = EKEvent(eventStore: eventStore)
-        event.title = title
+        event.title = "ROOTED INVITATION: \(title)"
         event.startDate = startDate
         event.endDate = endDate
         if let loc = location, let name = loc.name, let mapItem = loc.mapItem {
@@ -111,7 +124,7 @@ class EventKitManager: NSObject {
       } else {
         let calendar = eventStore.calendars(for: .event).first { $0.type == .calDAV || $0.type == .local }
         let event = EKEvent(eventStore: eventStore)
-        event.title = title
+        event.title = "ROOTED INVITATION: \(title)"
         event.startDate = startDate
         event.endDate = endDate
 
@@ -160,4 +173,41 @@ class EventKitManager: NSObject {
       completion(nil, false, RError.customError("There was an error retreiving the meeting."))
     }
   }
+
+  // MARK: - Use Case: Fetching events from a particular calendar
+  func getEventsFromCalenderWith(identifier: String, startingTimeInterval: TimeInterval, endingTimeInterval: TimeInterval) -> [EKEvent] {
+    let calendars = eventStore.calendars(for: .event)
+    for calendar in calendars {
+      if calendar.title == identifier {
+        let startingTime = Date(timeIntervalSinceNow: startingTimeInterval)
+        let endingTime = Date(timeIntervalSinceNow: endingTimeInterval)
+
+        let predicate = eventStore.predicateForEvents(withStart: startingTime, end: endingTime, calendars: [calendar])
+
+        let events = eventStore.events(matching: predicate)
+        var eventArray = [EKEvent]()
+        for event in events {
+          eventArray.append(event)
+        }
+        return eventArray
+      }
+    }
+    return [EKEvent]()
+  }
+
+  // MARK: - Use Case: Show list of current calendars
+  // TODO: - EKCalendarChooser is not supported in Extension apps. Look to create your own instance
+//  func showCalendarChooser() -> EKCalendarChooser {
+//    return EKCalendarChooser(selectionStyle: .single, displayStyle: .allCalendars, entityType: .event, eventStore: eventStore)
+//  }
+}
+
+extension EKEvent {
+    var hasGeoLocation: Bool {
+        return structuredLocation?.geoLocation != nil
+    }
+
+    var isBirthdayEvent: Bool {
+        return birthdayContactIdentifier != nil
+    }
 }

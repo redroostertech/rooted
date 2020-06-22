@@ -7,6 +7,8 @@ import NotificationCenter
 import CoreData
 import Branch
 import OnboardKit
+import Aztec
+import WordPressEditor
 
 class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLogic, MeetingsManagerDelegate, RootedCellDelegate, FloatingMenuBtnAction, AuthenticationLogic {
 
@@ -22,11 +24,12 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   public var toggleMenuButton = false
   private var menuSelection = 0
   private var menuItemImages: [UIImage] {
-    return [UIImage(named: "calendar-plus-sm")!, UIImage(named: "user-outline-male-symbol-of-interface-sm")!]
+    if isDebug {
+    return [UIImage(named: "calendar-plus-sm")!, UIImage(named: "gear-outlined-symbol-sm")!, UIImage(named: "nine-oclock-on-circular-clock-sm")!, UIImage(named: "cube-of-notes-stack-sm")!]
+    } else {
+      return [UIImage(named: "calendar-plus-sm")!, UIImage(named: "gear-outlined-symbol-sm")!]
+    }
   }
-//  private var menuItemImages: [UIImage] {
-//    return [UIImage(named: "plus")!, UIImage(named: "info")!, UIImage(named: "addavailability")!]
-//  }
 
   // MARK: - Private Properties
   private var interactor: RootedContentBusinessLogic?
@@ -68,7 +71,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   override func willBecomeActive(with conversation: MSConversation) {
     super.willBecomeActive(with: conversation)
-//    setupManagedSession()
+    SessionManager.refreshSession()
     setupBranchIO()
     setupConversationManager(using: conversation)
   }
@@ -216,10 +219,10 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   }
 
   func didFinishLoading(_ manager: Any?, invites: [MeetingContextWrapper]) {
-    dismissHUD()
-    // Filter invites by segment index
-    let rootedCollectionViewModel = EngagementFactory.Meetings.convert(contextWrappers: invites, for: menuSelection, withDelegate: self)
-    loadCells(cells: rootedCollectionViewModel)
+//    dismissHUD()
+//    Filter invites by segment index
+//    let rootedCollectionViewModel = EngagementFactory.Meetings.convert(contextWrappers: invites, for: menuSelection, withDelegate: self)
+//    loadCells(cells: rootedCollectionViewModel)
   }
 
   func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) {
@@ -318,7 +321,10 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     case 2:
       // MARK: - Use Case: Go to `AvailabilityNavigationViewController`
       self.goToAvailabilityNavigationView()
-
+    case 3:
+      // MARK: - Use Case: Go to `BeginCollaborationViewController`
+      let controller = EditorDemoController(wordPressMode: false)
+      self.present(controller, animated: true, completion: nil)
     default:
       RRLogger.log(message: "Unsupported menu action", owner: self)
       break
@@ -367,39 +373,27 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   private func share(meeting: Meeting?) {
     guard
       let subject = meeting,
+      let meetingname = subject.meetingName,
+      let startdate = subject.meetingDate?.startDate?.toDate()?.date,
+      let _ = subject.meetingDate?.endDate?.toDate()?.date,
       let message = EngagementFactory.Meetings.meetingToMessage(subject) else {
       self.showError(title: "Error", message: "There was an error trying to share the invite into the current conversation. Please try again.")
       return
     }
 
     // Insert into conversation
-    ConversationManager.shared.conversation?.insert(message, completionHandler: { error in
+    ConversationManager.shared.send(message: message, of: .insert) { (success, error) in
       if let err = error {
         RRLogger.logError(message: "There was an error", owner: self, error: err)
-        self.showError(title: err.localizedDescription, message: err.localizedDescription)
+        self.showError(title: "Oops!", message: err.localizedDescription)
       } else {
         // Do something if it was successful
+        let pasteboard = UIPasteboard.general
+        pasteboard.string = String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
+
+        self.displayError(with: "Copied to Clipboard!", and: "Event invitation was copied to your clipboard.")
       }
-    })
-  }
-
-  // MARK: - Use Case: Remove meeting from users calendar
-  private func removeFromCalendar(_ meeting: RootedCellViewModel?) {
-    guard let subject = meeting else {
-      RRLogger.log(message: "There was an error trying to remove the meeting. Please try again.", owner: self)
-      return
     }
-    var request = RootedContent.RemoveFromCalendar.Request()
-    request.meeting = subject
-    self.interactor?.removeMeetingFromCalendar(request: request)
-  }
-
-  func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
-    RRLogger.log(message: "Successfully removed meeting from calendar", owner: self)
-  }
-
-  func onFailedCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
-    RRLogger.log(message: "Failed to remove meeting from calendar. Error message: \(viewModel.errorMessage)", owner: self)
   }
 
   // MARK: - Use Case: Delete a meeting from the table view
@@ -445,6 +439,25 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
   }
 
+  // MARK: - Use Case: Remove meeting from users calendar
+  private func removeFromCalendar(_ meeting: RootedCellViewModel?) {
+    guard let subject = meeting else {
+      RRLogger.log(message: "There was an error trying to remove the meeting. Please try again.", owner: self)
+      return
+    }
+    var request = RootedContent.RemoveFromCalendar.Request()
+    request.meeting = subject
+    self.interactor?.removeMeetingFromCalendar(request: request)
+  }
+
+  func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
+    RRLogger.log(message: "Successfully removed meeting from calendar", owner: self)
+  }
+
+  func onFailedCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
+    RRLogger.log(message: "Failed to remove meeting from calendar. Error message: \(viewModel.errorMessage)", owner: self)
+  }
+
   // MARK: - Routing Logic
   // MARK: - Use Case: Go to add an meeting view
   func goToCreateNewMeetingView() {
@@ -484,6 +497,14 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   // MARK: - Use Case: Check if user is logged in and if not, show login screen
   func presentPhoneLoginViewController() {
+
+    // Dismiss HUD
+    dismissHUD()
+
+    // Clear table
+    clearTable()
+
+    // Handle presentation of PhoneLoginViewController
     let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
 
     let middleVC = sb.instantiateViewController(withIdentifier: kPhoneLoginViewController) as! PhoneLoginViewController

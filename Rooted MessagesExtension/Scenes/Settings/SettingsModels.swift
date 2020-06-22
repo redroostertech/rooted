@@ -12,20 +12,34 @@
 
 import UIKit
 
-enum Settings
-{
-  // MARK: Use cases
-  
-  enum Something
-  {
-    struct Request
-    {
+enum Settings {
+
+  // MARK: - Use Case: A user wants to logout
+  enum LogoutUser {
+    struct Request {
+
     }
-    struct Response
-    {
+
+    struct Response {
+      var errorMessage: String = ""
     }
-    struct ViewModel
-    {
+
+    struct ViewModel {
+      var errorMessage: String = ""
+    }
+  }
+
+  enum DisplayError {
+    struct Request { }
+
+    struct Response {
+      var errorTitle: String = ""
+      var errorMessage: String = ""
+    }
+
+    struct ViewModel {
+      var errorTitle: String = ""
+      var errorMessage: String = ""
     }
   }
 }

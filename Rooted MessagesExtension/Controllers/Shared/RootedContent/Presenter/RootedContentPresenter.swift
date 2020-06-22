@@ -34,6 +34,7 @@ protocol RootedContentPresentationLogic {
 
   func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response)
 
+  func onSuccessfulAcceptance(response: RootedContent.AcceptMeeting.Response)
 }
 
 extension RootedContentPresentationLogic {
@@ -57,6 +58,8 @@ extension RootedContentPresentationLogic {
   func onFailedCalendarRemoval(response: RootedContent.RemoveFromCalendar.Response) { }
 
   func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response) { }
+
+  func onSuccessfulAcceptance(response: RootedContent.AcceptMeeting.Response) { }
 }
 
 class RootedContentPresenter: RootedContentPresentationLogic {
@@ -157,5 +160,11 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     var viewModel = RootedContent.DeleteMeeting.ViewModel()
     viewModel.meeting = response.meeting
     viewController?.onDidDeleteMeeting(viewModel: viewModel)
+  }
+
+  func onSuccessfulAcceptance(response: RootedContent.AcceptMeeting.Response) {
+    var viewModel = RootedContent.AcceptMeeting.ViewModel()
+    viewModel.meeting = response.meeting
+    viewController?.onSuccessfulAcceptance(viewModel: viewModel)
   }
 }

@@ -12,30 +12,20 @@
 
 import UIKit
 
-protocol SettingsBusinessLogic
-{
-  func doSomething(request: Settings.Something.Request)
+protocol SettingsBusinessLogic {
+  func logoutUser(request: Settings.LogoutUser.Request)
 }
 
-protocol SettingsDataStore
-{
-  //var name: String { get set }
+protocol SettingsDataStore {
 }
 
-class SettingsInteractor: SettingsBusinessLogic, SettingsDataStore
-{
+class SettingsInteractor: SettingsBusinessLogic, SettingsDataStore {
   var presenter: SettingsPresentationLogic?
   var worker: SettingsWorker?
-  //var name: String = ""
-  
-  // MARK: Do something
-  
-  func doSomething(request: Settings.Something.Request)
-  {
-    worker = SettingsWorker()
-    worker?.doSomeWork()
-    
-    let response = Settings.Something.Response()
-    presenter?.presentSomething(response: response)
+
+  func logoutUser(request: Settings.LogoutUser.Request) {
+    SessionManager.clearSession()
+    let response = Settings.LogoutUser.Response()
+    self.presenter?.onSuccessfullLogout(response: response)
   }
 }

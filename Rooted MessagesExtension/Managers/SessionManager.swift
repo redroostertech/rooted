@@ -100,9 +100,63 @@ class SessionManager {
   // MARK: - Use Case: As a user, I want to be able to clear a session
   static func clearSession()  {
     let defaultsManager = DefaultsManager.shared
+    defaultsManager.setNilDefault(forKey: kSessionUserId)
     defaultsManager.setNilDefault(forKey: kSessionUser)
     defaultsManager.setNilDefault(forKey: kSessionStart)
     defaultsManager.setNilDefault(forKey: kSessionLastLogin)
     defaultsManager.setNilDefault(forKey: kSessionCart)
   }
+
+  static func refreshSession() {
+    guard let currentUser = SessionManager.shared.currentUser, let email = currentUser.email, let token = currentUser.token else {
+      SessionManager.clearSession()
+      return
+    }
+    let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
+    let params: [String: String] = [
+      "action": "session_check",
+      "email": email,
+      "token": token
+    ]
+    let apiService = Api()
+    apiService.performRequest(path: path,
+                              method: .post,
+                              parameters: params) { (results, error) in
+
+                                guard error == nil else {
+                                  RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                  SessionManager.clearSession()
+                                  return
+                                }
+
+                                guard let resultsDict = results as? [String: Any] else {
+                                  RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                  SessionManager.clearSession()
+                                  return
+                                }
+
+                                RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                if let success = resultsDict["success"] as? Bool {
+                                  if success {
+                                    if let data = resultsDict["data"] as? [String: Any], let uid = data["uid"] as? String, let userDataDict = (data["user"] as? [[String: Any]])?.first, let userData = UserProfileData(JSON: userDataDict) {
+                                      SessionManager.refresh(with: userData)
+                                    } else {
+                                      SessionManager.clearSession()
+                                    }
+                                  } else {
+                                    SessionManager.clearSession()
+                                  }
+                                }
+    }
+  }
+
+  static func refresh(with user: UserProfileData) {
+    let defaultsManager = DefaultsManager.shared
+    // Start a new session with the provided user object
+    if let userJsonString = user.toJSONString() {
+      defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)
+    }
+  }
+
 }

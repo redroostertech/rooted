@@ -14,6 +14,7 @@ import UIKit
 
 protocol PhoneLoginPresentationLogic {
   func onSuccessfulEmailAndPasswordLogin(response: PhoneLogin.LoginViaEmailAndPassword.Response)
+  func onSuccessfulForgotPassword(response: PhoneLogin.ForgotPassword.Response)
   func startUserSession(response: PhoneLogin.SetSession.Response)
   func handleError(response: PhoneLogin.HandleError.Response)
 }
@@ -26,6 +27,12 @@ class PhoneLoginPresenter: PhoneLoginPresentationLogic {
     viewModel.userId = response.userId
     viewModel.userData = response.userData
     viewController?.onSuccessfulEmailAndPasswordLogin(viewModel: viewModel)
+  }
+
+  func onSuccessfulForgotPassword(response: PhoneLogin.ForgotPassword.Response) {
+    var viewModel = PhoneLogin.ForgotPassword.ViewModel()
+    viewModel.emailSent = response.emailSent
+    viewController?.onSuccessfulForgotPassword(viewModel: viewModel)
   }
 
   func startUserSession(response: PhoneLogin.SetSession.Response) {

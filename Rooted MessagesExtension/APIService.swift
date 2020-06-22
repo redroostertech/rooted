@@ -29,7 +29,13 @@ enum Api_V2 {
 
 final class PathBuilder {
   public static func build(_ path: Api.Service, in service: Api_V2, with endpoint: String) -> String {
-    return String(format: "%@%@%@", arguments: [path.url, service.bucket, endpoint])
+    if isDebug {
+      RRLogger.log(message: "Using url: \(Api.Service.Test.url)", owner: self)
+      return String(format: "%@%@%@", arguments: [Api.Service.Test.url, service.bucket, endpoint])
+    } else {
+      RRLogger.log(message: "Using url: \(Api.Service.Live.url)", owner: self)
+      return String(format: "%@%@%@", arguments: [Api.Service.Live.url, service.bucket, endpoint])
+    }
   }
 }
 

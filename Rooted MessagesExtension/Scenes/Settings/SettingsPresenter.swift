@@ -12,20 +12,29 @@
 
 import UIKit
 
-protocol SettingsPresentationLogic
-{
-  func presentSomething(response: Settings.Something.Response)
+protocol SettingsPresentationLogic {
+  func onSuccessfullLogout(response: Settings.LogoutUser.Response)
+  func onFailedLogout(response: Settings.LogoutUser.Response)
+  func handleError(response: Settings.DisplayError.Response)
 }
 
-class SettingsPresenter: SettingsPresentationLogic
-{
+class SettingsPresenter: SettingsPresentationLogic {
   weak var viewController: SettingsDisplayLogic?
-  
-  // MARK: Do something
-  
-  func presentSomething(response: Settings.Something.Response)
-  {
-    let viewModel = Settings.Something.ViewModel()
-    viewController?.displaySomething(viewModel: viewModel)
+
+  func onSuccessfullLogout(response: Settings.LogoutUser.Response) {
+    let viewModel = Settings.LogoutUser.ViewModel()
+    viewController?.onSuccessfullLogout(viewModel: viewModel)
+  }
+  func onFailedLogout(response: Settings.LogoutUser.Response) {
+    var viewModel = Settings.LogoutUser.ViewModel()
+    viewModel.errorMessage = response.errorMessage
+    viewController?.onFailedLogout(viewModel: viewModel)
+  }
+
+  func handleError(response: Settings.DisplayError.Response) {
+    var viewModel = Settings.DisplayError.ViewModel()
+    viewModel.errorTitle = response.errorTitle
+    viewModel.errorMessage = response.errorMessage
+    viewController?.handleError(viewModel: viewModel)
   }
 }

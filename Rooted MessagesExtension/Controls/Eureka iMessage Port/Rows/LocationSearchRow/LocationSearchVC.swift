@@ -88,6 +88,13 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
   private var searchResults = [MKLocalSearchCompletionWrapper]()
   private var initialAuthSet = false
 
+  public var rowValue: MKLocalSearchCompletionWrapper? {
+    didSet {
+      RRLogger.log(message: "Row value was set", owner: self)
+      self.onDismissCallback?(self)
+    }
+  }
+  
   required public init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
   }
@@ -165,7 +172,7 @@ extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         let searchResult = searchResults[indexPath.row]
         row.value = searchResult
-        self.onDismissCallback?(self)
+        rowValue = searchResult
     }
 }
 
@@ -247,35 +254,35 @@ open class MKLocalSearchCompletionWrapper: SuggestionValue {
       address1 += thoroughfare
     }
 
-    dict["address_1"] = address1
+    dict["address_line_1"] = address1
 
     if let name = mapItem.name {
       dict["name"] = name
     }
 
     if let city = mapItem.placemark.locality {
-      dict["city"] = city
+      dict["address_city"] = city
     }
 
     if let state =  mapItem.placemark.administrativeArea {
-      dict["state"] = state
+      dict["address_state"] = state
     }
 
     if let state_sh = mapItem.placemark.subAdministrativeArea {
-      dict["state_sh"] = state_sh
+      dict["address_state_sh"] = state_sh
     }
 
     if let country = mapItem.placemark.countryCode {
-      dict["country"] = country
+      dict["address_country"] = country
     }
 
     if let zip_code = mapItem.placemark.postalCode {
-      dict["zip_code"] = zip_code
+      dict["address_zip"] = zip_code
     }
 
-    dict["coordinates"] = [
-      "long": mapItem.placemark.coordinate.longitude,
-      "lat": mapItem.placemark.coordinate.latitude
+    dict["address_coordinates"] = [
+      "address_long": mapItem.placemark.coordinate.longitude,
+      "address_lat": mapItem.placemark.coordinate.latitude
     ]
 
     dict["meta_information"] = [

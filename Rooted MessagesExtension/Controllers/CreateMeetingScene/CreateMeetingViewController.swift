@@ -168,8 +168,6 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
   private func setupForm() {
     form
           +++ Section("Create Invite")
-
-          +++ Section("What?")
           <<< TextRow() {
             $0.tag = "meeting_name"
             $0.title = "Event Name"
@@ -194,8 +192,9 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
             $0.tag = "event_label"
             $0.hidden = .function(["meeting_location"], { form -> Bool in
               if let row = form.rowBy(tag: "meeting_location") as? LocationSearchRow {
-                if let labelRow = form.rowBy(tag: "event_label") as? LabelRow {
-                  labelRow.title = row.value?.suggestionString ?? ""
+                if let labelRow = form.rowBy(tag: "event_label") as? LabelRow, let rowValue = row.value {
+                  self.selectedLocation = rowValue.rLocation?.toJSONString() ?? ""
+                  labelRow.title = rowValue.suggestionString ?? ""
                   labelRow.updateCell()
                 }
                 return row.value == nil
@@ -221,6 +220,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
           <<< URLRow() {
             $0.tag = "type_of_meeting_video"
             $0.title = "Web Conference (URL)"
+            $0.disabled = true
           }
 
           +++ Section("When?")
@@ -310,50 +310,55 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
               }
             }
 
+      <<< PushRow<String>("availability_time_id") {
+          $0.title = "Provide available times for selection"
+          $0.disabled = true
+      }
+
           +++ Section(header:"Description", footer: "Use this optional field to provide a description of your event. The circled text in the screen shot below is the event description.")
           <<< TextAreaRow("meeting_description") {
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 75)
         }
 
-    +++ MultivaluedSection { section in
-        section.header = {
-          var header = HeaderFooterView<UIView>(.callback({
-              let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 32))
-              return view
-          }))
-          header.title = "Create Agenda"
-          header.height = { 32 }
-          return header
-        }()
-      
-      section.footer = {
-        var header = HeaderFooterView<UIView>(.callback({
-            let view = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 75))
-            return view
-        }))
-        header.title = "Add items to the agenda"
-        header.height = { 75 }
-        return header
-      }()
+      +++ MultivaluedSection(multivaluedOptions: [.Reorder, .Insert, .Delete],
+      header: "Create Agenda") {
 
-      section.multivaluedOptions = [.Reorder, .Insert, .Delete]
-      section.tag = "agenda_items"
-      section.addButtonProvider = { section in
+      $0.multivaluedOptions = [.Reorder, .Insert, .Delete]
+      $0.tag = "agenda_items"
+      $0.addButtonProvider = { section in
           return ButtonRow(){
               $0.title = "Add Item"
               }.cellUpdate { cell, row in
                   cell.textLabel?.textAlignment = .left
           }
       }
-      section.multivaluedRowToInsertAt = { index in
+      $0.multivaluedRowToInsertAt = { index in
           return NameRow() {
               $0.placeholder = "Agenda Item"
           }
       }
-      section <<< NameRow() {
+      $0 <<< NameRow() {
           $0.placeholder = "Agenda Item"
       }
     }
+
+    +++ Section("Add-Ons")
+      <<< SwitchRow("is_chat_enabled") {
+        $0.title = "Add chat collaboration to meeting"
+        $0.disabled = true
+    }
+
+      <<< PushRow<String>("attached_project_id") {
+          $0.title = "Attach a project to meeting"
+          $0.disabled = true
+      }
+
+      <<< PushRow<String>("onboarding_project_id") {
+          $0.title = "Attach a pre-screening form"
+          $0.disabled = true
+      }
+
+    +++ Section()
   }
 
   // MARK: - Use Case: Start animating button
@@ -495,7 +500,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
   // MARK: - Use Case: Send message containing meeting data to MSMessage
   func sendResponse(to meeting: Meeting) {
-    guard let message = EngagementFactory.Meetings.meetingToMessage(meeting) else {
+    guard let meetingname = meeting.meetingName, let startdate = meeting.meetingDate?.startDate?.toDate()?.date, let _ = meeting.meetingDate?.endDate?.toDate()?.date, let message = EngagementFactory.Meetings.meetingToMessage(meeting) else {
       return self.displayFailure(with: "Oops!", and: "Something went wrong while sending message. Please try again.", afterAnimating: self.sendToFriendsButton)
     }
     conversationManager.send(message: message, of: .insert) { (success, error) in
@@ -504,12 +509,19 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
       } else {
         self.displaySuccess(afterAnimating: self.sendToFriendsButton, completion: {
           self.postNotification(withName: kNotificationMyInvitesReload, completion: {
-            self.dismiss(animated: true, completion: nil)
+            let pasteboard = UIPasteboard.general
+            pasteboard.string = String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
+
+            self.displayError(with: "Copied to Clipboard!", and: "Event invitation was copied to your clipboard.", withCompletion: {
+              self.dismiss(animated: true, completion: nil)
+            })
           })
         })
       }
     }
   }
+
+  // MARK: - Use Case: Notify user that message was copied to clipboard
 
   @IBAction func cancelAction(_ sender: UIButton) {
     dismissView()
