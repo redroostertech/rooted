@@ -175,4 +175,10 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     viewModel.meeting = response.meeting
     viewController?.onSuccessfulAcceptance(viewModel: viewModel)
   }
+
+  func onSuccessfulAppleCalendarRead(response: RootedContent.ReadEventsAppleCalendar.Response) {
+    var viewModel = RootedContent.ReadEventsAppleCalendar.ViewModel()
+    viewModel.events = response.events
+    viewController?.onSuccessfulAppleCalendarRead(viewModel: viewModel)
+  }
 }

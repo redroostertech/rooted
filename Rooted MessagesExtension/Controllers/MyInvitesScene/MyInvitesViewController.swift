@@ -266,6 +266,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
       self.retrieveSentMeetings()
     default:
       self.retrieveMeetings()
+      self.readFromAppleCalendar()
     }
   }
 
@@ -530,6 +531,19 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   func handleFailedLogin(_ sender: PhoneLoginViewController, reason: String) {
     // Don't do anything yet
   }
+
+  // MARK: - PROOF OF CONCEPT
+  // MARK: - Use Case: Read Events from Apple Calendar
+  func readFromAppleCalendar() {
+    let request = RootedContent.ReadEventsAppleCalendar.Request()
+    interactor?.readEventsFromAppleCalendar(request: request)
+  }
+
+  func onSuccessfulAppleCalendarRead(viewModel: RootedContent.ReadEventsAppleCalendar.ViewModel) {
+    guard let events = viewModel.events else { return }
+    print("Events from calendar")
+    print(events)
+  }
 }
 
 // Reusable components
@@ -557,6 +571,7 @@ extension MyInvitesViewController {
   func handleCalendarPermissionsCheck(viewModel: RootedContent.CheckCalendarPermissions.ViewModel) {
     if viewModel.isGranted {
       self.retrieveMeetings()
+      self.readFromAppleCalendar()
     } else {
       let appearance = OnboardViewController.AppearanceConfiguration(tintColor: .systemBlue,
                                                                      titleColor: .black,
@@ -597,6 +612,7 @@ extension MyInvitesViewController {
     RRLogger.log(message: "Calendar Permissions: \(viewModel.isGranted)", owner: self)
     if viewModel.isGranted {
       self.retrieveMeetings()
+      self.readFromAppleCalendar()
     } else {
       self.showCalendarError()
     }
