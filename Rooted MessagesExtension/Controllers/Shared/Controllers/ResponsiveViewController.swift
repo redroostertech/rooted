@@ -91,7 +91,7 @@ class ResponsiveViewController: BaseAppViewController {
 
       maincollectionviewcontroller.emptyDataSetView { view in
         view.titleLabelString(NSAttributedString(string: "Welcome"))
-        .detailLabelString(NSAttributedString(string: "Using the menu icon, expand the app to get started"))
+        .detailLabelString(NSAttributedString(string: "Using the menu icon, expand the app to get started."))
           .image(UIImage(named: "Rooted-sm"))
           .dataSetBackgroundColor(UIColor.white)
           .shouldDisplay(true)

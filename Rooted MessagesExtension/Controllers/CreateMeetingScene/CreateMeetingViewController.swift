@@ -219,7 +219,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
         }
           <<< URLRow() {
             $0.tag = "type_of_meeting_video"
-            $0.title = "Web Conference (URL)"
+            $0.title = "*Web Conference (URL)"
             $0.disabled = true
           }
 
@@ -311,7 +311,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
             }
 
       <<< PushRow<String>("availability_time_id") {
-          $0.title = "Provide available times for selection"
+          $0.title = "*Provide available times for selection"
           $0.disabled = true
       }
 
@@ -344,21 +344,21 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
     +++ Section("Add-Ons")
       <<< SwitchRow("is_chat_enabled") {
-        $0.title = "Add chat collaboration to meeting"
+        $0.title = "*Add chat collaboration to meeting"
         $0.disabled = true
     }
 
       <<< PushRow<String>("attached_project_id") {
-          $0.title = "Attach a project to meeting"
+          $0.title = "*Attach a project to meeting"
           $0.disabled = true
       }
 
       <<< PushRow<String>("onboarding_project_id") {
-          $0.title = "Attach a pre-screening form"
+          $0.title = "*Attach a pre-screening form"
           $0.disabled = true
       }
 
-    +++ Section()
+    +++ Section("(*) Features that are disabled are reserved for the premium version of Rooted.")
   }
 
   // MARK: - Use Case: Start animating button
