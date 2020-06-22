@@ -35,6 +35,10 @@ protocol RootedContentPresentationLogic {
   func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response)
 
   func onSuccessfulAcceptance(response: RootedContent.AcceptMeeting.Response)
+
+  func onSuccessfulAppleCalendarRead(response: RootedContent.ReadEventsAppleCalendar.Response)
+  func onSuccessfulGoogleCalendarRead(response: RootedContent.ReadEventsGoogleCalendar.Response)
+  func onSuccessfulOutlookCalendarRead(response: RootedContent.ReadEventsOutlookCalendar.Response)
 }
 
 extension RootedContentPresentationLogic {
@@ -60,6 +64,10 @@ extension RootedContentPresentationLogic {
   func onSuccessfulAvailabilitySave(response: RootedContent.SaveAvailability.Response) { }
 
   func onSuccessfulAcceptance(response: RootedContent.AcceptMeeting.Response) { }
+
+  func onSuccessfulAppleCalendarRead(response: RootedContent.ReadEventsAppleCalendar.Response) { }
+  func onSuccessfulGoogleCalendarRead(response: RootedContent.ReadEventsGoogleCalendar.Response) { }
+  func onSuccessfulOutlookCalendarRead(response: RootedContent.ReadEventsOutlookCalendar.Response) { }
 }
 
 class RootedContentPresenter: RootedContentPresentationLogic {

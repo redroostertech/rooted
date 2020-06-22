@@ -33,6 +33,10 @@ protocol RootedContentDisplayLogic: class {
   func onDidDeleteMeeting(viewModel: RootedContent.DeleteMeeting.ViewModel)
 
   func onSuccessfulAcceptance(viewModel: RootedContent.AcceptMeeting.ViewModel)
+
+  func onSuccessfulAppleCalendarRead(viewModel: RootedContent.ReadEventsAppleCalendar.ViewModel)
+  func onSuccessfulGoogleCalendarRead(viewModel: RootedContent.ReadEventsGoogleCalendar.ViewModel)
+  func onSuccessfulOutlookCalendarRead(viewModel: RootedContent.ReadEventsOutlookCalendar.ViewModel)
 }
 
 extension RootedContentDisplayLogic {
@@ -59,4 +63,8 @@ extension RootedContentDisplayLogic {
   func onDidDeleteMeeting(viewModel: RootedContent.DeleteMeeting.ViewModel) { }
 
   func onSuccessfulAcceptance(viewModel: RootedContent.AcceptMeeting.ViewModel) { }
+
+  func onSuccessfulAppleCalendarRead(viewModel: RootedContent.ReadEventsAppleCalendar.ViewModel) { }
+  func onSuccessfulGoogleCalendarRead(viewModel: RootedContent.ReadEventsGoogleCalendar.ViewModel) { }
+  func onSuccessfulOutlookCalendarRead(viewModel: RootedContent.ReadEventsOutlookCalendar.ViewModel) { }
 }

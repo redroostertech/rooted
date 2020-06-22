@@ -174,25 +174,30 @@ class EventKitManager: NSObject {
     }
   }
 
-  // MARK: - Use Case: Fetching events from a particular calendar
-  func getEventsFromCalenderWith(identifier: String, startingTimeInterval: TimeInterval, endingTimeInterval: TimeInterval) -> [EKEvent] {
+  // MARK: - Use Case: Fetch Events from ALL Calendars
+  func getEventsFromCalendars(startingTimeInterval: TimeInterval, endingTimeInterval: TimeInterval) -> [EKEvent] {
     let calendars = eventStore.calendars(for: .event)
+    var eventArray = [EKEvent]()
     for calendar in calendars {
-      if calendar.title == identifier {
-        let startingTime = Date(timeIntervalSinceNow: startingTimeInterval)
-        let endingTime = Date(timeIntervalSinceNow: endingTimeInterval)
-
-        let predicate = eventStore.predicateForEvents(withStart: startingTime, end: endingTime, calendars: [calendar])
-
-        let events = eventStore.events(matching: predicate)
-        var eventArray = [EKEvent]()
-        for event in events {
-          eventArray.append(event)
-        }
-        return eventArray
-      }
+      let events = getEventsFromCalendar(calendar, startingTimeInterval: startingTimeInterval, endingTimeInterval: endingTimeInterval)
+      eventArray.append(contentsOf: events)
     }
-    return [EKEvent]()
+    return eventArray
+  }
+
+  // MARK: - Use Case: Fetching events from a particular calendar
+  func getEventsFromCalendar(_ calendar: EKCalendar, startingTimeInterval: TimeInterval, endingTimeInterval: TimeInterval) -> [EKEvent] {
+    let startingTime = Date(timeIntervalSinceNow: startingTimeInterval)
+    let endingTime = Date(timeIntervalSinceNow: endingTimeInterval)
+
+    let predicate = eventStore.predicateForEvents(withStart: startingTime, end: endingTime, calendars: [calendar])
+
+    let events = eventStore.events(matching: predicate)
+    var eventArray = [EKEvent]()
+    for event in events {
+      eventArray.append(event)
+    }
+    return eventArray
   }
 
   // MARK: - Use Case: Show list of current calendars

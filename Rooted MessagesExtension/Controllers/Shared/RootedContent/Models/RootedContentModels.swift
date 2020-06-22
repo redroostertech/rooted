@@ -12,6 +12,7 @@
 
 import UIKit
 import CoreData
+import EventKit
 
 enum RootedContentDB {
   case remote
@@ -266,7 +267,45 @@ enum RootedContent {
       var meeting: Meeting?
     }
   }
-  
+
+  // MARK: - Use Case: Read Events from Apple Calendar
+  enum ReadEventsAppleCalendar {
+    struct Request {
+    }
+
+    struct Response {
+      var events: [EKEvent]?
+    }
+
+    struct ViewModel {
+      var events: [EKEvent]?
+    }
+  }
+
+  // MARK: - Use Case: Read Events from Google Calendar
+  enum ReadEventsGoogleCalendar {
+    struct Request {
+    }
+
+    struct Response {
+    }
+
+    struct ViewModel {
+    }
+  }
+
+  // MARK: - Use Case: Read Events from MicrosoftOutlook Calendar
+  enum ReadEventsOutlookCalendar {
+    struct Request {
+    }
+
+    struct Response {
+    }
+
+    struct ViewModel {
+    }
+  }
+
   enum DisplayError {
     struct Request { }
 

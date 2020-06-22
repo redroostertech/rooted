@@ -32,6 +32,10 @@ protocol RootedContentBusinessLogic: class {
   func saveAvailability(request: RootedContent.SaveAvailability.Request)
   func goToInfoView(request: RootedContent.InfoView.Request)
   func acceptMeeting(request: RootedContent.AcceptMeeting.Request)
+
+  func readEventsFromAppleCalendar(request: RootedContent.ReadEventsAppleCalendar.Request)
+  func readEventsFromGoogleCalendar(request: RootedContent.ReadEventsGoogleCalendar.Request)
+  func readEventsFromOutlookCalendar(request: RootedContent.ReadEventsOutlookCalendar.Request)
 }
 
 protocol RootedContentDataStore {
@@ -405,6 +409,11 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
 
   // MARK: - Use Case: Remove meeting from users calendar
   func removeMeetingFromCalendar(request: RootedContent.RemoveFromCalendar.Request) {
+    guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
     guard let meeting = request.meeting?.data else { return }
     eventKitManager.removeFromCalendar(meeting: meeting) { (mtng, success, error) in
       if let err = error {
@@ -682,10 +691,36 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
     }
   }
 
+  // MARK: - Use Case: Read Events from Apple Calendar
+  func readEventsFromAppleCalendar(request: RootedContent.ReadEventsAppleCalendar.Request) {
+
+    guard SessionManager.shared.sessionExists, let _ = SessionManager.shared.currentUser?.uid else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
+    // Get events up to 1 week from today
+    guard let startTimeInterval = TimeInterval(exactly: 0), let endTimeInterval = TimeInterval(exactly: 7 * 24 * 60 * 60) else { return }
+
+    var response = RootedContent.ReadEventsAppleCalendar.Response()
+    response.events = eventKitManager.getEventsFromCalendars(startingTimeInterval: startTimeInterval, endingTimeInterval: endTimeInterval)
+    presenter?.onSuccessfulAppleCalendarRead(response: response)
+  }
+
+  // MARK: - Use Case: Read Events from Google Calendar
+  func readEventsFromGoogleCalendar(request: RootedContent.ReadEventsGoogleCalendar.Request) {
+    // Not supported yet
+  }
+
+  // MARK: - Use Case: Read Events from Outlook Calendar
+  func readEventsFromOutlookCalendar(request: RootedContent.ReadEventsOutlookCalendar.Request) {
+    // Not supported yet
+  }
+
   // MARK: - Navigation
   // MARK: - Use Case: Go to add an meeting view
   func goToCreateNewMeetingView(request: RootedContent.CreateNewMeeting.Request) {
-    guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+    guard SessionManager.shared.sessionExists, let _ = SessionManager.shared.currentUser?.uid else {
       self.presenter?.onPresentPhoneLoginViewController()
       return
     }
@@ -702,7 +737,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
 
   // MARK: - Use Case: Go to `InfoViewController`
   func goToInfoView(request: RootedContent.InfoView.Request) {
-   guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+   guard SessionManager.shared.sessionExists, let _ = SessionManager.shared.currentUser?.uid else {
      self.presenter?.onPresentPhoneLoginViewController()
      return
    }
