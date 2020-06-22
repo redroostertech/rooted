@@ -11,7 +11,7 @@ import Alamofire
 
 private let localBaseURL = "https://localhost:3000/"
 private let testBaseURL = "https://rooted-test-web.herokuapp.com/"
-private let liveURL = "https://rooted.herokuapp.com/"
+private let liveURL = "https://rootedapp.herokuapp.com/"
 
 enum Api_V2 {
   case Analytics

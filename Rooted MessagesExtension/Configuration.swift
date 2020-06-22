@@ -19,11 +19,11 @@ public let maximumInvites = 3
 public let kPagination : UInt = 10
 public let kMaxConcurrentImageDownloads = 2
 
-public var isDebug = true
+public var isDebug = false
 
 public let kLocalBaseURL = "http://localhost:3000/"
 public let kTestBaseURL = "https://rooted-test-web.herokuapp.com/"
-public let kLiveBaseURL = "https://rooted.com/"
+public let kLiveBaseURL = "https://rootedapp.herokuapp.com/"
 
 public let kLocalURL = kLocalBaseURL + "api/v1/"
 public let kTestURL = kTestBaseURL + "api/v1/"
