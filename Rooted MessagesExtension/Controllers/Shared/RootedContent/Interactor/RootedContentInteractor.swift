@@ -685,7 +685,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
   // MARK: - Navigation
   // MARK: - Use Case: Go to add an meeting view
   func goToCreateNewMeetingView(request: RootedContent.CreateNewMeeting.Request) {
-    guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+    guard SessionManager.shared.sessionExists else {
       self.presenter?.onPresentPhoneLoginViewController()
       return
     }
@@ -702,7 +702,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
 
   // MARK: - Use Case: Go to `InfoViewController`
   func goToInfoView(request: RootedContent.InfoView.Request) {
-   guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+   guard SessionManager.shared.sessionExists else {
      self.presenter?.onPresentPhoneLoginViewController()
      return
    }
