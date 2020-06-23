@@ -31,5 +31,6 @@ target 'Rooted MessagesExtension' do
   pod 'FormTextField'
   pod 'WordPress-Editor-iOS'
   pod 'Gridicons'
+  pod 'KeychainSwift'
   
 end
