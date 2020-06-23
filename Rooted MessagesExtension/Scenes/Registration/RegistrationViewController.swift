@@ -173,7 +173,7 @@ class RegistrationViewController: FormMessagesAppViewController, RegistrationDis
     }
 
   <<< PhoneRow(kFormPhoneNumber) {
-      $0.placeholder = kFormPasswordPlaceholder
+      $0.placeholder = kFormPhoneNumberPlaceholder
       $0.add(rule: RuleRequired())
       $0.validationOptions = .validatesAlways
 
@@ -218,7 +218,7 @@ class RegistrationViewController: FormMessagesAppViewController, RegistrationDis
 
   private func formatPhoneNumber() -> String {
     var phoneNumber = ""
-    if let countryCode = (form.rowBy(tag: kFormCountryCode) as? PickerInputRow<String>)?.value?.split(separator: "-")[0] {
+    if let countryCode = (form.rowBy(tag: kFormCountryCode) as? PickerInputRow<String>)?.value?.split(separator: "-")[1] {
       phoneNumber += countryCode
     }
     if let phone = (form.rowBy(tag: kFormPhoneNumber) as? PhoneRow)?.value {
