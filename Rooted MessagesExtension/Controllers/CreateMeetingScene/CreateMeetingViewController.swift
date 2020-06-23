@@ -342,7 +342,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
       }
     }
 
-    +++ Section("Add-Ons")
+    +++ Section(header:"Add-Ons", footer:"(*) Premium features")
       <<< SwitchRow("is_chat_enabled") {
         $0.title = "*Add chat collaboration to meeting"
         $0.disabled = true
@@ -358,7 +358,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
           $0.disabled = true
       }
 
-    +++ Section("(*) Features that are disabled are reserved for the premium version of Rooted.")
+    +++ Section()
   }
 
   // MARK: - Use Case: Start animating button
