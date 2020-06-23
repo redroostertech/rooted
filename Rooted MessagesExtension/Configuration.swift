@@ -12,6 +12,8 @@ import UIKit
 // MARK: - Core
 public let kAppName = "Rooted"
 public let kGroupName = "group.com.rrtech.rooted.Rooted"
+public let kSaltKey = "rrtech-rooted-imessage-app"
+public let kKeychainAccessGroupName = "2PSWQPK482.com.rrtech.rooted.Rooted.MessagesExtension.KeychainGroup"
 
 public let maximumInvites = 3
 

@@ -25,24 +25,24 @@ class SessionManager {
 
   // MARK: - Use Case: As a user, I want to be able to resume my activity and maintain a single reference to my user information; app needs to a ccess the `currentUser` thats stored in the `SessionManager`
   var currentUser: UserProfileData? {
-    guard let userDict = DefaultsManager.shared.retrieveStringDefault(forKey: kSessionUser) else { return nil }
+    guard let userDict = KeychainManager.shared.retrieveStringDefault(forKey: kSessionUser) else { return nil }
     return UserProfileData(JSONString: userDict)
   }
 
   var currentUserId: String? {
-    guard let userid = DefaultsManager.shared.retrieveStringDefault(forKey: kSessionUserId) else { return nil }
+    guard let userid = KeychainManager.shared.retrieveStringDefault(forKey: kSessionUserId) else { return nil }
     return userid
   }
 
   // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity
   var sessionStart: Date {
-    return DefaultsManager.shared.retrieveStringDefault(forKey: kSessionStart)?.toDate()?.date ?? Date()
+    return KeychainManager.shared.retrieveStringDefault(forKey: kSessionStart)?.toDate()?.date ?? Date()
   }
 
   // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity; app needs to start a session using profile data
   static func start(with user: UserProfileData) {
 
-    let defaultsManager = DefaultsManager.shared
+    let defaultsManager = KeychainManager.shared
 
     // Check if current user is nil
     if SessionManager.shared.currentUser == nil {
@@ -69,7 +69,7 @@ class SessionManager {
   // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity; app needs to start a session using profile data
   static func start(with id: String) {
 
-    let defaultsManager = DefaultsManager.shared
+    let defaultsManager = KeychainManager.shared
 
     // Check if current user is nil
     if SessionManager.shared.currentUser == nil {
@@ -94,17 +94,17 @@ class SessionManager {
   // MARK: - Use Case: As a user, when I boot up my app, I want to ensure that the time of boot up or "login" is updated to the current time
   static func updateLastLogin() {
     let date = Date().toString()
-    DefaultsManager.shared.setDefault(withData: date, forKey: kSessionLastLogin)
+    KeychainManager.shared.setDefault(withData: date, forKey: kSessionLastLogin)
   }
 
   // MARK: - Use Case: As a user, I want to be able to clear a session
   static func clearSession()  {
-    let defaultsManager = DefaultsManager.shared
-    defaultsManager.setNilDefault(forKey: kSessionUserId)
-    defaultsManager.setNilDefault(forKey: kSessionUser)
-    defaultsManager.setNilDefault(forKey: kSessionStart)
-    defaultsManager.setNilDefault(forKey: kSessionLastLogin)
-    defaultsManager.setNilDefault(forKey: kSessionCart)
+    let defaultsManager = KeychainManager.shared
+    defaultsManager.deleteDefault(forKey: kSessionUserId)
+    defaultsManager.deleteDefault(forKey: kSessionUser)
+    defaultsManager.deleteDefault(forKey: kSessionStart)
+    defaultsManager.deleteDefault(forKey: kSessionLastLogin)
+    defaultsManager.deleteDefault(forKey: kSessionCart)
   }
 
   static func refreshSession() {
@@ -152,7 +152,7 @@ class SessionManager {
   }
 
   static func refresh(with user: UserProfileData) {
-    let defaultsManager = DefaultsManager.shared
+    let defaultsManager = KeychainManager.shared
     // Start a new session with the provided user object
     if let userJsonString = user.toJSONString() {
       defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)

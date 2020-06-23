@@ -242,7 +242,7 @@ class RegistrationViewController: FormMessagesAppViewController, RegistrationDis
   func onSuccessfulSessionSet(viewModel: Registration.SetSession.ViewModel) {
     let _ = SweetAlert().showAlert(on: self, title: "Thank You!", subTitle: "You are now logged in.", style: .success, buttonTitle: "Proceed", buttonColor: .systemOrange) { success in
       self.dismiss(animated: true, completion: {
-        self.router?.dataStore?.authenticationLogicDelegate?.onSucessfulRegistration(self, uid: viewModel.userId)
+//        self.router?.dataStore?.authenticationLogicDelegate?.onSucessfulRegistration(self, uid: viewModel.userId)
       })
     }
   }
