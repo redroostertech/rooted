@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.6</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -30,7 +30,9 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>Rooted needs access to your calendar to add created invites to it.</string>
 	<key>NSExtension</key>
@@ -44,13 +46,11 @@
 	<string>Rooted needs access to your location to search for and add locations to invites.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Rooted needs access to your location to search for and add locations to invites.</string>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 	<key>branch_app_domain</key>
 	<string>rooted.app.link</string>
 	<key>branch_key</key>
 	<string>key_live_npNUJjsLcUnbq6xSqRwS9mmjvsbMMu0R</string>
-	<key>UIUserInterfaceStyle</key>
-	<string>Light</string>
-	<key>LSApplicationCategoryType</key>
-	<string></string>
 </dict>
 </plist>
