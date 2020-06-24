@@ -101,6 +101,10 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
   override func viewDidLoad() {
     super.viewDidLoad()
     loginButton.applyCornerRadius()
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     isLogin = true
   }
 
@@ -117,6 +121,11 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
       if isDebug {
         $0.value = kDebugEmail
       }
+
+      if let rememberMeEmail = SessionManager.rememberMeEmail {
+        $0.value = rememberMeEmail
+      }
+
     }.cellUpdate { cell, row in
       NavigationCoordinator.performExpandedNavigation(from: self) {
         // Adjust view
@@ -153,6 +162,42 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
             cell.textField.textColor = .black
             self.loginButton.isEnabled = true
             self.loginButton.isUserInteractionEnabled = true
+          }
+        }
+      }
+
+      let rememberMe = [kFormRememberMe]
+
+      form +++ SelectableSection<ImageCheckRow<String>>("", selectionType: .singleSelection(enableDeselection: true))
+
+      for option in rememberMe {
+        if let _ = SessionManager.rememberMeEmail {
+          form.last! <<< ImageCheckRow<String>(option){ lrow in
+            lrow.cell.selectionStyle = .none
+            lrow.cell.falseImage = UIImage(named: "checked-circle")!
+            lrow.cell.trueImage = UIImage(named: "un-checked-circle")!
+            lrow.cell.accessoryType = .checkmark
+            lrow.title = option
+            lrow.selectableValue = option
+            lrow.value = nil
+          }.cellSetup { cell, _ in
+            cell.falseImage = UIImage(named: "checked-circle")!
+            cell.trueImage = UIImage(named: "un-checked-circle")!
+            cell.accessoryType = .checkmark
+          }
+        } else {
+          form.last! <<< ImageCheckRow<String>(option){ lrow in
+            lrow.cell.selectionStyle = .none
+            lrow.cell.trueImage = UIImage(named: "checked-circle")!
+            lrow.cell.falseImage = UIImage(named: "un-checked-circle")!
+            lrow.cell.accessoryType = .checkmark
+            lrow.title = option
+            lrow.selectableValue = option
+            lrow.value = nil
+          }.cellSetup { cell, _ in
+            cell.trueImage = UIImage(named: "checked-circle")!
+            cell.falseImage = UIImage(named: "un-checked-circle")!
+            cell.accessoryType = .checkmark
           }
         }
       }
@@ -196,6 +241,15 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
     var request = PhoneLogin.LoginViaEmailAndPassword.Request()
     request.email = (form.rowBy(tag: kFormEmailAddress) as? EmailRow)?.value ?? ""
     request.password = (form.rowBy(tag: kFormPassword) as? PasswordRow)?.value ?? ""
+    if let _ = SessionManager.rememberMeEmail {
+      if let _ = (form.allSections.last as! SelectableSection<ImageCheckRow<String>>).selectedRow() {
+        request.isRememberMeOn = false
+      }
+    } else {
+      if let _ = (form.allSections.last as! SelectableSection<ImageCheckRow<String>>).selectedRow() {
+        request.isRememberMeOn = true
+      }
+    }
     interactor?.loginViaEmailAndPassword(request: request)
   }
 
@@ -245,4 +299,68 @@ extension PhoneLoginViewController {
       self.progressHUD?.dismiss()
     }
   }
+}
+
+public final class ImageCheckRow<T: Equatable>: Row<ImageCheckCell<T>>, SelectableRowType, RowType {
+    public var selectableValue: T?
+    required public init(tag: String?) {
+        super.init(tag: tag)
+        displayValueFor = nil
+    }
+}
+
+public class ImageCheckCell<T: Equatable> : Cell<T>, CellType {
+
+    required public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    }
+
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    /// Image for selected state
+    lazy public var trueImage: UIImage = {
+        return UIImage(named: "checked-circle")!
+    }()
+
+    /// Image for unselected state
+    lazy public var falseImage: UIImage = {
+        return UIImage(named: "un-checked-circle")!
+    }()
+
+    public override func update() {
+        super.update()
+        checkImageView?.image = row.value != nil ? trueImage : falseImage
+        checkImageView?.sizeToFit()
+    }
+
+    /// Image view to render images. If `accessoryType` is set to `checkmark`
+    /// will create a new `UIImageView` and set it as `accessoryView`.
+    /// Otherwise returns `self.imageView`.
+    open var checkImageView: UIImageView? {
+        guard accessoryType == .checkmark else {
+            return self.imageView
+        }
+
+        guard let accessoryView = accessoryView else {
+            let imageView = UIImageView()
+            self.accessoryView = imageView
+            return imageView
+        }
+
+        return accessoryView as? UIImageView
+    }
+
+    public override func setup() {
+        super.setup()
+        accessoryType = .none
+    }
+
+    public override func didSelect() {
+        row.reload()
+        row.select()
+        row.deselect()
+    }
+
 }

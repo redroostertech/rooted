@@ -32,6 +32,7 @@ enum PhoneLogin {
     struct Request {
       var email: String?
       var password: String?
+      var isRememberMeOn: Bool = false
     }
 
     struct Response {

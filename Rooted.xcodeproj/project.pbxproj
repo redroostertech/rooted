@@ -257,6 +257,8 @@
 		D7DF8D13248422AA005C116A /* AttachmentDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DF8D11248422AA005C116A /* AttachmentDetailsViewController.swift */; };
 		D7DF8D14248422AA005C116A /* AttachmentDetailsViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D7DF8D12248422AA005C116A /* AttachmentDetailsViewController.storyboard */; };
 		D7E2815B24A23EC6004CF478 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E2815A24A23EC6004CF478 /* KeychainManager.swift */; };
+		D7E2820D24A37F1D004CF478 /* ImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E2820B24A37F1D004CF478 /* ImagePickerController.swift */; };
+		D7E2820E24A37F1D004CF478 /* ImageRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E2820C24A37F1D004CF478 /* ImageRow.swift */; };
 		D7F1AAE9240BEE0F00210504 /* industriesJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE5240BEE0F00210504 /* industriesJson.json */; };
 		D7F1AAEA240BEE0F00210504 /* RootedJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE6240BEE0F00210504 /* RootedJson.json */; };
 		D7F1AAEB240BEE0F00210504 /* Rooted_Meetings_Response.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */; };
@@ -547,6 +549,8 @@
 		D7DF8D11248422AA005C116A /* AttachmentDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttachmentDetailsViewController.swift; sourceTree = "<group>"; };
 		D7DF8D12248422AA005C116A /* AttachmentDetailsViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = AttachmentDetailsViewController.storyboard; sourceTree = "<group>"; };
 		D7E2815A24A23EC6004CF478 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
+		D7E2820B24A37F1D004CF478 /* ImagePickerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerController.swift; sourceTree = "<group>"; };
+		D7E2820C24A37F1D004CF478 /* ImageRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageRow.swift; sourceTree = "<group>"; };
 		D7F1AAE5240BEE0F00210504 /* industriesJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = industriesJson.json; sourceTree = "<group>"; };
 		D7F1AAE6240BEE0F00210504 /* RootedJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RootedJson.json; sourceTree = "<group>"; };
 		D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Rooted_Meetings_Response.json; sourceTree = "<group>"; };
@@ -928,6 +932,7 @@
 		D79A5EDC2407FF90006DAA7A /* Rows */ = {
 			isa = PBXGroup;
 			children = (
+				D7E2820A24A37F1D004CF478 /* ImageRow */,
 				D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */,
 				D7C3B936241687A700B22E8F /* DateRangeRow */,
 				D7C3B937241687B800B22E8F /* LocationSearchRow */,
@@ -1281,6 +1286,15 @@
 			path = Notes;
 			sourceTree = "<group>";
 		};
+		D7E2820A24A37F1D004CF478 /* ImageRow */ = {
+			isa = PBXGroup;
+			children = (
+				D7E2820B24A37F1D004CF478 /* ImagePickerController.swift */,
+				D7E2820C24A37F1D004CF478 /* ImageRow.swift */,
+			);
+			path = ImageRow;
+			sourceTree = "<group>";
+		};
 		D7F1AAE4240BEE0F00210504 /* JSON */ = {
 			isa = PBXGroup;
 			children = (
@@ -1591,6 +1605,7 @@
 				D747BAB7240EBB0700E571CF /* SessionManager.swift in Sources */,
 				D79A5F3F2407FF91006DAA7A /* PopoverSelectorRow.swift in Sources */,
 				BA0D0EDC2248019B00209993 /* InviteDetailsViewController.swift in Sources */,
+				D7E2820D24A37F1D004CF478 /* ImagePickerController.swift in Sources */,
 				D701DC6F23E9459B00A45E9B /* HUDFactory.swift in Sources */,
 				D79A5F7C24083038006DAA7A /* SuggestionCollectionCell.swift in Sources */,
 				D79A5F312407FF91006DAA7A /* DecimalFormatter.swift in Sources */,
@@ -1636,6 +1651,7 @@
 				D701DC5D23E8DBF600A45E9B /* Response.swift in Sources */,
 				D701DC5E23E8DBF600A45E9B /* Meeting.swift in Sources */,
 				D7B758CD245B302F005CD0C9 /* BranchWorker.swift in Sources */,
+				D7E2820E24A37F1D004CF478 /* ImageRow.swift in Sources */,
 				D73725CF249E6F7A00336EFC /* ForgotPasswordWorker.swift in Sources */,
 				D7DDDA1B24703F860061C15B /* PhoneLoginRouter.swift in Sources */,
 				D7C3B92F2416696700B22E8F /* DateRangePickerInlineRow.swift in Sources */,
@@ -1865,6 +1881,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = "Rooted MessagesExtension/Rooted MessagesExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = "Rooted MessagesExtension/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1873,6 +1890,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rrtech.rooted.Rooted.MessagesExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1888,6 +1906,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = "Rooted MessagesExtension/Rooted MessagesExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = "Rooted MessagesExtension/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1896,6 +1915,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rrtech.rooted.Rooted.MessagesExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

@@ -26,6 +26,7 @@ public class KeychainManager: NSObject {
 
   private override init() {
     self.keychain = KeychainSwift()
+    self.keychain.synchronizable = true
     self.keychain.accessGroup = kKeychainAccessGroupName
   }
 }

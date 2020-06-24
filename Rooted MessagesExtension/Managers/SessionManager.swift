@@ -49,13 +49,13 @@ class SessionManager {
 
       // Start a new session with the provided user object
       if let userJsonString = user.toJSONString() {
-        defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)
+        let _ = defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)
       }
 
       // Capture the date that a new session was created
       let date = Date().toString()
-      defaultsManager.setDefault(withData: date, forKey: kSessionStart)
-      defaultsManager.setDefault(withData: date, forKey: kSessionLastLogin)
+      let _ = defaultsManager.setDefault(withData: date, forKey: kSessionStart)
+      let _ = defaultsManager.setDefault(withData: date, forKey: kSessionLastLogin)
 
     } else {
 
@@ -75,12 +75,12 @@ class SessionManager {
     if SessionManager.shared.currentUser == nil {
 
       // Start a new session with the provided user id
-      defaultsManager.setDefault(withData: id, forKey: kSessionUserId)
+      let _ = defaultsManager.setDefault(withData: id, forKey: kSessionUserId)
 
       // Capture the date that a new session was created
       let date = Date().toString()
-      defaultsManager.setDefault(withData: date, forKey: kSessionStart)
-      defaultsManager.setDefault(withData: date, forKey: kSessionLastLogin)
+      let _ = defaultsManager.setDefault(withData: date, forKey: kSessionStart)
+      let _ = defaultsManager.setDefault(withData: date, forKey: kSessionLastLogin)
 
     } else {
 
@@ -94,17 +94,17 @@ class SessionManager {
   // MARK: - Use Case: As a user, when I boot up my app, I want to ensure that the time of boot up or "login" is updated to the current time
   static func updateLastLogin() {
     let date = Date().toString()
-    KeychainManager.shared.setDefault(withData: date, forKey: kSessionLastLogin)
+    let _ = KeychainManager.shared.setDefault(withData: date, forKey: kSessionLastLogin)
   }
 
   // MARK: - Use Case: As a user, I want to be able to clear a session
   static func clearSession()  {
     let defaultsManager = KeychainManager.shared
-    defaultsManager.deleteDefault(forKey: kSessionUserId)
-    defaultsManager.deleteDefault(forKey: kSessionUser)
-    defaultsManager.deleteDefault(forKey: kSessionStart)
-    defaultsManager.deleteDefault(forKey: kSessionLastLogin)
-    defaultsManager.deleteDefault(forKey: kSessionCart)
+    let _ = defaultsManager.deleteDefault(forKey: kSessionUserId)
+    let _ = defaultsManager.deleteDefault(forKey: kSessionUser)
+    let _ = defaultsManager.deleteDefault(forKey: kSessionStart)
+    let _ = defaultsManager.deleteDefault(forKey: kSessionLastLogin)
+    let _ = defaultsManager.deleteDefault(forKey: kSessionCart)
   }
 
   static func refreshSession() {
@@ -155,8 +155,27 @@ class SessionManager {
     let defaultsManager = KeychainManager.shared
     // Start a new session with the provided user object
     if let userJsonString = user.toJSONString() {
-      defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)
+      let _ = defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)
     }
+  }
+
+  static func rememberMe(using email: String) {
+    let defaultsManager = KeychainManager.shared
+    let _ = defaultsManager.setDefault(withData: email, forKey: kSessionEmailAddress)
+  }
+
+  static var rememberMeEmail: String? {
+    return KeychainManager.shared.retrieveStringDefault(forKey: kSessionEmailAddress)
+  }
+
+  static func doNotRememberMe() {
+    let defaultsManager = KeychainManager.shared
+    let didDelete = defaultsManager.deleteDefault(forKey: kSessionEmailAddress)
+    print(didDelete)
+  }
+
+  static func isRememberMeOn() -> Bool {
+    return KeychainManager.shared.retrieveStringDefault(forKey: kSessionEmailAddress) != nil
   }
 
 }

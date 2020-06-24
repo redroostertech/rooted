@@ -37,6 +37,13 @@ class PhoneLoginInteractor: PhoneLoginBusinessLogic, PhoneLoginDataStore {
       self.presenter?.handleError(response: error)
       return
     }
+
+    if request.isRememberMeOn {
+      SessionManager.rememberMe(using: email)
+    } else {
+      SessionManager.doNotRememberMe()
+    }
+
     let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
     let params: [String: String] = [
       "action": "email_login",

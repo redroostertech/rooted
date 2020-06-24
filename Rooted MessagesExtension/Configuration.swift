@@ -174,6 +174,7 @@ public let kBranchMeetingStartedSave = "user_started_save"
 public let kBranchMeetingDeleteMeeting = "user_deleted_meeting"
 
 // MARK: - Session strings
+public var kSessionEmailAddress = "currentUserEmailAddress"
 public var kSessionUser = "currentUser"
 public var kSessionUserId = "currentUserId"
 public var kSessionStart = "sessionStart"
@@ -193,6 +194,7 @@ public var kFormPhoneNumberPlaceholder = "Enter your phone number"
 public var kFormFullname = "fullName"
 public var kFormFullnamePlaceholder = "Provide your full name"
 public var kFormCountryCode = "countryCode"
+public var kFormRememberMe = "Remember me?"
 
 // MARK: - Debug Credentials
 public var kDebugEmail = "mwestbrooksjr@gmail.com"
