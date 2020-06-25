@@ -32,5 +32,6 @@ target 'Rooted MessagesExtension' do
   pod 'WordPress-Editor-iOS'
   pod 'Gridicons'
   pod 'KeychainSwift'
+  pod 'EggRating'
   
 end

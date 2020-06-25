@@ -9,6 +9,7 @@ import Branch
 import OnboardKit
 import Aztec
 import WordPressEditor
+import EggRating
 
 class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLogic, MeetingsManagerDelegate, RootedCellDelegate, FloatingMenuBtnAction, AuthenticationLogic {
 
@@ -596,6 +597,10 @@ extension MyInvitesViewController {
   func handleCalendarPermissions(viewModel: RootedContent.CheckCalendarPermissions.ViewModel) {
     RRLogger.log(message: "Calendar Permissions: \(viewModel.isGranted)", owner: self)
     if viewModel.isGranted {
+      // Prompt user to provide feedback
+      self.setupRatingSystem()
+
+      // Get meetings
       self.retrieveMeetings()
     } else {
       self.showCalendarError()
@@ -619,4 +624,17 @@ extension MyInvitesViewController {
       self.goToCreateNewMeetingView()
     }
   }
+
+  // MARK: - Use Case: As a business, I want a user to be prompted to provide feedback on the app
+  func setupRatingSystem() {
+    EggRating.itunesId = "1458363262"
+    EggRating.minRatingToAppStore = 3.5
+    EggRating.daysUntilPrompt = 30
+    EggRating.remindPeriod = 15
+    EggRating.debugMode = isDebug
+    EggRating.minuteUntilPrompt = 1
+    EggRating.minuteRemindPeriod = 1
+    EggRating.promptRateUsIfNeeded(in: self)
+  }
+
 }

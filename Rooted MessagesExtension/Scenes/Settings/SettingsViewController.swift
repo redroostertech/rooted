@@ -13,6 +13,8 @@
 import UIKit
 import CoreLocation
 import WebKit
+import Messages
+import EggRating
 
 protocol SettingsDisplayLogic: class {
   func onSuccessfullLogout(viewModel: Settings.LogoutUser.ViewModel)
@@ -155,12 +157,13 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
     +++ Section()
       <<< ButtonRow("About Rooted") {
         $0.title = $0.tag
-        $0.presentationMode = .show(controllerProvider: .callback(builder: {
+        $0.presentationMode = .popover(controllerProvider: .callback(builder: {
           let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
           let destinationVC = sb.instantiateViewController(withIdentifier: kInfoViewController) as! InfoViewController
           return destinationVC
         }), onDismiss: nil)
     }
+
       <<< ButtonRow("Privacy Policy") {
       $0.title = $0.tag
         $0.presentationMode = .popover(controllerProvider: .callback(builder: {
@@ -173,10 +176,21 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
       }), onDismiss: nil)
     }
 
+      +++ Section()
+        <<< ButtonRow("Submit a Review") {
+        $0.title = $0.tag
+        $0.presentationMode = .none
+        }.onCellSelection { [weak self] (cell, row) in
+          if let messageAppViewController = self {
+            EggRating.promptRateUs(in: messageAppViewController)
+          }
+        }
+
       +++ Section(footer: "Rooted was created and is maintained by the folks over at RedRooster Technologies Inc.\n\nVersion: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")")
-      <<< LabelRow() {
-        $0.title = "Logout"
-    }.onCellSelection { [weak self] _, _ in
+      <<< ButtonRow("Logout") {
+        $0.title = $0.tag
+        $0.presentationMode = .none
+      }.onCellSelection { [weak self] _, _ in
       // MARK: - Use Case: Show an alert for a user to perform more actions
       let alert = UIAlertController(title: "Logout", message: "You are about to logout. Are you sure?", preferredStyle: .alert)
 
