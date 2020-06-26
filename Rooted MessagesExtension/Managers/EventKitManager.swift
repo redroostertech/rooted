@@ -162,16 +162,28 @@ class EventKitManager: NSObject {
 
   // MARK: - Use Case: Remove meeting from calendar
   func removeFromCalendar(meeting: Meeting, _ completion: @escaping (Meeting?, Bool, Error?) -> Void) {
-    if let event = eventStore.event(withIdentifier: meeting.calendarId ?? "") {
-      do {
-        try eventStore.remove(event, span: .thisEvent)
-        completion(meeting, true, nil)
-      } catch {
-        completion(nil, false, error)
-      }
-    } else {
-      completion(nil, false, RError.customError("There was an error retreiving the meeting."))
+    guard let startdate = meeting.meetingDate?.startDate?.toDate()?.date,
+      let enddate = meeting.meetingDate?.endDate?.toDate()?.date else {
+        return completion(nil, false, RError.customError("There was an error retreiving the meeting."))
     }
+
+    let calendars = eventStore.calendars(for: .event)
+
+    let predicate = eventStore.predicateForEvents(withStart: startdate, end: enddate, calendars: calendars)
+
+    let events = eventStore.events(matching: predicate)
+    for event in events {
+      if let eventTitle = event.title, let meetingName = meeting.meetingName, eventTitle == "ROOTED INVITATION: \(meetingName)" {
+        do {
+          try eventStore.remove(event, span: .thisEvent)
+          completion(meeting, true, nil)
+        } catch {
+          completion(nil, false, error)
+        }
+      }
+    }
+
+    completion(nil, false, RError.customError("There was an error retreiving the meeting."))
   }
 
   // MARK: - Use Case: Fetching events from a particular calendar

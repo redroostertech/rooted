@@ -14,7 +14,7 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
 
   // MARK: - IBOutlets
   @IBOutlet private weak var acceptInviteButton: SSSpinnerButton!
-  @IBOutlet private weak var declineInviteButton: UIButton!
+  @IBOutlet private weak var declineInviteButton: SSSpinnerButton!
   @IBOutlet private weak var backButton: UIButton!
   @IBOutlet private weak var actionsContainerView: UIView!
 
@@ -307,6 +307,23 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
     displaySuccess(afterAnimating: acceptInviteButton, completion: completion)
   }
 
+  // MARK: - Use Case: Check if user is logged in and if not, show login screen
+  func presentPhoneLoginViewController() {
+    dismissHUD()
+    showError(title: "Login In", message: "You are not logged in. Please do so and try again.", style: .alert, defaultButtonText: "OK")
+  }
+
+  // MARK: - Use Case: On Successful login resume setting up the view controller
+  func onSucessfulLogin(_ sender: PhoneLoginViewController, uid: String?) {
+    sender.dismiss()
+    retrieveMeetingById()
+  }
+
+  // MARK: - Use Case: On failed login attempt, resume setting up the view controller
+  func handleFailedLogin(_ sender: PhoneLoginViewController, reason: String) {
+    // Don't do anything yet
+  }
+
   // MARK: - IBActions
   // MARK: - Use Case: Accept the meeting, save it locally, and add it to your calendar
   @IBAction func acceptInvite(_ sender: UIButton) {
@@ -331,7 +348,7 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
 
   func onSuccessfulCalendarAdd(viewModel: RootedContent.AddToCalendar.ViewModel) {
     guard let meeting = viewModel.meeting else { return }
-    saveMeeting(meeting: meeting)
+    acceptMeeting(meeting: meeting)
   }
 
   // MARK: - Use Case: Accept meeting and add user as a participant
@@ -414,18 +431,41 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
   // MARK: - Use Case: Decline the meeting
   @IBAction func declineInvite(_ sender: UIButton) {
     BranchEvent.customEvent(withName: "event_invite_declined")
-    removeFromCalendar(meeting)
+    declineInvite()
   }
 
-  func removeFromCalendar(_ meeting: RootedCellViewModel?) {
+  private func declineInvite() {
+    startAnimating(declineInviteButton) {
+      guard let mting = self.meeting, let _ = mting.data else {
+        return self.displayFailure(with: "Oops!", and: "There was an error adding event to your calendar. Please try again.", afterAnimating: self.acceptInviteButton)
+      }
+      self.removeFromCalendar(meeting: mting)
+    }
+  }
+
+  func removeFromCalendar(meeting: RootedCellViewModel) {
     var request = RootedContent.RemoveFromCalendar.Request()
     request.meeting = meeting
     interactor?.removeMeetingFromCalendar(request: request)
   }
 
   func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
-    print("Removed from calendar")
-    declineMeeting(viewModel.meeting)
+    guard let meeting = viewModel.meeting?.data else { return }
+    declineMeeting(meeting: meeting)
+  }
+
+  func declineMeeting(meeting: Meeting) {
+    var request = RootedContent.DeclineMeeting.Request()
+    request.meeting = meeting
+    request.branchEventID = kBranchInviteAccepted
+    request.saveType = .receive
+    request.contentDB = .remote
+    interactor?.declineMeeting(request: request)
+  }
+
+  func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel) {
+    guard let meeting = viewModel.meeting else { return }
+    sendResponse(.decline, to: meeting)
   }
 
   func deleteFromLocalStorage(meeting: RootedCellViewModel?) {
@@ -436,14 +476,13 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
   }
 
   func didDeleteInvite(_ manager: Any?, invite: MeetingContextWrapper) {
-    print("Did delete invite")
     showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
   }
 
-  private func declineMeeting(_ meeting: RootedCellViewModel?) {
-    guard let mting = meeting?.data else { return }
-    sendResponse(.decline, to: mting)
-  }
+//  private func declineMeeting(_ meeting: RootedCellViewModel?) {
+//    guard let mting = meeting?.data else { return }
+//    sendResponse(.decline, to: mting)
+//  }
 
   // MARK: - Use Case: Accept the meeting, save it locally, and add it to your calendar
   @IBAction func back(_ sender: UIButton) {
@@ -468,23 +507,6 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
       NSLog("[ROOTED-IMESSAGE] InviteDetailsVC: User opted out of sending a response")
     })
     HUDFactory.displayAlert(with: "Propose a New Time", message: "Would you like to propose a new time for the meeting?", and: [sendResponseAction, noAction], on: self)
-  }
-
-  // MARK: - Use Case: Check if user is logged in and if not, show login screen
-  func presentPhoneLoginViewController() {
-    dismissHUD()
-    showError(title: "Login In", message: "You are not logged in. Please do so and try again.", style: .alert, defaultButtonText: "OK")
-  }
-
-  // MARK: - Use Case: On Successful login resume setting up the view controller
-  func onSucessfulLogin(_ sender: PhoneLoginViewController, uid: String?) {
-    sender.dismiss()
-    retrieveMeetingById()
-  }
-
-  // MARK: - Use Case: On failed login attempt, resume setting up the view controller
-  func handleFailedLogin(_ sender: PhoneLoginViewController, reason: String) {
-    // Don't do anything yet
   }
 }
 

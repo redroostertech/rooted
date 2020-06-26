@@ -84,6 +84,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     case .compact, .transcript:
       self.layoutOption = .horizontalList
       self.segmentControlHeightConstraint.constant = 0
+      self.clearTable()
       break
     default:
       self.layoutOption = .list
@@ -99,6 +100,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     case .compact, .transcript:
       self.layoutOption = .horizontalList
       self.segmentControlHeightConstraint.constant = 0
+      self.clearTable()
       break
     default:
       self.layoutOption = .list
@@ -116,6 +118,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
       self.floatingMenu?.isOpen = true
       self.floatingMenu?.toggleMenu()
       self.segmentControlHeightConstraint.constant = 0
+      self.clearTable()
       break
     default:
       if toggleMenuButton {
@@ -344,19 +347,51 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
       NavigationCoordinator.performExpandedNavigation(from: self) {
 
         // MARK: - Use Case: Show an alert for a user to perform more actions
-        let alert = UIAlertController(title: "More Actions", message: "You can perform any of the following actions on this event invite.", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Quick Actions", message: "You can perform any of the following actions on this event invite.", preferredStyle: .actionSheet)
 
-        // MARK: - Use Case: Share a meeting from the table view
-        let share = UIAlertAction(title: "Share to Conversation", style: .default, handler: { action in
-          self.share(meeting: meeting)
+        // MARK: - Use Case: View details from the table view
+        let viewDetails = UIAlertAction(title: "View Details", style: .default, handler: { action in
+          let destination = InviteDetailsViewController.setupViewController(meeting: viewmodel)
+          NavigationCoordinator.performExpandedNavigation(from: self) {
+            self.present(destination, animated: true, completion: nil)
+          }
         })
-        alert.addAction(share)
+        alert.addAction(viewDetails)
 
-        // MARK: - Use Case: Delete a meeting from the table view
-        let delete = UIAlertAction(title: "Delete Meeting", style: .destructive, handler: { action in
-          self.delete(viewmodel)
+        // MARK: - Use Case: View participant information
+        let viewParticipants = UIAlertAction(title: "Confirmed Participants (\(meeting.participants?.count ?? 0))", style: .default, handler: { action in
+          let destination = ViewParticipantsViewController.setupViewController(meeting: viewmodel)
+          NavigationCoordinator.performExpandedNavigation(from: self) {
+            self.present(destination, animated: true, completion: nil)
+          }
         })
-        alert.addAction(delete)
+        alert.addAction(viewParticipants)
+
+        if let meetingOwner = meeting.ownerId, let currentUserId = SessionManager.shared.currentUser?.uid, meetingOwner != currentUserId {
+
+          if let meetingParticipants = meeting.meetingParticipantsIds, meetingParticipants.contains(currentUserId) {
+            // MARK: - Use Case: View details from the table view
+            let decline = UIAlertAction(title: "Remove Attendance", style: .default, handler: { action in
+              self.declineInvite(meeting: viewmodel)
+            })
+            alert.addAction(decline)
+          }
+        } else {
+
+          // MARK: - Use Case: Share a meeting from the table view
+          let share = UIAlertAction(title: "Share to Conversation", style: .default, handler: { action in
+            self.share(meeting: meeting)
+          })
+          alert.addAction(share)
+
+
+          // MARK: - Use Case: Delete a meeting from the table view
+          let delete = UIAlertAction(title: "Cancel Meeting", style: .destructive, handler: { action in
+            self.delete(viewmodel)
+          })
+          alert.addAction(delete)
+
+        }
 
         // MARK: - Use Case: Dismiss the action sheet if a desired function is not available
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
@@ -368,6 +403,39 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
         self.present(alert, animated: true, completion: nil)
       }
     }
+  }
+
+  // MARK: - Use Case: Decline the meeting
+  private func declineInvite(meeting: RootedCellViewModel) {
+    let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { action in
+      self.removeFromCalendar(meeting: meeting)
+    })
+
+    let noAction = UIAlertAction(title: "No", style: .cancel, handler: { action in
+      // Do something if user changes their mind
+    })
+
+    HUDFactory.displayAlert(with: "Remove Attendance", message: "Are you sure you are not attending the meeting anymore?", and: [yesAction, noAction], on: self)
+  }
+
+  func removeFromCalendar(meeting: RootedCellViewModel) {
+    var request = RootedContent.RemoveFromCalendar.Request()
+    request.meeting = meeting
+    interactor?.removeMeetingFromCalendar(request: request)
+  }
+
+  func declineMeeting(meeting: Meeting) {
+    var request = RootedContent.DeclineMeeting.Request()
+    request.meeting = meeting
+    request.branchEventID = kBranchInviteAccepted
+    request.saveType = .receive
+    request.contentDB = .remote
+    interactor?.declineMeeting(request: request)
+  }
+
+  func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel) {
+    guard let meeting = viewModel.meeting else { return }
+    retrieveMeetings()
   }
 
   // MARK: - Use Case: Share a meeting from the table view by inserting it into the current conversation
@@ -453,6 +521,8 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
     RRLogger.log(message: "Successfully removed meeting from calendar", owner: self)
+    guard let meeting = viewModel.meeting?.data else { return }
+    declineMeeting(meeting: meeting)
   }
 
   func onFailedCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {

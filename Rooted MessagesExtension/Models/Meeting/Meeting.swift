@@ -30,13 +30,13 @@ public class Meeting: Mappable {
   public var meetingName, meetingDescription: String?
   public var meetingLocation: RLocation?
   public var meetingDate: MeetingDateClass?
-  public var meetingParticipantsIds, meetingAgendaItemIds, meetingFilesIds, remindOnIds: [Int]?
+  public var meetingParticipantsIds: [String]?
+  public var meetingAgendaItemIds, meetingFilesIds, remindOnIds: [Int]?
   public var requireResponse, isPublic: Bool?
   public var meetingResponseIds: [Int]?
   public var createdAt, updatedAt: String?
 
-  public var owner: [UserProfileData]?
-  public var participants: [UserProfileData]?
+  public var owner, participants: [UserProfileData]?
   public var agendaItems: [AgendaItem]?
   public var files: [Media]?
   public var reminders: [Reminders]?
@@ -73,7 +73,7 @@ public class Meeting: Mappable {
     updatedAt <- map["updated_at"]
     metaInformation <- map["meta_information"]
     owner <- map["owner"]
-    participants <- map["meeting_participants"]
+    participants <- map["participants"]
     agendaItems <- map["agenda_items"]
     files <- map["meeting_files"]
     reminders <- map["reminders"]

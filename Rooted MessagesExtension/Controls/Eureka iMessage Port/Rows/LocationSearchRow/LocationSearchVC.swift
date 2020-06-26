@@ -158,7 +158,7 @@ extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
         let searchResult = searchResults[indexPath.row]
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
 
-        cell.backgroundColor = .clear
+        cell.backgroundColor = .white
         cell.textLabel?.textColor = .darkText
         cell.textLabel?.lineBreakMode = .byWordWrapping
         cell.textLabel?.numberOfLines = 2

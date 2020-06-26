@@ -110,7 +110,7 @@ class ResponsiveViewController: BaseAppViewController {
 
       flowLayout.minimumInteritemSpacing = 0
       flowLayout.minimumLineSpacing = 0
-      flowLayout.itemSize = CGSize(width: self.view.bounds.width, height: 200)
+      flowLayout.itemSize = CGSize(width: self.view.bounds.width, height: 245)
       flowLayout.sectionInset = UIEdgeInsets(top: 0.0, left: 0, bottom: 0.0, right: 0)
       flowLayout.scrollDirection = .vertical
 
