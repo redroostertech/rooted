@@ -1925,7 +1925,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = "Rooted MessagesExtension/Rooted MessagesExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = "Rooted MessagesExtension/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1950,7 +1950,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = "Rooted MessagesExtension/Rooted MessagesExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = "Rooted MessagesExtension/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;

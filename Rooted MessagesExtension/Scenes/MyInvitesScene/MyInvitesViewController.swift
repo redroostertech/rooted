@@ -704,7 +704,7 @@ extension MyInvitesViewController {
     EggRating.debugMode = isDebug
     EggRating.minuteUntilPrompt = 1
     EggRating.minuteRemindPeriod = 1
-    EggRating.promptRateUsIfNeeded(in: self)
+    EggRating.promptRateUsIfNeededMessageExt(in: self)
   }
 
 }
