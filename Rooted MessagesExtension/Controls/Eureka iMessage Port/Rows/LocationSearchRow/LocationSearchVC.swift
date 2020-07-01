@@ -66,6 +66,7 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
     } else {
       tableView.frame = CGRect(x: .zero, y: 56, width: self.view.bounds.width, height: self.view.bounds.height - 56)
     }
+    tableView.separatorStyle = .none
     tableView.estimatedRowHeight = UITableView.automaticDimension
     tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     return tableView
@@ -82,6 +83,13 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
     searchBar.setMagnifyingGlassColorTo(color: .darkText)
     return searchBar
   }()
+
+  var emptyDataSource: EmptyDataSetSource? {
+    didSet {
+      guard let emptydatasource = self.emptyDataSource else { return }
+      searchResultsTableView.emptyDataSetSource = emptydatasource
+    }
+  }
 
   private var locationManager = CLLocationManager()
   private var searchCompleter = MKLocalSearchCompleter()
@@ -135,6 +143,22 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
     view.addSubview(searchResultsTableView)
     searchResultsTableView.delegate = self
     searchResultsTableView.dataSource = self
+    searchResultsTableView.emptyDataSetView { view in
+      view.titleLabelString(NSAttributedString(string: "Find a location to meet at"))
+        .image(UIImage(named: "map-folded-outlined-paper-sm"))
+        .dataSetBackgroundColor(UIColor.white)
+        .shouldDisplay(true)
+        .shouldFadeIn(true)
+        .isTouchAllowed(true)
+        .isScrollAllowed(true)
+        .didTapDataButton {
+          // Do something
+        }
+        .didTapContentView {
+          // Do something
+      }
+    }
+
 
     view.addSubview(searchFormField)
     searchFormField.delegate = self
@@ -172,7 +196,10 @@ extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         let searchResult = searchResults[indexPath.row]
         row.value = searchResult
-        rowValue = searchResult
+//        rowValue = searchResult
+      DispatchQueue.main.async {
+        self.onDismissCallback?(self)
+      }
     }
 }
 
@@ -180,7 +207,12 @@ extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
 // MARK: - UISearchBarDelegate
 extension LocationSearchVC: UISearchBarDelegate {
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-    searchCompleter.queryFragment = searchText
+//    searchCompleter.queryFragment = searchText
+  }
+
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    searchCompleter.queryFragment = searchBar.text ?? ""
+    self.view.endEditing(true)
   }
 }
 
@@ -225,10 +257,25 @@ open class MKLocalSearchCompletionWrapper: SuggestionValue {
 
     mkLocalSearchCompletion = localSearchCompletion
     let searchRequest = MKLocalSearch.Request(completion: localSearchCompletion)
+    searchRequest.naturalLanguageQuery = suggestionString
+
     let search = MKLocalSearch(request: searchRequest)
     search.start { (response, error) in
 
-      guard let mapItem = response?.mapItems[0], let location = self.generateRLocation(from: mapItem) else { return }
+      print("Response items")
+      print(response?.mapItems)
+
+      print(error?.localizedDescription)
+
+      guard let mapItem = response?.mapItems[0] else {
+        RRLogger.log(message: "Map item couldn't be created", owner: self)
+        return
+      }
+
+      guard let location = self.generateRLocation(from: mapItem) else {
+        RRLogger.log(message: "RLocation couldn't be created.", owner: self)
+        return
+      }
 
       // Add MKMapItem to RLocation
       location.mapItem = mapItem
