@@ -79,6 +79,7 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
     } else {
       searchBar.frame = CGRect(x: .zero, y: .zero, width: self.view.bounds.width, height: 56)
     }
+    searchBar.backgroundColor = .white
     searchBar.setPlaceholderTextColorTo(color: .darkText)
     searchBar.setMagnifyingGlassColorTo(color: .darkText)
     return searchBar
