@@ -194,7 +194,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
               if let row = form.rowBy(tag: "meeting_location") as? LocationSearchRow {
                 if let labelRow = form.rowBy(tag: "event_label") as? LabelRow, let rowValue = row.value {
                   self.selectedLocation = rowValue.rLocation?.toJSONString() ?? ""
-                  labelRow.title = rowValue.suggestionString ?? ""
+                  labelRow.title = rowValue.suggestionString 
                   labelRow.updateCell()
                 }
                 return row.value == nil
