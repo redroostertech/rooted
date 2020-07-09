@@ -17,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="G49-fd-08p">
-                                <rect key="frame" x="0.0" y="16" width="320" height="512"/>
+                                <rect key="frame" x="0.0" y="20" width="320" height="508"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="pUl-Rt-aLE">
                                     <size key="itemSize" width="50" height="50"/>
@@ -54,7 +54,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BmR-DY-Maj" customClass="ScrollableSegmentedControl" customModule="Rooted_MessagesExtension" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="16" width="320" height="0.0"/>
+                                <rect key="frame" x="0.0" y="20" width="320" height="0.0"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" id="LSq-Go-Mpl"/>
@@ -66,6 +66,7 @@
                                     <constraint firstAttribute="width" constant="49" id="fAM-CR-VEP"/>
                                 </constraints>
                                 <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <inset key="imageEdgeInsets" minX="8" minY="8" maxX="8" maxY="8"/>
                                 <state key="normal" image="two-circular-arrows"/>
                                 <connections>
                                     <action selector="refreshAction:" destination="Ts0-8B-CVl" eventType="touchUpInside" id="dQ2-aS-WKg"/>
@@ -86,13 +87,13 @@
                                     <constraint firstAttribute="height" id="uU3-s4-Esq"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="14"/>
-                                <color key="textColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="Uii-t9-pjY" firstAttribute="top" secondItem="37a-dK-bp3" secondAttribute="bottom" constant="4" id="0wQ-wM-Lyq"/>
+                            <constraint firstItem="Uii-t9-pjY" firstAttribute="top" secondItem="37a-dK-bp3" secondAttribute="bottom" id="0wQ-wM-Lyq"/>
                             <constraint firstItem="BmR-DY-Maj" firstAttribute="top" secondItem="Uii-t9-pjY" secondAttribute="bottom" constant="8" id="4FA-De-Sjo"/>
                             <constraint firstItem="Z6K-sP-Wx0" firstAttribute="trailing" secondItem="lfh-Px-pbt" secondAttribute="trailing" constant="16" id="4qS-hp-GYK"/>
                             <constraint firstItem="37a-dK-bp3" firstAttribute="leading" secondItem="Z6K-sP-Wx0" secondAttribute="leading" constant="8" id="5Kc-Qx-A6w"/>
@@ -248,7 +249,22 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S75-ve-dEE">
                                 <rect key="frame" x="0.0" y="450" width="320" height="58"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jq9-Tl-GSx" customClass="SSSpinnerButton" customModule="SSSpinnerButton">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zKP-bl-hHF">
+                                        <rect key="frame" x="137" y="8" width="175" height="42"/>
+                                        <color key="backgroundColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="175" id="5dF-Gh-Dfe"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="AvenirNext-Bold" family="Avenir Next" pointSize="16"/>
+                                        <inset key="titleEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        <state key="normal" title="Create Event">
+                                            <color key="titleColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="sendToFriends:" destination="ObA-dk-sSI" eventType="touchUpInside" id="kbg-Di-TS8"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jq9-Tl-GSx" customClass="SSSpinnerButton" customModule="SSSpinnerButton">
                                         <rect key="frame" x="272" y="13" width="32" height="32"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
@@ -256,7 +272,8 @@
                                             <constraint firstAttribute="height" constant="32" id="ptd-xm-tLL"/>
                                         </constraints>
                                         <color key="tintColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <state key="normal" image="upload-to-the-cloud-sm"/>
+                                        <inset key="imageEdgeInsets" minX="4" minY="4" maxX="4" maxY="4"/>
+                                        <state key="normal" image="upload-to-the-cloud-ok"/>
                                         <connections>
                                             <action selector="sendToFriends:" destination="ObA-dk-sSI" eventType="touchUpInside" id="tfR-zx-tOZ"/>
                                         </connections>
@@ -272,21 +289,6 @@
                                         <state key="normal" image="arrow-back-icon"/>
                                         <connections>
                                             <action selector="cancelAction:" destination="ObA-dk-sSI" eventType="touchUpInside" id="qyy-gR-7bg"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zKP-bl-hHF">
-                                        <rect key="frame" x="137" y="8" width="175" height="42"/>
-                                        <color key="backgroundColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="175" id="5dF-Gh-Dfe"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="16"/>
-                                        <inset key="titleEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                        <state key="normal" title="Create Event">
-                                            <color key="titleColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="sendToFriends:" destination="ObA-dk-sSI" eventType="touchUpInside" id="kbg-Di-TS8"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -829,8 +831,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign-in to your account" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uOk-lC-4kl">
-                                <rect key="frame" x="68" y="139" width="239" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <rect key="frame" x="68" y="139" width="239" height="23.5"/>
+                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="18"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -841,12 +843,13 @@
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mrm-Q1-Q8F">
-                                <rect key="frame" x="105" y="478" width="165" height="50"/>
+                                <rect key="frame" x="105" y="480.5" width="165" height="50"/>
                                 <color key="backgroundColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="TaF-h8-ovq"/>
                                     <constraint firstAttribute="width" constant="165" id="rJN-0M-LMs"/>
                                 </constraints>
+                                <fontDescription key="fontDescription" name="AvenirNext-Bold" family="Avenir Next" pointSize="16"/>
                                 <state key="normal" title="Login">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
@@ -855,17 +858,18 @@
                                 </connections>
                             </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="dpe-id-nbf">
-                                <rect key="frame" x="68" y="184" width="239" height="125"/>
+                                <rect key="frame" x="68" y="186.5" width="239" height="125"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="125" id="Z1W-US-6g7"/>
                                 </constraints>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0aS-f5-Dku">
-                                <rect key="frame" x="68" y="333" width="239" height="50"/>
+                                <rect key="frame" x="68" y="335.5" width="239" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="51k-4L-SbG"/>
                                 </constraints>
+                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="18"/>
                                 <state key="normal" title="Forgot your password?">
                                     <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
@@ -874,17 +878,17 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Create Account - SWIPE" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vAc-WG-JXr">
-                                <rect key="frame" x="105" y="552" width="165" height="50"/>
+                                <rect key="frame" x="105" y="554.5" width="165" height="50"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="fCa-Uv-jT4"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="10"/>
+                                <fontDescription key="fontDescription" name="AvenirNext-Bold" family="Avenir Next" pointSize="10"/>
                                 <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="two-arrows" translatesAutoresizingMaskIntoConstraints="NO" id="HaS-zW-R5E">
-                                <rect key="frame" x="105" y="562" width="20" height="30"/>
+                                <rect key="frame" x="105" y="564.5" width="20" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="20" id="JAN-Xv-hQd"/>
                                     <constraint firstAttribute="height" constant="30" id="ei4-Vd-QSZ"/>
@@ -935,8 +939,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Creating an account is 100% FREE" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jAc-dt-SvJ">
-                                <rect key="frame" x="68" y="139" width="239" height="41"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <rect key="frame" x="68" y="139" width="239" height="42"/>
+                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -947,12 +951,13 @@
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5nK-vg-4HO">
-                                <rect key="frame" x="105" y="478" width="165" height="50"/>
+                                <rect key="frame" x="105" y="479" width="165" height="50"/>
                                 <color key="backgroundColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="165" id="Ru4-70-UYi"/>
                                     <constraint firstAttribute="height" constant="50" id="Vqa-L9-uvN"/>
                                 </constraints>
+                                <fontDescription key="fontDescription" name="AvenirNext-Bold" family="Avenir Next" pointSize="16"/>
                                 <state key="normal" title="Create Account">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
@@ -961,24 +966,24 @@
                                 </connections>
                             </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="fsi-XD-71X">
-                                <rect key="frame" x="68" y="204" width="239" height="250"/>
+                                <rect key="frame" x="68" y="205" width="239" height="250"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="250" id="SSH-Co-MeZ"/>
                                 </constraints>
                             </tableView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Login - SWIPE" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P1a-gq-klP">
-                                <rect key="frame" x="105" y="552" width="165" height="50"/>
+                                <rect key="frame" x="105" y="553" width="165" height="50"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="kDi-dp-HMv"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="10"/>
+                                <fontDescription key="fontDescription" name="AvenirNext-Bold" family="Avenir Next" pointSize="10"/>
                                 <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="double-right-arrows-angles" translatesAutoresizingMaskIntoConstraints="NO" id="zHr-eX-6Tx">
-                                <rect key="frame" x="250" y="562" width="20" height="30"/>
+                                <rect key="frame" x="250" y="563" width="20" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="O52-u8-U5D"/>
                                     <constraint firstAttribute="width" constant="20" id="yY5-VX-QXP"/>
@@ -1024,6 +1029,6 @@
         <image name="menu-square-button-sm" width="25" height="25"/>
         <image name="two-arrows" width="512" height="512"/>
         <image name="two-circular-arrows" width="32" height="32"/>
-        <image name="upload-to-the-cloud-sm" width="25" height="25"/>
+        <image name="upload-to-the-cloud-ok" width="50" height="50"/>
     </resources>
 </document>
