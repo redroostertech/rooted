@@ -87,12 +87,14 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     case .compact, .transcript:
       self.layoutOption = .horizontalList
       self.segmentControlHeightConstraint.constant = 0
+      self.refreshButton.isHidden = true
       self.welcomeLabelHeightConstraint.constant = 0
       self.activityCountLabelHeightConstraint.constant = 0
       break
     default:
       self.layoutOption = .list
       self.segmentControlHeightConstraint.constant = 49
+      self.refreshButton.isHidden = false
       self.welcomeLabelHeightConstraint.constant = 55
       self.activityCountLabelHeightConstraint.constant = 21
       break
@@ -106,12 +108,14 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     case .compact, .transcript:
       self.layoutOption = .horizontalList
       self.segmentControlHeightConstraint.constant = 0
+      self.refreshButton.isHidden = true
       self.welcomeLabelHeightConstraint.constant = 0
       self.activityCountLabelHeightConstraint.constant = 0
       break
     default:
       self.layoutOption = .list
       self.segmentControlHeightConstraint.constant = 49
+      self.refreshButton.isHidden = false
       self.welcomeLabelHeightConstraint.constant = 55
       self.activityCountLabelHeightConstraint.constant = 21
       break
@@ -128,6 +132,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
       self.floatingMenu?.toggleMenu()
 
       self.segmentControlHeightConstraint.constant = 0
+      self.refreshButton.isHidden = true
       self.welcomeLabelHeightConstraint.constant = 0
       self.activityCountLabelHeightConstraint.constant = 0
       break
@@ -138,7 +143,8 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
         self.floatingMenu?.toggleMenu()
       }
       self.segmentControlHeightConstraint.constant = 49
-      self.welcomeLabelHeightConstraint.constant = 49
+      self.refreshButton.isHidden = false
+      self.welcomeLabelHeightConstraint.constant = 55
       self.activityCountLabelHeightConstraint.constant = 21
       self.setupManagedSession()
 
@@ -195,10 +201,21 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   func setupManagedSession() {
     NavigationCoordinator.performExpandedNavigation(from: self, {
       // Authentication does not exist yet so set up a empty anonymous user
-      if SessionManager.shared.sessionExists, let currentUser = SessionManager.shared.currentUser, let currentUserFullName = currentUser.fullName {
+      if
+        // Check if session exists; essentially sees if current user exists
+        SessionManager.shared.sessionExists,
+        // Retrieve current user from session manager
+        let currentUser = SessionManager.shared.currentUser,
+        // Get full name
+        let currentUserFullName = currentUser.fullName,
+        // Get first name
+        let currentUserFirstName = currentUserFullName.components(separatedBy: " ").first
+
+      {
 
         // Update heads up display labels
-        self.updateLabel(self.welcomeLabel, text: "Hello, \(currentUserFullName)")
+        // Parse full name
+        self.updateLabel(self.welcomeLabel, text: "Hello, \(currentUserFirstName)!")
         self.updateLabel(self.activityCountLabel, text: "Upcoming meetings today")
 
         // Check calendar permissions
@@ -242,10 +259,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   }
 
   func didFinishLoading(_ manager: Any?, invites: [MeetingContextWrapper]) {
-//    dismissHUD()
-//    Filter invites by segment index
-//    let rootedCollectionViewModel = EngagementFactory.Meetings.convert(contextWrappers: invites, for: menuSelection, withDelegate: self)
-//    loadCells(cells: rootedCollectionViewModel)
+    // Handle some additional business logic
   }
 
   func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) {
