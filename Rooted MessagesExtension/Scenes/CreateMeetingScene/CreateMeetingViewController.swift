@@ -50,6 +50,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
   // MARK: - IBOutlets
   @IBOutlet private weak var sendToFriendsButton: SSSpinnerButton!
+  @IBOutlet private weak var createMeetingButton: UIButton!
   @IBOutlet private weak var cancelButton: UIButton!
   @IBOutlet private weak var actionsContainerView: UIView!
 
@@ -143,6 +144,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
   // MARK: - Use Case: Setup the UI for the view
   private func setupUI() {
+    setupCreateMeetingButton()
     setupSendToFriendsButton()
 
     startDatePicker.delegate = self
@@ -159,6 +161,11 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: NSNotification.Name.init(rawValue: kNotificationKeyboardWillHideNotification), object: nil)
    }
+
+  private func setupCreateMeetingButton() {
+    actionsContainerView.sendSubviewToBack(createMeetingButton)
+    createMeetingButton.applyCornerRadius()
+  }
 
   private func setupSendToFriendsButton() {
     sendToFriendsButton.applyCornerRadius()

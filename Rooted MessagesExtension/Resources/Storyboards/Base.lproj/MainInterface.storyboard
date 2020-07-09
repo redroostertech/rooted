@@ -248,14 +248,15 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S75-ve-dEE">
                                 <rect key="frame" x="0.0" y="450" width="320" height="58"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jq9-Tl-GSx" customClass="SSSpinnerButton" customModule="SSSpinnerButton">
-                                        <rect key="frame" x="254" y="8" width="50" height="42"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jq9-Tl-GSx" customClass="SSSpinnerButton" customModule="SSSpinnerButton">
+                                        <rect key="frame" x="272" y="13" width="32" height="32"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="50" id="IsI-qG-ZND"/>
+                                            <constraint firstAttribute="width" constant="32" id="IsI-qG-ZND"/>
+                                            <constraint firstAttribute="height" constant="32" id="ptd-xm-tLL"/>
                                         </constraints>
-                                        <state key="normal" image="upload-to-the-cloud-sm">
-                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
-                                        </state>
+                                        <color key="tintColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" image="upload-to-the-cloud-sm"/>
                                         <connections>
                                             <action selector="sendToFriends:" destination="ObA-dk-sSI" eventType="touchUpInside" id="tfR-zx-tOZ"/>
                                         </connections>
@@ -273,15 +274,33 @@
                                             <action selector="cancelAction:" destination="ObA-dk-sSI" eventType="touchUpInside" id="qyy-gR-7bg"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zKP-bl-hHF">
+                                        <rect key="frame" x="137" y="8" width="175" height="42"/>
+                                        <color key="backgroundColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="175" id="5dF-Gh-Dfe"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="16"/>
+                                        <inset key="titleEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        <state key="normal" title="Create Event">
+                                            <color key="titleColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="sendToFriends:" destination="ObA-dk-sSI" eventType="touchUpInside" id="kbg-Di-TS8"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstItem="Jq9-Tl-GSx" firstAttribute="bottom" secondItem="Shp-5d-WQB" secondAttribute="bottom" id="4k8-bH-PLs"/>
                                     <constraint firstItem="Shp-5d-WQB" firstAttribute="leading" secondItem="S75-ve-dEE" secondAttribute="leading" constant="8" id="9DW-S4-rNH"/>
-                                    <constraint firstItem="Jq9-Tl-GSx" firstAttribute="top" secondItem="Shp-5d-WQB" secondAttribute="top" id="HVD-LK-EAy"/>
+                                    <constraint firstAttribute="trailing" secondItem="zKP-bl-hHF" secondAttribute="trailing" constant="8" id="EjG-Rt-Vc1"/>
+                                    <constraint firstItem="Jq9-Tl-GSx" firstAttribute="centerY" secondItem="S75-ve-dEE" secondAttribute="centerY" id="aHR-zh-KtV"/>
                                     <constraint firstAttribute="trailing" secondItem="Jq9-Tl-GSx" secondAttribute="trailing" constant="16" id="baC-zs-ZH2"/>
                                     <constraint firstAttribute="bottom" secondItem="Shp-5d-WQB" secondAttribute="bottom" constant="8" id="bvm-2x-Soh"/>
+                                    <constraint firstAttribute="bottom" secondItem="zKP-bl-hHF" secondAttribute="bottom" constant="8" id="d1v-Jh-uTV"/>
                                     <constraint firstItem="Shp-5d-WQB" firstAttribute="top" secondItem="S75-ve-dEE" secondAttribute="top" constant="8" id="fmw-as-sej"/>
+                                    <constraint firstItem="zKP-bl-hHF" firstAttribute="top" secondItem="Shp-5d-WQB" secondAttribute="top" id="kcW-jA-DzN"/>
+                                    <constraint firstItem="zKP-bl-hHF" firstAttribute="bottom" secondItem="Shp-5d-WQB" secondAttribute="bottom" id="xIX-mo-f8F"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -298,6 +317,7 @@
                     <connections>
                         <outlet property="actionsContainerView" destination="S75-ve-dEE" id="4k3-KN-bbv"/>
                         <outlet property="cancelButton" destination="Shp-5d-WQB" id="LcM-u7-a4g"/>
+                        <outlet property="createMeetingButton" destination="zKP-bl-hHF" id="ABq-zO-hXz"/>
                         <outlet property="sendToFriendsButton" destination="Jq9-Tl-GSx" id="9V4-4t-fMD"/>
                     </connections>
                 </viewController>
@@ -321,7 +341,7 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="50" id="YN1-eU-iGN"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                        <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="16"/>
                                         <state key="normal" title="Yes">
                                             <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
                                         </state>
@@ -334,7 +354,7 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="50" id="4cK-EV-7Uw"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                        <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="16"/>
                                         <state key="normal" title="No">
                                             <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
                                         </state>
@@ -370,7 +390,7 @@
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Going?" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J1d-Z8-FoL">
                                         <rect key="frame" x="58" y="8" width="122" height="42"/>
-                                        <fontDescription key="fontDescription" type="system" weight="black" pointSize="12"/>
+                                        <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="18"/>
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
