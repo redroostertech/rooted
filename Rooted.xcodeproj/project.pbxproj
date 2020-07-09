@@ -356,7 +356,7 @@
 		D701DC6C23E8DC6B00A45E9B /* PaymentInformation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentInformation.swift; sourceTree = "<group>"; };
 		D701DC6E23E9459B00A45E9B /* HUDFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDFactory.swift; sourceTree = "<group>"; };
 		D706F11A241F4C8800C40130 /* AvailabilityModelBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityModelBuilder.swift; sourceTree = "<group>"; };
-		D706F1592420932700C40130 /* AvailabilitySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AvailabilitySelectionViewController.swift; path = "Rooted MessagesExtension/Controllers/AvailabilitySelectionViewController.swift"; sourceTree = SOURCE_ROOT; };
+		D706F1592420932700C40130 /* AvailabilitySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AvailabilitySelectionViewController.swift; path = "Rooted MessagesExtension/Scenes/AvailabilitySelectionViewController.swift"; sourceTree = SOURCE_ROOT; };
 		D706F15B2420943A00C40130 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		D706F15D242094E700C40130 /* UIImage+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extensions.swift"; sourceTree = "<group>"; };
 		D706F16124210C0700C40130 /* CloseButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
@@ -643,7 +643,6 @@
 				D701DA8523E8DBF400A45E9B /* Models */,
 				D75711F323D8817200BDD6A0 /* Resources */,
 				D75711F623D8818900BDD6A0 /* Managers */,
-				D7A18AE924063A7B0039A295 /* Controllers */,
 				D701DC6E23E9459B00A45E9B /* HUDFactory.swift */,
 				D79A5EAA2406B070006DAA7A /* RRLogger.swift */,
 				BA41F4CA224CECE4006AD793 /* LaunchVC.swift */,
@@ -1059,20 +1058,6 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		D7A18AE924063A7B0039A295 /* Controllers */ = {
-			isa = PBXGroup;
-			children = (
-				D7B758D1245B6FF8005CD0C9 /* Shared */,
-				D7B758D0245B6E80005CD0C9 /* MyInvitesScene */,
-				D7B758E7245C6955005CD0C9 /* CreateMeetingScene */,
-				D7B758D9245B72F6005CD0C9 /* InviteDetailsScene */,
-				D7B758E9245DB4EE005CD0C9 /* InfoScene */,
-				D7B758E8245DB4E4005CD0C9 /* AvailabilityScene */,
-				D706F1592420932700C40130 /* AvailabilitySelectionViewController.swift */,
-			);
-			path = Controllers;
-			sourceTree = "<group>";
-		};
 		D7B758C0245AF015005CD0C9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1223,6 +1208,13 @@
 		D7DDDA1124703F630061C15B /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				D7B758D1245B6FF8005CD0C9 /* Shared */,
+				D7B758D0245B6E80005CD0C9 /* MyInvitesScene */,
+				D7B758E7245C6955005CD0C9 /* CreateMeetingScene */,
+				D7B758D9245B72F6005CD0C9 /* InviteDetailsScene */,
+				D7B758E9245DB4EE005CD0C9 /* InfoScene */,
+				D7B758E8245DB4E4005CD0C9 /* AvailabilityScene */,
+				D706F1592420932700C40130 /* AvailabilitySelectionViewController.swift */,
 				D73725C7249E6F3B00336EFC /* Forgot Password */,
 				D790B5A024858FD900A69192 /* Chat */,
 				D7DF8D0624841A33005C116A /* Notes */,
