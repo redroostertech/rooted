@@ -18,6 +18,10 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   @IBOutlet private weak var segmentControlHeightConstraint: NSLayoutConstraint!
   @IBOutlet private weak var collectionView: UICollectionView!
   @IBOutlet private weak var menuButton: UIButton!
+  @IBOutlet private weak var welcomeLabel: UILabel!
+  @IBOutlet private weak var welcomeLabelHeightConstraint: NSLayoutConstraint!
+  @IBOutlet private weak var activityCountLabel: UILabel!
+  @IBOutlet private weak var activityCountLabelHeightConstraint: NSLayoutConstraint!
 
   // Floating Menu
   public var floatingMenu: FloatingMenuBtn?
@@ -83,10 +87,14 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     case .compact, .transcript:
       self.layoutOption = .horizontalList
       self.segmentControlHeightConstraint.constant = 0
+      self.welcomeLabelHeightConstraint.constant = 0
+      self.activityCountLabelHeightConstraint.constant = 0
       break
     default:
       self.layoutOption = .list
       self.segmentControlHeightConstraint.constant = 49
+      self.welcomeLabelHeightConstraint.constant = 55
+      self.activityCountLabelHeightConstraint.constant = 21
       break
     }
   }
@@ -98,10 +106,14 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     case .compact, .transcript:
       self.layoutOption = .horizontalList
       self.segmentControlHeightConstraint.constant = 0
+      self.welcomeLabelHeightConstraint.constant = 0
+      self.activityCountLabelHeightConstraint.constant = 0
       break
     default:
       self.layoutOption = .list
       self.segmentControlHeightConstraint.constant = 49
+      self.welcomeLabelHeightConstraint.constant = 55
+      self.activityCountLabelHeightConstraint.constant = 21
       break
     }
   }
@@ -114,7 +126,10 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
       self.toggleMenuButton = false
       self.floatingMenu?.isOpen = true
       self.floatingMenu?.toggleMenu()
+
       self.segmentControlHeightConstraint.constant = 0
+      self.welcomeLabelHeightConstraint.constant = 0
+      self.activityCountLabelHeightConstraint.constant = 0
       break
     default:
       if toggleMenuButton {
@@ -123,6 +138,8 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
         self.floatingMenu?.toggleMenu()
       }
       self.segmentControlHeightConstraint.constant = 49
+      self.welcomeLabelHeightConstraint.constant = 49
+      self.activityCountLabelHeightConstraint.constant = 21
       self.setupManagedSession()
 
       break
@@ -178,11 +195,17 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   func setupManagedSession() {
     NavigationCoordinator.performExpandedNavigation(from: self, {
       // Authentication does not exist yet so set up a empty anonymous user
-      if !SessionManager.shared.sessionExists {
+      if SessionManager.shared.sessionExists, let currentUser = SessionManager.shared.currentUser, let currentUserFullName = currentUser.fullName {
+
+        // Update heads up display labels
+        self.updateLabel(self.welcomeLabel, text: "Hello, \(currentUserFullName)")
+        self.updateLabel(self.activityCountLabel, text: "Upcoming meetings today")
+
+        // Check calendar permissions
+        self.checkCalendarPermissions()
+      } else {
         RRLogger.log(message: "Session does not exist, start an anonymous one.", owner: self)
         self.presentPhoneLoginViewController()
-      } else {
-        self.checkCalendarPermissions()
       }
     })
   }
@@ -228,8 +251,18 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) {
     dismissHUD()
     guard let meetings = viewModel.meetings else { return }
+
+    // Update activity label
+    updateLabel(activityCountLabel, text: "You have \(meetings.count) upcoming meetings")
+
+    // Update table for meetings
     let rootedCollectionViewModel = EngagementFactory.Meetings.convert(contextWrappers: meetings, for: menuSelection, withDelegate: self)
     loadCells(cells: rootedCollectionViewModel)
+  }
+
+  // MARK: - Use Case: App needs to quickly update text value within a UILabel
+  private func updateLabel(_ label: UILabel, text: String) {
+    label.text = text
   }
 
   // MARK: - Use Case: App should handle selection within `ScrollableSegmentedControl` to update the type of meeting data that is displayed in the table view
