@@ -59,4 +59,11 @@ public class MeetingDateClass: Mappable {
     return string
   }
 
+  public var startTimeOnly: String {
+    var string = ""
+    guard let startdate = startDate?.toDate()?.date, let _ = endDate?.toDate()?.date else { return string }
+    string += "on \(startdate.toString(.rooted))"
+    return string
+  }
+
 }

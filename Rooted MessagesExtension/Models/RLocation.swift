@@ -15,7 +15,7 @@ import MapKit
 // MARK: - Location
 public class RLocation: Mappable, SuggestionValue {
   public var name, address1, address2, address3, address4: String?
-  public var city, state, stateSh, zipCode, country: String?
+  public var city, state, stateAbbr, zipCode, country: String?
   public var coordinates: Coordinates?
   public var metaInformation: [String: Any]?
 
@@ -40,7 +40,7 @@ public class RLocation: Mappable, SuggestionValue {
     }
 
     if self.city != nil || self.state != nil || self.zipCode != nil {
-      addressString += "\n"
+      addressString += " "
 
       if let city = self.city {
         addressString += city
@@ -75,16 +75,16 @@ public class RLocation: Mappable, SuggestionValue {
 
   public func mapping(map: Map) {
     name <- map["name"]
-    address1 <- map["address_1"]
-    address2 <- map["address_2"]
-    address3 <- map["address_3"]
-    address4 <- map["address_4"]
-    city <- map["city"]
-    state <- map["state"]
-    stateSh <- map["state_sh"]
-    country <- map["country"]
-    zipCode <- map["zip_code"]
-    coordinates <- map["coordinates"]
+    address1 <- map["address_line_1"]
+    address2 <- map["address_line_2"]
+    address3 <- map["address_line_3"]
+    address4 <- map["address_line_4"]
+    city <- map["address_city"]
+    state <- map["address_state"]
+    stateAbbr <- map["address_state_sh"]
+    country <- map["address_country"]
+    zipCode <- map["address_zip"]
+    coordinates <- map["address_coordinates"]
     metaInformation <- map["meta_information"]
   }
 

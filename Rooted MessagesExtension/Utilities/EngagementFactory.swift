@@ -47,10 +47,10 @@ class EngagementFactory {
       }
 
       let message = MSMessage()
-      var subcaption = ""
+      var subcaption = meeting.meetingDescription ?? ""
 
       let layout = MSMessageTemplateLayout()
-      layout.caption = String(format: captionString, arguments: [meetingname, startdate.toString(.rooted)])
+      layout.caption = String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
 
       message.md.set(value: meetingname, forKey: kMessageTitleKey)
       message.md.set(value: startdate.toString(.rooted), forKey: kMessageStartDateKey)
@@ -87,12 +87,12 @@ class EngagementFactory {
       var meetingContextWrappers = [MeetingContextWrapper]()
 
       switch menuSelection {
-      case 1:
-        meetingContextWrappers = contextWrappers.filter { meetingContextWrapper -> Bool in
-          guard let meeting = meetingContextWrapper.meeting, let dashboardSectionId = meeting.dashboardSectionId else { return false }
-          return dashboardSectionId == menuSelection
-        }
-        break
+//      case 1:
+//        meetingContextWrappers = contextWrappers.filter { meetingContextWrapper -> Bool in
+//          guard let meeting = meetingContextWrapper.meeting, let dashboardSectionId = meeting.dashboardSectionId else { return false }
+//          return dashboardSectionId == menuSelection
+//        }
+//        break
       default:
         meetingContextWrappers = contextWrappers
         break

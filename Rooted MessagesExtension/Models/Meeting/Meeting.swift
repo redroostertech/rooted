@@ -24,7 +24,7 @@ public class Meetings: Mappable {
 
 // MARK: - Meeting
 public class Meeting: Mappable {
-  public var id: String?
+  public var id, key, ownerId: String?
   public var metaInformation: [String: Any]?
   public var dashboardSectionId, meetingStatusId, meetingOwnerId: Int?
   public var meetingName, meetingDescription: String?
@@ -35,19 +35,24 @@ public class Meeting: Mappable {
   public var meetingResponseIds: [Int]?
   public var createdAt, updatedAt: String?
 
-  public var owner: UserProfileShortData?
-  public var participants: [UserProfileShortData]?
+  public var owner: [UserProfileData]?
+  public var participants: [UserProfileData]?
   public var agendaItems: [AgendaItem]?
   public var files: [Media]?
   public var reminders: [Reminders]?
   public var meetingType: [MeetingType]?
 
   public var calendarId: String?
+
+  public var meetingAgendaItems: [String]?
+  public var isChatEnabled: String?
   
   required public init?(map: Map) { }
 
   public func mapping(map: Map) {
     id <- map["id"]
+    key <- map["key"]
+    ownerId <- map["owner_id"]
     metaInformation <- map["meta_information"]
     owner <- map["owner"]
     dashboardSectionId <- map["dashboard_section_id"]
@@ -74,6 +79,8 @@ public class Meeting: Mappable {
     reminders <- map["reminders"]
     meetingType <- map["meeting_type"]
     calendarId <- map["calendar_id"]
+    meetingAgendaItems <- map["agenda_items_strings"]
+    isChatEnabled <- map["is_chat_enabled"]
   }
 }
 

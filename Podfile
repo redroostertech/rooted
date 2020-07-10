@@ -26,5 +26,11 @@ target 'Rooted MessagesExtension' do
   pod 'Branch'
   pod 'SwiftDate', '~> 5.0'
   pod 'FSCalendar'
-
+  pod 'PhoneNumberKit', '~> 3.1'
+  pod 'OnboardKit'
+  pod 'FormTextField'
+  pod 'WordPress-Editor-iOS'
+  pod 'Gridicons'
+  pod 'KeychainSwift'
+  
 end

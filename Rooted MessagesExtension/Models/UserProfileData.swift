@@ -13,44 +13,50 @@ import ObjectMapper
 
 // MARK: - UserProfileData
 public class UserProfileData: Mappable {
-  public var id: String?
-  public var firstName, lastName, fullName: String?
-  public var accountTypeId, phoneNumberId: [Int]?
+  public var id, uid, key, token: String?
+  public var firstName, lastName, fullName, phoneNumber, email: String?
+  public var jobTitle, companyName, bio: String?
+  public var cardOnFile, initialSetup: Bool?
+
   public var location: RLocation?
-  public var gender: Int?
-  public var dob: String?
   public var userPreferences: [UserPreference]?
-  public var notifications, cardOnFile: Bool?
-  public var paymentInfoId, lastKnownCheckinIds: [Int]?
   public var dashboardSections: [UserProfileDataDashboardSection]?
 
-  public var accountType: AccountType?
-  public var phoneNumber: PhoneNumber?
-  public var payment: PaymentInformation?
-  public var checkIn: CheckIn?
+  public var accountType: [AccountType]?
+  public var payment: [PaymentInformation]?
+  public var checkIn: [CheckIn]?
+
+  public var createdAt, lastLogin: String?
+
+  public var meetings: [Meeting]?
 
   required public init?(map: Map) { }
 
   public func mapping(map: Map) {
     id <- map["id"]
-    firstName <- map["first_name"]
-    lastName <- map["last_name"]
-    fullName <- map["full_name"]
-    accountTypeId <- map["account_type_id"]
-    phoneNumberId <- map["phone_number_id"]
-    location <- map["location"]
-    gender <- map["gender"]
-    dob <- map["dob"]
-    userPreferences <- map["user_preferences"]
-    notifications <- map["notifications"]
-    cardOnFile <- map["card_on_file"]
-    paymentInfoId <- map["payment_info_id"]
-    lastKnownCheckinIds <- map["last_known_checkin_ids"]
-    dashboardSections <- map["dashboard_sections"]
-    accountType <- map["account_type"]
+    uid <- map["uid"]
+    key <- map["key"]
+    token <- map["token"]
+    email <- map["email_address"]
     phoneNumber <- map["phone_number"]
+    jobTitle <- map["job_title"]
+    companyName <- map["company_name"]
+    fullName <- map["full_name"]
+    phoneNumber <- map["phone_number_string"]
+    cardOnFile <- map["card_on_file"]
+    initialSetup <- map["initial_setup"]
+
+    location <- map["location"]
+    userPreferences <- map["user_preferences"]
+    dashboardSections <- map["dashboard_sections"]
+
     payment <- map["payment"]
+    accountType <- map["account_type"]
     checkIn <- map["check_in"]
+    createdAt <- map["createdAt"]
+    lastLogin <- map["lastLogin"]
+
+    meetings <- map["meetings"]
   }
 }
 

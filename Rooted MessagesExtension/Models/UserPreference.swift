@@ -13,16 +13,63 @@ import ObjectMapper
 
 // MARK: - UserPreference
 public class UserPreference: Mappable {
-  public var preferenceId, preferenceSelectionId: Int?
+  public var id, priority, minimumUserTypeRequired: Int?
+  public var isExtension, defaultIsOn, isActive, isMobile: Bool?
+  public var description, key, title, type, defaultValue: String?
   public var metaInformation: [String: Any]?
-  public var preference: Preference?
+  public var choices: [UserPreferenceChoice]?
 
   required public init?(map: Map) { }
 
   public func mapping(map: Map) {
-    preferenceId <- map["preference_id"]
-    preferenceSelectionId <- map["preference_selection_id"]
+    id <- map["id"]
+    priority <- map["priority"]
+    minimumUserTypeRequired <- map["minimum_user_type_required"]
+    isExtension <- map["is_extension"]
+    defaultIsOn <- map["default_is_on"]
+    isActive <- map["is_active"]
+    isMobile <- map["is_mobile"]
+    description <- map["description"]
+    key <- map["key"]
+    title <- map["title"]
+    type <- map["type"]
+
+    switch type {
+    case "picker":
+      choices <- map["choices"]
+      defaultValue <- map["default_value"]
+    default: break
+    }
     metaInformation <- map["meta_information"]
-    preference <- map["preference"]
+  }
+}
+
+// MARK: - UserPreferenceChoice
+public class UserPreferenceChoice: Mappable {
+  public var collectionName: String?
+  public var values: [PreferenceChoice]?
+
+  required public init?(map: Map) { }
+
+  public func mapping(map: Map) {
+    collectionName <- map["id"]
+    values <- map["values"]
+  }
+}
+
+// MARK: - PreferenceChoice
+public class PreferenceChoice: Mappable {
+  public var title, shortTitle, value: String?
+  public var id, minimumUserTypeRequired, order: Int?
+
+  required public init?(map: Map) { }
+
+  public func mapping(map: Map) {
+    title <- map["title"]
+    shortTitle <- map["sh_title"]
+    value <- map["value"]
+    minimumUserTypeRequired <- map["minimum_user_type_required"]
+    id <- map["id"]
+    order <- map["order"]
   }
 }

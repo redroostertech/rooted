@@ -12,6 +12,8 @@ import UIKit
 // MARK: - Core
 public let kAppName = "Rooted"
 public let kGroupName = "group.com.rrtech.rooted.Rooted"
+public let kSaltKey = "rrtech-rooted-imessage-app"
+public let kKeychainAccessGroupName = "2PSWQPK482.com.rrtech.rooted.Rooted.MessagesExtension.KeychainGroup"
 
 public let maximumInvites = 3
 
@@ -19,12 +21,11 @@ public let maximumInvites = 3
 public let kPagination : UInt = 10
 public let kMaxConcurrentImageDownloads = 2
 
-public var isLive = false
-public var isLocal = false
+public var isDebug = false
 
 public let kLocalBaseURL = "http://localhost:3000/"
 public let kTestBaseURL = "https://rooted-test-web.herokuapp.com/"
-public let kLiveBaseURL = "https://rooted.com/"
+public let kLiveBaseURL = "https://rootedapp.herokuapp.com/"
 
 public let kLocalURL = kLocalBaseURL + "api/v1/"
 public let kTestURL = kTestBaseURL + "api/v1/"
@@ -137,6 +138,12 @@ public let kStoryboardMain = "MainInterface"
 public let kViewControllerAvailability = "AvailabilityViewController"
 public let kViewControllerAvailabilityNavigation = "AvailabilityNavigationViewController"
 public let kViewControllerMessagesNavigation = "MessagesNavigationController"
+public let kMyInvitesViewController = "MyInvitesViewController"
+public let kPhoneLoginViewController = "PhoneLoginViewController"
+public let kRegistrationViewController = "RegistrationViewController"
+public let kInfoViewController = "InfoViewController"
+public let kSettingsNavigationController = "SettingsNavigationController"
+public let kSettingsViewController = "SettingsViewController"
 
 // MARK: - Segues
 public let kGoToDashboardSegue = "goToDashboard"
@@ -147,7 +154,7 @@ public let kGoToAddInviteVC = "goToAddInviteVC"
 // MARK: - User Experience Strings
 public let kDeleteTitle = "Delete Invite"
 public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
-public let captionString = "%@ on %@"
+public let kCaptionString = "ROOTED INVITATION: %@ on %@"
 public let kBackText = "Back"
 
 // MARK: - NotificationCenter Methods
@@ -167,10 +174,30 @@ public let kBranchMeetingStartedSave = "user_started_save"
 public let kBranchMeetingDeleteMeeting = "user_deleted_meeting"
 
 // MARK: - Session strings
+public var kSessionEmailAddress = "currentUserEmailAddress"
 public var kSessionUser = "currentUser"
+public var kSessionUserId = "currentUserId"
 public var kSessionStart = "sessionStart"
 public var kSessionLastLogin = "lastLogin"
 public var kSessionCart = "sessionCart" // Not in use yet
 
 // MARK: - Entities
 public var kEntityMeeting = "MeetingEntity"
+
+// MARK: - Form tags
+public var kFormEmailAddress = "emailAddress"
+public var kFormEmailPlaceholder = "Enter your email here"
+public var kFormPassword = "password"
+public var kFormPasswordPlaceholder = "Enter your Password"
+public var kFormPhoneNumber = "phoneNumber"
+public var kFormPhoneNumberPlaceholder = "Enter your phone number"
+public var kFormFullname = "fullName"
+public var kFormFullnamePlaceholder = "Provide your full name"
+public var kFormCountryCode = "countryCode"
+public var kFormRememberMe = "Remember me?"
+
+// MARK: - Debug Credentials
+public var kDebugEmail = "mwestbrooksjr@gmail.com"
+public var kDebugPassword = "abc123456"
+public var kDebugFullName = "John Doe"
+public var kDebugPhone = "9082178274"

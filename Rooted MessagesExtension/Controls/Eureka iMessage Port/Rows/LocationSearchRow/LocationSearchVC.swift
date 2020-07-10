@@ -66,6 +66,7 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
     } else {
       tableView.frame = CGRect(x: .zero, y: 56, width: self.view.bounds.width, height: self.view.bounds.height - 56)
     }
+    tableView.separatorStyle = .none
     tableView.estimatedRowHeight = UITableView.automaticDimension
     tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     return tableView
@@ -78,16 +79,31 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
     } else {
       searchBar.frame = CGRect(x: .zero, y: .zero, width: self.view.bounds.width, height: 56)
     }
+    searchBar.backgroundColor = .white
     searchBar.setPlaceholderTextColorTo(color: .darkText)
     searchBar.setMagnifyingGlassColorTo(color: .darkText)
     return searchBar
   }()
+
+  var emptyDataSource: EmptyDataSetSource? {
+    didSet {
+      guard let emptydatasource = self.emptyDataSource else { return }
+      searchResultsTableView.emptyDataSetSource = emptydatasource
+    }
+  }
 
   private var locationManager = CLLocationManager()
   private var searchCompleter = MKLocalSearchCompleter()
   private var searchResults = [MKLocalSearchCompletionWrapper]()
   private var initialAuthSet = false
 
+  public var rowValue: MKLocalSearchCompletionWrapper? {
+    didSet {
+      RRLogger.log(message: "Row value was set", owner: self)
+      self.onDismissCallback?(self)
+    }
+  }
+  
   required public init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
   }
@@ -128,6 +144,22 @@ class LocationSearchVC: UIViewController, TypedRowControllerType {
     view.addSubview(searchResultsTableView)
     searchResultsTableView.delegate = self
     searchResultsTableView.dataSource = self
+    searchResultsTableView.emptyDataSetView { view in
+      view.titleLabelString(NSAttributedString(string: "Find a location to meet at"))
+        .image(UIImage(named: "map-folded-outlined-paper-sm"))
+        .dataSetBackgroundColor(UIColor.white)
+        .shouldDisplay(true)
+        .shouldFadeIn(true)
+        .isTouchAllowed(true)
+        .isScrollAllowed(true)
+        .didTapDataButton {
+          // Do something
+        }
+        .didTapContentView {
+          // Do something
+      }
+    }
+
 
     view.addSubview(searchFormField)
     searchFormField.delegate = self
@@ -165,7 +197,10 @@ extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         let searchResult = searchResults[indexPath.row]
         row.value = searchResult
+//        rowValue = searchResult
+      DispatchQueue.main.async {
         self.onDismissCallback?(self)
+      }
     }
 }
 
@@ -173,7 +208,12 @@ extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
 // MARK: - UISearchBarDelegate
 extension LocationSearchVC: UISearchBarDelegate {
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-    searchCompleter.queryFragment = searchText
+//    searchCompleter.queryFragment = searchText
+  }
+
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    searchCompleter.queryFragment = searchBar.text ?? ""
+    self.view.endEditing(true)
   }
 }
 
@@ -218,10 +258,25 @@ open class MKLocalSearchCompletionWrapper: SuggestionValue {
 
     mkLocalSearchCompletion = localSearchCompletion
     let searchRequest = MKLocalSearch.Request(completion: localSearchCompletion)
+    searchRequest.naturalLanguageQuery = suggestionString
+
     let search = MKLocalSearch(request: searchRequest)
     search.start { (response, error) in
 
-      guard let mapItem = response?.mapItems[0], let location = self.generateRLocation(from: mapItem) else { return }
+      print("Response items")
+      print(response?.mapItems)
+
+      print(error?.localizedDescription)
+
+      guard let mapItem = response?.mapItems[0] else {
+        RRLogger.log(message: "Map item couldn't be created", owner: self)
+        return
+      }
+
+      guard let location = self.generateRLocation(from: mapItem) else {
+        RRLogger.log(message: "RLocation couldn't be created.", owner: self)
+        return
+      }
 
       // Add MKMapItem to RLocation
       location.mapItem = mapItem
@@ -247,35 +302,35 @@ open class MKLocalSearchCompletionWrapper: SuggestionValue {
       address1 += thoroughfare
     }
 
-    dict["address_1"] = address1
+    dict["address_line_1"] = address1
 
     if let name = mapItem.name {
       dict["name"] = name
     }
 
     if let city = mapItem.placemark.locality {
-      dict["city"] = city
+      dict["address_city"] = city
     }
 
     if let state =  mapItem.placemark.administrativeArea {
-      dict["state"] = state
+      dict["address_state"] = state
     }
 
     if let state_sh = mapItem.placemark.subAdministrativeArea {
-      dict["state_sh"] = state_sh
+      dict["address_state_sh"] = state_sh
     }
 
     if let country = mapItem.placemark.countryCode {
-      dict["country"] = country
+      dict["address_country"] = country
     }
 
     if let zip_code = mapItem.placemark.postalCode {
-      dict["zip_code"] = zip_code
+      dict["address_zip"] = zip_code
     }
 
-    dict["coordinates"] = [
-      "long": mapItem.placemark.coordinate.longitude,
-      "lat": mapItem.placemark.coordinate.latitude
+    dict["address_coordinates"] = [
+      "address_long": mapItem.placemark.coordinate.longitude,
+      "address_lat": mapItem.placemark.coordinate.latitude
     ]
 
     dict["meta_information"] = [

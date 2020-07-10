@@ -12,5 +12,9 @@
 		<string>group.com.rrtech.rooted.Rooted</string>
 		<string>group.com.rrtech.rooted.Rooted.MessagesExtension</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.rrtech.rooted.Rooted.MessagesExtension.KeychainGroup</string>
+	</array>
 </dict>
 </plist>

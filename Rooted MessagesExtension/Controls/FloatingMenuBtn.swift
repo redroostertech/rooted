@@ -38,8 +38,12 @@ class FloatingMenuBtn {
       let btn = UIButton(type: .system)
       btn.frame = mainButton.frame
       btn.setImage(image, for: .normal)
-      btn.backgroundColor = .gradientColor2
-      btn.layer.cornerRadius = mainButton.layer.cornerRadius
+//      btn.backgroundColor = .white
+//      btn.layer.cornerRadius = mainButton.layer.cornerRadius
+//      btn.tintColor = .darkGray
+      btn.applyCornerRadius()
+      btn.imageView?.contentMode = .scaleAspectFit
+      btn.backgroundColor = .systemOrange
       btn.tintColor = .white
       btn.tag = index
       btn.addTarget(self, action: #selector(menuButtonClicked(_:)), for: .touchUpInside)

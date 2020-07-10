@@ -91,6 +91,18 @@ class CoreDataManager: NSObject {
     return managedObject
   }
 
+  // MARK: - Session
+  private var sessionEntity: NSEntityDescription? {
+    let entity = NSEntityDescription.entity(forEntityName: "SessionEntity", in: persistentContainer.viewContext)
+    return entity
+  }
+
+  public var sessionManagedObject: NSManagedObject? {
+    guard let entity = availabilityEntity else { return nil }
+    let managedObject = NSManagedObject(entity: entity, insertInto: managedContext)
+    return managedObject
+  }
+
   // MARK: - Use Case: App needs to be able retrieve objects by entity name from core data
   func retrieve(entityName: String, _ completion: CoreDataHandler) {
     let sectionSortDescriptor = NSSortDescriptor(key: "createdAt", ascending: true)

@@ -12,15 +12,8 @@ class RootedCollectionViewCell: UICollectionViewCell {
 
   @IBOutlet weak var mainContentView: UIView!
   @IBOutlet weak var titleLabel: UILabel!
-  @IBOutlet weak var descriptionLabel: UILabel!
-  @IBOutlet weak var descriptionLabelHeight: NSLayoutConstraint!
-  @IBOutlet weak var locationLabel: UILabel!
-  @IBOutlet weak var locationImageView: UIButton!
   @IBOutlet weak var dateLabel: UILabel!
-  @IBOutlet weak var dateImageView: UIButton!
-  @IBOutlet weak var participantsButton: UIButton!
   @IBOutlet weak var actionsButton: UIButton!
-  @IBOutlet weak var separatorView: UILabel!
 
   private weak var delegate: RootedCellDelegate?
   private var participants = [UserProfileShortData]()
@@ -41,21 +34,25 @@ class RootedCollectionViewCell: UICollectionViewCell {
         self.titleLabel.text = meetingName
       }
 
+      dateLabel.text = ""
+
       if let meetingTime = meeting.meetingDate {
-        dateLabel.text = meetingTime.readableTime
+        self.dateLabel.text! += meetingTime.startTimeOnly
       }
 
       if let meetingLocation = meeting.meetingLocation {
-        locationLabel.text = meetingLocation.readableWhereString
-      } else {
-        locationLabel.text = "No location provided"
+        self.dateLabel.text! += " | \(meetingLocation.readableWhereString)"
+      }
+
+      if let meetingDescription = meeting.meetingDescription {
+        self.dateLabel.text! += "\n\n\(meetingDescription)"
       }
     }
   }
 
   override func awakeFromNib() {
     super.awakeFromNib()
-    participantsButton.isHidden = true
+    mainContentView.applyCornerRadius(0.15)
   }
 
   func configure(viewModel: RootedCellViewModel, layout: LayoutOption) {
@@ -63,15 +60,9 @@ class RootedCollectionViewCell: UICollectionViewCell {
 
     if layout == .horizontalList {
       actionsButton.isHidden = true
-      separatorView.isHidden = true
     } else {
       actionsButton.isHidden = false
-      separatorView.isHidden = false
     }
-  }
-
-  @IBAction func viewParticipants(_ sender: UIButton) {
-    self.delegate?.performActions(self, ofType: .none, on: viewModel)
   }
 
   @IBAction func performAction(_ sender: UIButton) {
