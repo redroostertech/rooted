@@ -1208,6 +1208,13 @@
 		D7DDDA1124703F630061C15B /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				D7B758D1245B6FF8005CD0C9 /* Shared */,
+				D7B758D0245B6E80005CD0C9 /* MyInvitesScene */,
+				D7B758E7245C6955005CD0C9 /* CreateMeetingScene */,
+				D7B758D9245B72F6005CD0C9 /* InviteDetailsScene */,
+				D7B758E9245DB4EE005CD0C9 /* InfoScene */,
+				D7B758E8245DB4E4005CD0C9 /* AvailabilityScene */,
+				D706F1592420932700C40130 /* AvailabilitySelectionViewController.swift */,
 				D73725C7249E6F3B00336EFC /* Forgot Password */,
 				D790B5A024858FD900A69192 /* Chat */,
 				D7DF8D0624841A33005C116A /* Notes */,
