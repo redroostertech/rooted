@@ -28,6 +28,11 @@ public class RProgressHUD {
     ai.startAnimating()
     ai.center = spinnerView.center
 
+    let label = UILabel(frame: CGRect(x: spinnerView.center.x - CGFloat(62), y: spinnerView.center.y + CGFloat(50), width: CGFloat(124), height: CGFloat(24)))
+    label.textColor = .white
+    label.text = "Updating app..."
+
+    spinnerView.addSubview(label)
     spinnerView.addSubview(ai)
     appWindow.addSubview(spinnerView)
     appWindow.bringSubviewToFront(spinnerView)

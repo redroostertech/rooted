@@ -20,7 +20,7 @@ target 'Rooted MessagesExtension' do
   pod 'Firebase/Storage'
   pod 'FirebaseUI/Storage'
   pod 'Firebase/Analytics'
-  pod 'Alamofire'
+  pod 'Alamofire', '4.9.1'
   pod 'ObjectMapper', '~> 3.1'
   pod 'SwiftyCodeView'
   pod 'Branch'
@@ -32,5 +32,6 @@ target 'Rooted MessagesExtension' do
   pod 'WordPress-Editor-iOS'
   pod 'Gridicons'
   pod 'KeychainSwift'
+  pod 'EggRating', :git => 'https://github.com/redroostertech/EGGRating.git', :commit => 'ad32b475b74ef1aae896d8d8a6f96d0851ffdffb'
   
 end

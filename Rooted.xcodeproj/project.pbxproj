@@ -259,6 +259,7 @@
 		D7E2815B24A23EC6004CF478 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E2815A24A23EC6004CF478 /* KeychainManager.swift */; };
 		D7E2820D24A37F1D004CF478 /* ImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E2820B24A37F1D004CF478 /* ImagePickerController.swift */; };
 		D7E2820E24A37F1D004CF478 /* ImageRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E2820C24A37F1D004CF478 /* ImageRow.swift */; };
+		D7E2823224A6AB27004CF478 /* ViewParticipantsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E2823124A6AB27004CF478 /* ViewParticipantsViewController.swift */; };
 		D7F1AAE9240BEE0F00210504 /* industriesJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE5240BEE0F00210504 /* industriesJson.json */; };
 		D7F1AAEA240BEE0F00210504 /* RootedJson.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE6240BEE0F00210504 /* RootedJson.json */; };
 		D7F1AAEB240BEE0F00210504 /* Rooted_Meetings_Response.json in Resources */ = {isa = PBXBuildFile; fileRef = D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */; };
@@ -551,6 +552,7 @@
 		D7E2815A24A23EC6004CF478 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 		D7E2820B24A37F1D004CF478 /* ImagePickerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerController.swift; sourceTree = "<group>"; };
 		D7E2820C24A37F1D004CF478 /* ImageRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageRow.swift; sourceTree = "<group>"; };
+		D7E2823124A6AB27004CF478 /* ViewParticipantsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewParticipantsViewController.swift; sourceTree = "<group>"; };
 		D7F1AAE5240BEE0F00210504 /* industriesJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = industriesJson.json; sourceTree = "<group>"; };
 		D7F1AAE6240BEE0F00210504 /* RootedJson.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = RootedJson.json; sourceTree = "<group>"; };
 		D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Rooted_Meetings_Response.json; sourceTree = "<group>"; };
@@ -632,20 +634,14 @@
 		BA068C042245AD7D00A0EE9B /* Rooted MessagesExtension */ = {
 			isa = PBXGroup;
 			children = (
-				D7DDDA4E247833270061C15B /* SnapContainerViewController.swift */,
-				D7DDDA4F247833270061C15B /* VerticalScrollViewController.swift */,
-				D7DDDA1124703F630061C15B /* Scenes */,
 				D787A26723E1EB41001795D3 /* GoogleService-Info.plist */,
 				BA98DD8C224ED26F0070BC39 /* Rooted MessagesExtension.entitlements */,
 				D787A26923E1EC2F001795D3 /* AppInitializer.swift */,
 				D7A18AEA24063ACC0039A295 /* Configuration.swift */,
-				D7DF8CFA24801550005C116A /* CountryData.json */,
+				D75711F623D8818900BDD6A0 /* Managers */,
+				D7DDDA1124703F630061C15B /* Scenes */,
 				D701DA8523E8DBF400A45E9B /* Models */,
 				D75711F323D8817200BDD6A0 /* Resources */,
-				D75711F623D8818900BDD6A0 /* Managers */,
-				D701DC6E23E9459B00A45E9B /* HUDFactory.swift */,
-				D79A5EAA2406B070006DAA7A /* RRLogger.swift */,
-				BA41F4CA224CECE4006AD793 /* LaunchVC.swift */,
 				D75711F723D8819B00BDD6A0 /* Cells */,
 				BA0D0EF6224ADCE200209993 /* Invites.xcdatamodeld */,
 				BA068C0C2245AD7D00A0EE9B /* Info.plist */,
@@ -726,14 +722,14 @@
 			path = Poll;
 			sourceTree = "<group>";
 		};
-		D706F15F24210C0700C40130 /* TagListView */ = {
+		D706F15F24210C0700C40130 /* Tag List View */ = {
 			isa = PBXGroup;
 			children = (
 				D706F16124210C0700C40130 /* CloseButton.swift */,
 				D706F16224210C0700C40130 /* TagView.swift */,
 				D706F16324210C0700C40130 /* TagListView.swift */,
 			);
-			path = TagListView;
+			path = "Tag List View";
 			sourceTree = "<group>";
 		};
 		D73725C7249E6F3B00336EFC /* Forgot Password */ = {
@@ -749,7 +745,7 @@
 			path = "Forgot Password";
 			sourceTree = "<group>";
 		};
-		D747BABD240FF76500E571CF /* EmptyDataSet */ = {
+		D747BABD240FF76500E571CF /* Empty Data Set */ = {
 			isa = PBXGroup;
 			children = (
 				D747BABE240FF77100E571CF /* EmptyDataSet.swift */,
@@ -758,10 +754,10 @@
 				D747BABF240FF77100E571CF /* EmptyDataSetView.swift */,
 				D747BAC1240FF77100E571CF /* EmptyDataSetView+Extension.swift */,
 			);
-			path = EmptyDataSet;
+			path = "Empty Data Set";
 			sourceTree = "<group>";
 		};
-		D75711F023D811E600BDD6A0 /* DateTimePicker */ = {
+		D75711F023D811E600BDD6A0 /* Date Time Picker */ = {
 			isa = PBXGroup;
 			children = (
 				D75711E923D811E000BDD6A0 /* DateCollectionViewCell.swift */,
@@ -771,21 +767,22 @@
 				D75711E623D811E000BDD6A0 /* FullDateCollectionViewCell.swift */,
 				D75711E423D811DF00BDD6A0 /* StepCollectionViewFlowLayout.swift */,
 			);
-			path = DateTimePicker;
+			path = "Date Time Picker";
 			sourceTree = "<group>";
 		};
 		D75711F123D8813600BDD6A0 /* Controls */ = {
 			isa = PBXGroup;
 			children = (
-				D7DDDA4C24780B3D0061C15B /* SweetAlert.swift */,
-				D706F15F24210C0700C40130 /* TagListView */,
-				D70741D22417809200115998 /* ScrollableSegmentedControl.swift */,
-				D747BABD240FF76500E571CF /* EmptyDataSet */,
+				D7E2823724A6B7CA004CF478 /* Scrollable View Controller */,
+				D7E2823524A6B775004CF478 /* Sweet Alert */,
+				D706F15F24210C0700C40130 /* Tag List View */,
+				D7E2823624A6B78F004CF478 /* Scrollable Segment Control */,
+				D747BABD240FF76500E571CF /* Empty Data Set */,
 				D79A5F8F240960F5006DAA7A /* Sources */,
 				D79A5EC62407FF7B006DAA7A /* Eureka iMessage Port */,
-				D75711F023D811E600BDD6A0 /* DateTimePicker */,
-				D75711F923D8832200BDD6A0 /* RProgressHUD.swift */,
-				D747BADC2411404100E571CF /* FloatingMenuBtn.swift */,
+				D75711F023D811E600BDD6A0 /* Date Time Picker */,
+				D7E2823324A6B74F004CF478 /* Progress HUD */,
+				D7E2823424A6B75B004CF478 /* Floating Menu Button */,
 			);
 			path = Controls;
 			sourceTree = "<group>";
@@ -793,6 +790,9 @@
 		D75711F223D8815C00BDD6A0 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				D701DC6E23E9459B00A45E9B /* HUDFactory.swift */,
+				D79A5EAA2406B070006DAA7A /* RRLogger.swift */,
+				BA41F4CA224CECE4006AD793 /* LaunchVC.swift */,
 				D7E2815A24A23EC6004CF478 /* KeychainManager.swift */,
 				D7A18AEE24063BB00039A295 /* DefaultsManager.swift */,
 				D70741D72419A0C200115998 /* EngagementFactory.swift */,
@@ -1221,6 +1221,14 @@
 				D7DDDA52247943750061C15B /* Settings */,
 				D7DDDA2E247327CE0061C15B /* Registration */,
 				D7DDDA1224703F6C0061C15B /* Login */,
+				D7B758D1245B6FF8005CD0C9 /* Shared */,
+				D7B758D0245B6E80005CD0C9 /* MyInvitesScene */,
+				D7B758E7245C6955005CD0C9 /* CreateMeetingScene */,
+				D7B758D9245B72F6005CD0C9 /* InviteDetailsScene */,
+				D7B758E9245DB4EE005CD0C9 /* InfoScene */,
+				D7B758E8245DB4E4005CD0C9 /* AvailabilityScene */,
+				D706F1592420932700C40130 /* AvailabilitySelectionViewController.swift */,
+				D7E2823024A6AAD7004CF478 /* ViewParticipantsScene */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -1287,9 +1295,59 @@
 			path = ImageRow;
 			sourceTree = "<group>";
 		};
+		D7E2823024A6AAD7004CF478 /* ViewParticipantsScene */ = {
+			isa = PBXGroup;
+			children = (
+				D7E2823124A6AB27004CF478 /* ViewParticipantsViewController.swift */,
+			);
+			path = ViewParticipantsScene;
+			sourceTree = "<group>";
+		};
+		D7E2823324A6B74F004CF478 /* Progress HUD */ = {
+			isa = PBXGroup;
+			children = (
+				D75711F923D8832200BDD6A0 /* RProgressHUD.swift */,
+			);
+			path = "Progress HUD";
+			sourceTree = "<group>";
+		};
+		D7E2823424A6B75B004CF478 /* Floating Menu Button */ = {
+			isa = PBXGroup;
+			children = (
+				D747BADC2411404100E571CF /* FloatingMenuBtn.swift */,
+			);
+			path = "Floating Menu Button";
+			sourceTree = "<group>";
+		};
+		D7E2823524A6B775004CF478 /* Sweet Alert */ = {
+			isa = PBXGroup;
+			children = (
+				D7DDDA4C24780B3D0061C15B /* SweetAlert.swift */,
+			);
+			path = "Sweet Alert";
+			sourceTree = "<group>";
+		};
+		D7E2823624A6B78F004CF478 /* Scrollable Segment Control */ = {
+			isa = PBXGroup;
+			children = (
+				D70741D22417809200115998 /* ScrollableSegmentedControl.swift */,
+			);
+			path = "Scrollable Segment Control";
+			sourceTree = "<group>";
+		};
+		D7E2823724A6B7CA004CF478 /* Scrollable View Controller */ = {
+			isa = PBXGroup;
+			children = (
+				D7DDDA4E247833270061C15B /* SnapContainerViewController.swift */,
+				D7DDDA4F247833270061C15B /* VerticalScrollViewController.swift */,
+			);
+			path = "Scrollable View Controller";
+			sourceTree = "<group>";
+		};
 		D7F1AAE4240BEE0F00210504 /* JSON */ = {
 			isa = PBXGroup;
 			children = (
+				D7DF8CFA24801550005C116A /* CountryData.json */,
 				D7F1AAE5240BEE0F00210504 /* industriesJson.json */,
 				D7F1AAE6240BEE0F00210504 /* RootedJson.json */,
 				D7F1AAE7240BEE0F00210504 /* Rooted_Meetings_Response.json */,
@@ -1547,6 +1605,7 @@
 				BA98DD92225255B90070BC39 /* InfoViewController.swift in Sources */,
 				D75711EC23D811E000BDD6A0 /* FullDateCollectionViewCell.swift in Sources */,
 				D79A5EAF2406C987006DAA7A /* ConversationManager.swift in Sources */,
+				D7E2823224A6AB27004CF478 /* ViewParticipantsViewController.swift in Sources */,
 				D701DC5A23E8DBF600A45E9B /* JSONSchemaSupport.swift in Sources */,
 				D79A5F9F240960F5006DAA7A /* NSDate+Timepiece.swift in Sources */,
 				D73725D1249E6F7A00336EFC /* ForgotPasswordModels.swift in Sources */,
@@ -1873,7 +1932,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = "Rooted MessagesExtension/Rooted MessagesExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = "Rooted MessagesExtension/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1898,7 +1957,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = "Rooted MessagesExtension/Rooted MessagesExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = "Rooted MessagesExtension/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;

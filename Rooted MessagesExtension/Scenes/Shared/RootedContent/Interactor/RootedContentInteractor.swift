@@ -32,6 +32,7 @@ protocol RootedContentBusinessLogic: class {
   func saveAvailability(request: RootedContent.SaveAvailability.Request)
   func goToInfoView(request: RootedContent.InfoView.Request)
   func acceptMeeting(request: RootedContent.AcceptMeeting.Request)
+  func declineMeeting(request: RootedContent.DeclineMeeting.Request)
 }
 
 protocol RootedContentDataStore {
@@ -160,7 +161,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
                                             }
                                           }
                                           return array
-                                        }) ?? [MeetingContextWrapper]()
+                                        })?.sorted(by: { $0.meeting?.meetingDate?.startDate?.toDate()?.date ?? Date() < $1.meeting?.meetingDate?.startDate?.toDate()?.date ?? Date() }) ?? [MeetingContextWrapper]()
 
                                         // Refresh removed meeting
                                         SessionManager.refreshSession()
@@ -405,6 +406,12 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
 
   // MARK: - Use Case: Remove meeting from users calendar
   func removeMeetingFromCalendar(request: RootedContent.RemoveFromCalendar.Request) {
+    
+    guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
     guard let meeting = request.meeting?.data else { return }
     eventKitManager.removeFromCalendar(meeting: meeting) { (mtng, success, error) in
       if let err = error {
@@ -679,6 +686,103 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
           }
         }
       }
+    }
+  }
+
+  // MARK: - Use Case: As a user I want to decline a meeting I receive
+  func declineMeeting(request: RootedContent.DeclineMeeting.Request) {
+    guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
+    guard let calendarAccessGranted = isCalendarPermissionGranted, calendarAccessGranted else {
+      let request = RootedContent.CheckCalendarPermissions.Request()
+      self.checkCalendarPermissions(request: request)
+      return
+    }
+
+    guard let meeting = request.meeting, let meetingId = meeting.id else {
+      var response = RootedContent.DisplayError.Response()
+      response.errorMessage = "Something went wrong. Please try again."
+      self.presenter?.handleError(response: response)
+      return
+    }
+
+    switch request.saveType {
+    case .receive:
+      meeting.dashboardSectionId = 0
+    case .send:
+      meeting.dashboardSectionId = 1
+    default:
+      meeting.dashboardSectionId = 2
+    }
+
+    branchWorker.customEvent(withName: request.branchEventID)
+
+    switch request.contentDB {
+    case .remote:
+      let path = PathBuilder.build(.Test, in: .Core, with: "eggman")
+      let params: [String: Any] = [
+        "action": "decline_meeting",
+        "meeting_id": meetingId,
+        "user_id": userId,
+      ]
+      let apiService = Api()
+      apiService.performRequest(path: path,
+                                method: .post,
+                                parameters: params) { (results, error) in
+
+                                  guard error == nil else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    error.errorTitle = "Oops!"
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  guard let resultsDict = results as? [String: Any] else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    error.errorTitle = "Oops!"
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                  if let success = resultsDict["success"] as? Bool {
+                                    if success {
+                                      if let _ = resultsDict["data"] as? [String: Any] {
+
+                                        var response = RootedContent.DeclineMeeting.Response()
+                                        response.meeting = meeting
+
+                                        // Refresh removed meeting
+                                        SessionManager.refreshSession()
+
+                                        self.presenter?.onSuccessfulDecline(response: response)
+
+                                      } else {
+                                        var error = RootedContent.DisplayError.Response()
+                                        error.errorMessage = "Something went wrong. Please try again."
+                                        error.errorTitle = "Oops!"
+                                        self.presenter?.handleError(response: error)
+                                      }
+                                    } else {
+                                      var error = RootedContent.DisplayError.Response()
+                                      error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
+                                      error.errorTitle = "Oops!"
+                                      self.presenter?.handleError(response: error)
+                                    }
+                                  }
+      }
+      default:
+        var response = RootedContent.DisplayError.Response()
+        response.errorMessage = "Something went wrong. Please try again."
+        self.presenter?.handleError(response: response)
     }
   }
 

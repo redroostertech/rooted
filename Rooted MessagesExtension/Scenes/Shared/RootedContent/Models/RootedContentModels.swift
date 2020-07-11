@@ -266,6 +266,25 @@ enum RootedContent {
       var meeting: Meeting?
     }
   }
+
+  // MARK: - Use Case: As a user I want to decline a meeting I receive
+  enum DeclineMeeting {
+    struct Request {
+      var meeting: Meeting?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var branchEventID = ""
+      var saveType: RootedContentManagerType = .none
+    }
+
+    struct Response {
+      var meeting: Meeting?
+    }
+
+    struct ViewModel {
+      var meeting: Meeting?
+    }
+  }
   
   enum DisplayError {
     struct Request { }

@@ -14,6 +14,7 @@ class RootedCollectionViewCell: UICollectionViewCell {
   @IBOutlet weak var titleLabel: UILabel!
   @IBOutlet weak var dateLabel: UILabel!
   @IBOutlet weak var actionsButton: UIButton!
+  @IBOutlet weak var ownershipLabel: UILabel!
 
   private weak var delegate: RootedCellDelegate?
   private var participants = [UserProfileShortData]()
@@ -47,12 +48,36 @@ class RootedCollectionViewCell: UICollectionViewCell {
       if let meetingDescription = meeting.meetingDescription {
         self.dateLabel.text! += "\n\n\(meetingDescription)"
       }
+
+      if let meetingOwner = meeting.ownerId, let currentUserId = SessionManager.shared.currentUser?.uid, meetingOwner != currentUserId {
+        self.isOwnedByCurrentUser = false
+      } else {
+        self.isOwnedByCurrentUser = true
+      }
+    }
+  }
+
+  private var isOwnedByCurrentUser: Bool = true {
+    didSet {
+      if !self.isOwnedByCurrentUser {
+        self.ownershipLabel.backgroundColor = .lightGray
+        self.ownershipLabel.textColor = .darkGray
+        self.ownershipLabel.text = "Not owned by you"
+      } else {
+        self.ownershipLabel.backgroundColor = .systemGreen
+        self.ownershipLabel.textColor = .white
+        self.ownershipLabel.text = "Owned by you"
+      }
     }
   }
 
   override func awakeFromNib() {
     super.awakeFromNib()
-    mainContentView.applyCornerRadius(0.15)
+    titleLabel.adjustsFontSizeToFitWidth = true
+    mainContentView.applyCornerRadius(0.10)
+    mainContentView.backgroundColor = .groupTableViewBackground
+    ownershipLabel.applyCornerRadius()
+    ownershipLabel.textAlignment = .center
   }
 
   func configure(viewModel: RootedCellViewModel, layout: LayoutOption) {
