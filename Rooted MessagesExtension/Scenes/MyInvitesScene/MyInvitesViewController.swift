@@ -176,8 +176,8 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     // Clear `UITableView`
     clearTable()
 
-    // Hide `RefreshButton`
-    hideRefreshButton()
+    // Hide top buttons
+    hideTopBarButtons()
 
     // Hide `WelcomeLabel`
     hideWelcomeLabel()
@@ -196,14 +196,30 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     // Clear `UITableView`
     clearTable()
 
-    // Show `RefreshButton`
-    showRefreshButton()
+    // Show top buttons
+    showTopBarButtons()
 
     // Show `WelcomeLabel`
     showWelcomeLabel()
 
     // Show `ActivityCountLabel`
     showActivityCountLabel()
+  }
+
+  private func hideTopBarButtons() {
+    // Hide `CalendarButton`
+    hideCalendarButton()
+
+    // Hide `RefreshButton`
+    hideRefreshButton()
+  }
+
+  private func showTopBarButtons() {
+    // Show `RefreshButton`
+    showRefreshButton()
+
+    // Show `CalendarButton`
+    showCalendarButton()
   }
 
   private func hideCalendarButton() {
