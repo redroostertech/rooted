@@ -37,6 +37,8 @@ protocol RootedContentPresentationLogic {
   func onSuccessfulAcceptance(response: RootedContent.AcceptMeeting.Response)
   func onSuccessfulDecline(response: RootedContent.DeclineMeeting.Response)
 
+  func didRefreshSession(response: RootedContent.RefreshSession.Response)
+
 }
 
 extension RootedContentPresentationLogic {
@@ -63,6 +65,8 @@ extension RootedContentPresentationLogic {
 
   func onSuccessfulAcceptance(response: RootedContent.AcceptMeeting.Response) { }
   func onSuccessfulDecline(response: RootedContent.DeclineMeeting.Response) { }
+
+  func didRefreshSession(response: RootedContent.RefreshSession.Response) { }
 }
 
 class RootedContentPresenter: RootedContentPresentationLogic {
@@ -73,6 +77,11 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     var viewModel = RootedContent.SetupBranchIO.ViewModel()
     viewModel.meeting = response.meeting
     viewController?.handleBranchIOResponse(viewModel: viewModel)
+  }
+
+  func didRefreshSession(response: RootedContent.RefreshSession.Response) {
+    let viewModel = RootedContent.RefreshSession.ViewModel()
+    viewController?.didRefreshSession(viewModel: viewModel)
   }
 
   // MARK: - Use Case: Check if app has access to calendar permissions

@@ -285,6 +285,15 @@ enum RootedContent {
       var meeting: Meeting?
     }
   }
+
+  // MARK: - Use Case: Refresh session
+  enum RefreshSession {
+    struct Request { }
+
+    struct Response { }
+
+    struct ViewModel { }
+  }
   
   enum DisplayError {
     struct Request { }

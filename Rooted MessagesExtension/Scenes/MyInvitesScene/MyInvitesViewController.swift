@@ -76,7 +76,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   override func willBecomeActive(with conversation: MSConversation) {
     super.willBecomeActive(with: conversation)
-    SessionManager.refreshSession()
+    refreshSession()
     setupBranchIO()
     setupConversationManager(using: conversation)
   }

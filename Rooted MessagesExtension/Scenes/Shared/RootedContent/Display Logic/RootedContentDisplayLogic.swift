@@ -35,6 +35,8 @@ protocol RootedContentDisplayLogic: class {
   func onSuccessfulAcceptance(viewModel: RootedContent.AcceptMeeting.ViewModel)
   func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel)
 
+  func didRefreshSession(viewModel: RootedContent.RefreshSession.ViewModel)
+
 }
 
 extension RootedContentDisplayLogic {
@@ -62,4 +64,6 @@ extension RootedContentDisplayLogic {
 
   func onSuccessfulAcceptance(viewModel: RootedContent.AcceptMeeting.ViewModel) { }
   func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel) { }
+
+  func didRefreshSession(viewModel: RootedContent.RefreshSession.ViewModel) { }
 }

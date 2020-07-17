@@ -33,6 +33,7 @@ protocol RootedContentBusinessLogic: class {
   func goToInfoView(request: RootedContent.InfoView.Request)
   func acceptMeeting(request: RootedContent.AcceptMeeting.Request)
   func declineMeeting(request: RootedContent.DeclineMeeting.Request)
+  func refreshSession(request: RootedContent.RefreshSession.Request)
 }
 
 protocol RootedContentDataStore {
@@ -61,6 +62,13 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
     } else {
       return error.localizedDescription
     }
+  }
+
+  // MARK: - Use Case: Refresh session
+  func refreshSession(request: RootedContent.RefreshSession.Request) {
+    SessionManager.refreshSession()
+    let response = RootedContent.RefreshSession.Response()
+    presenter?.didRefreshSession(response: response)
   }
 
   // MARK: - Use Case: Initialize session of BranchIO and handle response
