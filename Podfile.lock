@@ -222,6 +222,9 @@ PODS:
   - Branch (0.33.1):
     - Branch/Core (= 0.33.1)
   - Branch/Core (0.33.1)
+  - CalendarKit (0.13.11):
+    - DateToolsSwift
+  - DateToolsSwift (5.0.0)
   - EggRating (0.1.6):
     - RateView
   - Firebase/Analytics (6.25.0):
@@ -383,6 +386,7 @@ PODS:
 DEPENDENCIES:
   - Alamofire (= 4.9.1)
   - Branch
+  - CalendarKit
   - EggRating (from `https://github.com/redroostertech/EGGRating.git`, commit `ad32b475b74ef1aae896d8d8a6f96d0851ffdffb`)
   - Firebase/Analytics
   - Firebase/Auth
@@ -409,6 +413,8 @@ SPEC REPOS:
     - Alamofire
     - BoringSSL-GRPC
     - Branch
+    - CalendarKit
+    - DateToolsSwift
     - Firebase
     - FirebaseAnalytics
     - FirebaseAuth
@@ -461,6 +467,8 @@ SPEC CHECKSUMS:
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   Branch: 65d05ffb137ef504777cff6bd4fb6f770f17145a
+  CalendarKit: b61b8e08c1891b9a5790d22cc47d98939e15ea72
+  DateToolsSwift: 4207ada6ad615d8dc076323d27037c94916dbfa6
   EggRating: 378f25f5ac0629e7edfb011f5c5177c63f135e6e
   Firebase: 5719b4f965f76643241a1bb8244483ff6117db39
   FirebaseAnalytics: 93565f3f0f0f50a5d8770850bfe6a82eaba5db27
@@ -499,6 +507,6 @@ SPEC CHECKSUMS:
   WordPress-Aztec-iOS: d01bf0c5e150ae6a046f06ba63b7cc2762061c0b
   WordPress-Editor-iOS: 5b726489e5ae07b7281a2862d69aba2d5c83f140
 
-PODFILE CHECKSUM: 29f7632d3e8eb5e75575006fd4638b10059dceba
+PODFILE CHECKSUM: 1fbc1b3cdf884bf6cf9cfe12513e7d51aca14994
 
 COCOAPODS: 1.9.1

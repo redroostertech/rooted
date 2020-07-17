@@ -100,6 +100,12 @@
 		D747BADD2411404100E571CF /* FloatingMenuBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747BADC2411404100E571CF /* FloatingMenuBtn.swift */; };
 		D747BAEA2411C6B200E571CF /* CustomHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747BAE82411C6B200E571CF /* CustomHeader.swift */; };
 		D747BAEB2411C6B200E571CF /* CustomHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = D747BAE92411C6B200E571CF /* CustomHeader.xib */; };
+		D74E948F24C20E3700E8C577 /* ViewCalendarPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74E948924C20E3700E8C577 /* ViewCalendarPresenter.swift */; };
+		D74E949024C20E3700E8C577 /* ViewCalendarWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74E948A24C20E3700E8C577 /* ViewCalendarWorker.swift */; };
+		D74E949124C20E3700E8C577 /* ViewCalendarRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74E948B24C20E3700E8C577 /* ViewCalendarRouter.swift */; };
+		D74E949224C20E3700E8C577 /* ViewCalendarModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74E948C24C20E3700E8C577 /* ViewCalendarModels.swift */; };
+		D74E949324C20E3700E8C577 /* ViewCalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74E948D24C20E3700E8C577 /* ViewCalendarViewController.swift */; };
+		D74E949424C20E3700E8C577 /* ViewCalendarInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74E948E24C20E3700E8C577 /* ViewCalendarInteractor.swift */; };
 		D75711EA23D811E000BDD6A0 /* StepCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E423D811DF00BDD6A0 /* StepCollectionViewFlowLayout.swift */; };
 		D75711EB23D811E000BDD6A0 /* DateTimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E523D811E000BDD6A0 /* DateTimePicker.swift */; };
 		D75711EC23D811E000BDD6A0 /* FullDateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75711E623D811E000BDD6A0 /* FullDateCollectionViewCell.swift */; };
@@ -393,6 +399,12 @@
 		D747BADC2411404100E571CF /* FloatingMenuBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingMenuBtn.swift; sourceTree = "<group>"; };
 		D747BAE82411C6B200E571CF /* CustomHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomHeader.swift; sourceTree = "<group>"; };
 		D747BAE92411C6B200E571CF /* CustomHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomHeader.xib; sourceTree = "<group>"; };
+		D74E948924C20E3700E8C577 /* ViewCalendarPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCalendarPresenter.swift; sourceTree = "<group>"; };
+		D74E948A24C20E3700E8C577 /* ViewCalendarWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCalendarWorker.swift; sourceTree = "<group>"; };
+		D74E948B24C20E3700E8C577 /* ViewCalendarRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCalendarRouter.swift; sourceTree = "<group>"; };
+		D74E948C24C20E3700E8C577 /* ViewCalendarModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCalendarModels.swift; sourceTree = "<group>"; };
+		D74E948D24C20E3700E8C577 /* ViewCalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCalendarViewController.swift; sourceTree = "<group>"; };
+		D74E948E24C20E3700E8C577 /* ViewCalendarInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCalendarInteractor.swift; sourceTree = "<group>"; };
 		D75711E423D811DF00BDD6A0 /* StepCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StepCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		D75711E523D811E000BDD6A0 /* DateTimePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateTimePicker.swift; sourceTree = "<group>"; };
 		D75711E623D811E000BDD6A0 /* FullDateCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FullDateCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -755,6 +767,19 @@
 				D747BAC1240FF77100E571CF /* EmptyDataSetView+Extension.swift */,
 			);
 			path = "Empty Data Set";
+			sourceTree = "<group>";
+		};
+		D74E948824C20E1A00E8C577 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				D74E948924C20E3700E8C577 /* ViewCalendarPresenter.swift */,
+				D74E948A24C20E3700E8C577 /* ViewCalendarWorker.swift */,
+				D74E948B24C20E3700E8C577 /* ViewCalendarRouter.swift */,
+				D74E948C24C20E3700E8C577 /* ViewCalendarModels.swift */,
+				D74E948D24C20E3700E8C577 /* ViewCalendarViewController.swift */,
+				D74E948E24C20E3700E8C577 /* ViewCalendarInteractor.swift */,
+			);
+			path = Calendar;
 			sourceTree = "<group>";
 		};
 		D75711F023D811E600BDD6A0 /* Date Time Picker */ = {
@@ -1208,13 +1233,7 @@
 		D7DDDA1124703F630061C15B /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
-				D7B758D1245B6FF8005CD0C9 /* Shared */,
-				D7B758D0245B6E80005CD0C9 /* MyInvitesScene */,
-				D7B758E7245C6955005CD0C9 /* CreateMeetingScene */,
-				D7B758D9245B72F6005CD0C9 /* InviteDetailsScene */,
-				D7B758E9245DB4EE005CD0C9 /* InfoScene */,
-				D7B758E8245DB4E4005CD0C9 /* AvailabilityScene */,
-				D706F1592420932700C40130 /* AvailabilitySelectionViewController.swift */,
+				D74E948824C20E1A00E8C577 /* Calendar */,
 				D73725C7249E6F3B00336EFC /* Forgot Password */,
 				D790B5A024858FD900A69192 /* Chat */,
 				D7DF8D0624841A33005C116A /* Notes */,
@@ -1646,6 +1665,7 @@
 				D7A18AED24063B330039A295 /* BaseAppViewController.swift in Sources */,
 				D79A5F492407FF91006DAA7A /* RuleEqualsToRow.swift in Sources */,
 				D7DDDA5B247943F70061C15B /* SettingsRouter.swift in Sources */,
+				D74E949024C20E3700E8C577 /* ViewCalendarWorker.swift in Sources */,
 				D701DC5F23E8DBF600A45E9B /* MeetingDateClass.swift in Sources */,
 				D701DC5C23E8DBF600A45E9B /* DataClass.swift in Sources */,
 				D706F16524210C0700C40130 /* CloseButton.swift in Sources */,
@@ -1654,6 +1674,7 @@
 				D71F075423E0CA6E0039F572 /* UISearchBar+Ectensions.swift in Sources */,
 				D747BABB240EE64900E571CF /* RegistrationForm.swift in Sources */,
 				D747BAB7240EBB0700E571CF /* SessionManager.swift in Sources */,
+				D74E948F24C20E3700E8C577 /* ViewCalendarPresenter.swift in Sources */,
 				D79A5F3F2407FF91006DAA7A /* PopoverSelectorRow.swift in Sources */,
 				BA0D0EDC2248019B00209993 /* InviteDetailsViewController.swift in Sources */,
 				D7E2820D24A37F1D004CF478 /* ImagePickerController.swift in Sources */,
@@ -1684,6 +1705,7 @@
 				D7DDDA1C24703F860061C15B /* PhoneLoginModels.swift in Sources */,
 				D73725D2249E6F7A00336EFC /* ForgotPasswordViewController.swift in Sources */,
 				D7DDDA51247833280061C15B /* VerticalScrollViewController.swift in Sources */,
+				D74E949124C20E3700E8C577 /* ViewCalendarRouter.swift in Sources */,
 				D73725D3249E6F7A00336EFC /* ForgotPasswordInteractor.swift in Sources */,
 				D79A5F1C2407FF91006DAA7A /* SelectableSection.swift in Sources */,
 				D7DDDA1D24703F860061C15B /* PhoneLoginViewController.swift in Sources */,
@@ -1735,8 +1757,10 @@
 				D79A5F262407FF91006DAA7A /* StepperRow.swift in Sources */,
 				D7255F91241387600048F8D8 /* EmptyHeader.swift in Sources */,
 				D79A5F322407FF91006DAA7A /* Protocols.swift in Sources */,
+				D74E949324C20E3700E8C577 /* ViewCalendarViewController.swift in Sources */,
 				D701DB8523E8DBF600A45E9B /* AgendaItem.swift in Sources */,
 				D79A5F9E240960F5006DAA7A /* WWCalendarTimeSelector.swift in Sources */,
+				D74E949424C20E3700E8C577 /* ViewCalendarInteractor.swift in Sources */,
 				D7DDDA1924703F860061C15B /* PhoneLoginPresenter.swift in Sources */,
 				D79A5F332407FF91006DAA7A /* AlertOptionsRow.swift in Sources */,
 				D7DF8D0E24841CC3005C116A /* MediaInserter.swift in Sources */,
@@ -1763,6 +1787,7 @@
 				BA1314DC225BFCE50089EDE0 /* CoreDataManager.swift in Sources */,
 				D787A26423E1C4D8001795D3 /* Dictionary+Extensions.swift in Sources */,
 				D7DDDA50247833280061C15B /* SnapContainerViewController.swift in Sources */,
+				D74E949224C20E3700E8C577 /* ViewCalendarModels.swift in Sources */,
 				D79A5F192407FF91006DAA7A /* RowType.swift in Sources */,
 				D73725D0249E6F7A00336EFC /* ForgotPasswordRouter.swift in Sources */,
 				D79A5F142407FF91006DAA7A /* BaseRow.swift in Sources */,

@@ -15,6 +15,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   // MARK: - IBOutlets
   @IBOutlet private weak var refreshButton: UIButton!
+  @IBOutlet private weak var calendarButton: UIButton!
   @IBOutlet private weak var segmentedControl: ScrollableSegmentedControl!
   @IBOutlet private weak var segmentControlHeightConstraint: NSLayoutConstraint!
   @IBOutlet private weak var collectionView: UICollectionView!
@@ -203,6 +204,14 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
     // Show `ActivityCountLabel`
     showActivityCountLabel()
+  }
+
+  private func hideCalendarButton() {
+    calendarButton.isHidden = true
+  }
+
+  private func showCalendarButton() {
+    calendarButton.isHidden = false
   }
 
   private func hideRefreshButton() {
@@ -819,4 +828,8 @@ extension MyInvitesViewController {
     EggRating.promptRateUsIfNeededMessageExt(in: self)
   }
 
+  // MARK: - Use Case: Go to Calendar view
+  @IBAction func calendarButtonAction(_ sender: UIButton) {
+    // show calendar view
+  }
 }
