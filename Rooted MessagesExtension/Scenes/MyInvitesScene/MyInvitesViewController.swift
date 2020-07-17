@@ -86,19 +86,10 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     log(presentationStyle: presentationStyle)
     switch presentationStyle {
     case .compact, .transcript:
-      self.layoutOption = .horizontalList
-      self.segmentControlHeightConstraint.constant = 0
-      self.clearTable()
-      self.refreshButton.isHidden = true
-      self.welcomeLabelHeightConstraint.constant = 0
-      self.activityCountLabelHeightConstraint.constant = 0
+      self.configureCompactUI()
       break
     default:
-      self.layoutOption = .list
-      self.segmentControlHeightConstraint.constant = 49
-      self.refreshButton.isHidden = false
-      self.welcomeLabelHeightConstraint.constant = 55
-      self.activityCountLabelHeightConstraint.constant = 21
+      self.configureDefaultUI()
       break
     }
   }
@@ -108,19 +99,10 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     log(presentationStyle: presentationStyle)
     switch presentationStyle {
     case .compact, .transcript:
-      self.layoutOption = .horizontalList
-      self.segmentControlHeightConstraint.constant = 0
-      self.clearTable()
-      self.refreshButton.isHidden = true
-      self.welcomeLabelHeightConstraint.constant = 0
-      self.activityCountLabelHeightConstraint.constant = 0
+      self.configureCompactUI()
       break
     default:
-      self.layoutOption = .list
-      self.segmentControlHeightConstraint.constant = 49
-      self.refreshButton.isHidden = false
-      self.welcomeLabelHeightConstraint.constant = 55
-      self.activityCountLabelHeightConstraint.constant = 21
+      self.configureDefaultUI()
       break
     }
   }
@@ -130,28 +112,13 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     log(presentationStyle: presentationStyle)
     switch presentationStyle {
     case .compact, .transcript:
-      self.toggleMenuButton = false
-      self.floatingMenu?.isOpen = true
-      self.floatingMenu?.toggleMenu()
-
-      self.segmentControlHeightConstraint.constant = 0
-      self.clearTable()
-      self.refreshButton.isHidden = true
-      self.welcomeLabelHeightConstraint.constant = 0
-      self.activityCountLabelHeightConstraint.constant = 0
+      self.hideFloatingMenuButton()
+      self.configureCompactUI()
       break
     default:
-      if toggleMenuButton {
-        self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.menuButton, images: self.menuItemImages)
-        self.floatingMenu?.delegate = self
-        self.floatingMenu?.toggleMenu()
-      }
-      self.segmentControlHeightConstraint.constant = 49
-      self.refreshButton.isHidden = false
-      self.welcomeLabelHeightConstraint.constant = 55
-      self.activityCountLabelHeightConstraint.constant = 21
       self.setupManagedSession()
-
+      self.setupMenuButton()
+      self.configureDefaultUI()
       break
     }
   }
@@ -168,6 +135,22 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     menuButton.imageView?.contentMode = .scaleAspectFit
     menuButton.backgroundColor = .systemOrange
     menuButton.tintColor = .white
+
+    setupFloatingMenuButton()
+  }
+
+  private func setupFloatingMenuButton() {
+    if toggleMenuButton {
+      self.floatingMenu = FloatingMenuBtn(parentView: self.view, mainButton: self.menuButton, images: self.menuItemImages)
+      self.floatingMenu?.delegate = self
+      self.floatingMenu?.toggleMenu()
+    }
+  }
+
+  private func hideFloatingMenuButton() {
+    toggleMenuButton = false
+    floatingMenu?.isOpen = true
+    floatingMenu?.toggleMenu()
   }
 
   private func setupSegmentedControl() {
@@ -180,6 +163,88 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     segmentedControl.selectedSegmentIndex = menuSelection
     segmentedControl.fixedSegmentWidth = true
     segmentedControl.addTarget(self, action: #selector(self.segmentSelected(sender:)), for: .valueChanged)
+  }
+
+  private func configureCompactUI() {
+    // Set layout option
+    layoutOption = .horizontalList
+
+    // Hide segment control
+    hideSegmentControl()
+
+    // Clear `UITableView`
+    clearTable()
+
+    // Hide `RefreshButton`
+    hideRefreshButton()
+
+    // Hide `WelcomeLabel`
+    hideWelcomeLabel()
+
+    // Hide `ActivityCountLabel`
+    hideActivityCountLabel()
+  }
+
+  private func configureDefaultUI() {
+    // Set layout option
+    layoutOption = .list
+
+    // Show segment control
+    showSegmentControl()
+
+    // Clear `UITableView`
+    clearTable()
+
+    // Show `RefreshButton`
+    showRefreshButton()
+
+    // Show `WelcomeLabel`
+    showWelcomeLabel()
+
+    // Show `ActivityCountLabel`
+    showActivityCountLabel()
+  }
+
+  private func hideRefreshButton() {
+    refreshButton.isHidden = true
+  }
+
+  private func showRefreshButton() {
+    refreshButton.isHidden = false
+  }
+
+  private func hideSegmentControl() {
+    segmentControlHeightConstraint.constant = 0
+  }
+
+  private func showSegmentControl() {
+    segmentControlHeightConstraint.constant = 49
+  }
+
+  private func hideWelcomeLabel() {
+    welcomeLabelHeightConstraint.constant = 0
+  }
+
+  private func showWelcomeLabel() {
+    welcomeLabelHeightConstraint.constant = 55
+  }
+
+  private func hideActivityCountLabel() {
+    activityCountLabelHeightConstraint.constant = 0
+  }
+
+  private func showActivityCountLabel() {
+    activityCountLabelHeightConstraint.constant = 21
+  }
+
+  // MARK: - Use Case: Refresh session
+  func refreshSession() {
+    let request = RootedContent.RefreshSession.Request()
+    interactor?.refreshSession(request: request)
+  }
+
+  func didRefreshSession(viewModel: RootedContent.RefreshSession.ViewModel) {
+    // Did finish refreshing session
   }
 
   // MARK: - Use Case: Initialize session of BranchIO and handle response
