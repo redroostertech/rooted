@@ -12,20 +12,10 @@
 
 import UIKit
 
-protocol ViewCalendarPresentationLogic
-{
-  func presentSomething(response: ViewCalendar.Something.Response)
+protocol ViewCalendarPresentationLogic {
 }
 
-class ViewCalendarPresenter: ViewCalendarPresentationLogic
-{
+class ViewCalendarPresenter: ViewCalendarPresentationLogic {
   weak var viewController: ViewCalendarDisplayLogic?
   
-  // MARK: Do something
-  
-  func presentSomething(response: ViewCalendar.Something.Response)
-  {
-    let viewModel = ViewCalendar.Something.ViewModel()
-    viewController?.displaySomething(viewModel: viewModel)
-  }
 }

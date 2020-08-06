@@ -1,5 +1,6 @@
 import UIKit
 import Messages
+import MessageUI
 import EventKit
 import iMessageDataKit
 import MapKit
@@ -9,6 +10,7 @@ import CoreData
 import ObjectMapper
 import Branch
 import SwiftDate
+import Contacts
 
 // The url which will be used to encode the current state of the app that can be reconstructed when the recipient receives the message.
 func prepareUrl() -> URL {
@@ -46,7 +48,7 @@ func decodeURL(_ url: URL) {
 //  }
 }
 
-class CreateMeetingViewController: FormMessagesAppViewController, RootedContentDisplayLogic {
+class CreateMeetingViewController: FormMessagesAppViewController, RootedContentDisplayLogic, MFMessageComposeViewControllerDelegate, EPPickerDelegate {
 
   // MARK: - IBOutlets
   @IBOutlet private weak var sendToFriendsButton: SSSpinnerButton!
@@ -57,6 +59,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
   // MARK: - Private Properties
   private var interactor: RootedContentBusinessLogic?
   private var conversationManager = ConversationManager.shared
+  private var contactsManager = ContactKitManager()
   private var isStartCalendarShowing: Bool = false
   private var isEndCalendarShowing: Bool = false
 
@@ -322,6 +325,51 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
           $0.disabled = true
       }
 
+      +++ Section(header:"Invite Attendees", footer:"Select any contact from your contacts")
+      <<< ButtonRow() {
+        $0.tag = "meeting_invite_phone_numbers_new"
+        $0.title = "Select contacts from your contacts"
+        }.cellUpdate { cell, row in
+          cell.textLabel?.textAlignment = .left
+          cell.textLabel?.textColor = .darkText
+        }.onCellSelection { [weak self] (cell, row) in
+          if self != nil {
+            let contactPickerScene = EPContactsPicker(delegate: self, multiSelection: true, subtitleCellType: .phoneNumber)
+            contactPickerScene.selectedContacts = self!.contactsForInvite
+            let navigationController = UINavigationController(rootViewController: contactPickerScene)
+            self!.present(navigationController, animated: true, completion: nil)
+          }
+      }
+      <<< TokenTableRow<EPContact>() {
+        $0.tag = "meeting_invite_phone_numbers"
+        $0.placeholder = "selected contacts will show here"
+        $0.cellSetup { (cell, row) in
+          cell.disableTextField()
+//          ContactKitManager().fetchContactsOnBackgroundThread(completionHandler: { result in
+//
+//            switch result {
+//              case .Success(response: let contacts):
+//                let rContacts = contacts.map { (contact) -> [RContact] in
+//                  var multiPhoneContact = [RContact]()
+//                  for phoneNumber in contact.phoneNumbers {
+//                    if let phone = (phoneNumber.value).value(forKey: "digits") as? String {
+//                      let contact = RContact(contact: contact, phoneNumber: phone)
+//                      multiPhoneContact.append(contact)
+//                    }
+//                  }
+//                  return multiPhoneContact
+//                }.flatMap { $0 }
+//                print(rContacts[0].familyName)
+//                row.options.append(contentsOf: rContacts)
+//              break
+//              case .Error(error: let error):
+//                print(error)
+//              break
+//            }
+//          })
+        }
+      }
+
           +++ Section(header:"Description", footer: "Use this optional field to provide a description of your event. The circled text in the screen shot below is the event description.")
           <<< TextAreaRow("meeting_description") {
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 75)
@@ -350,6 +398,20 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
     }
 
     +++ Section(header:"Add-Ons", footer:"(*) Premium features")
+      <<< SwitchRow("is_meeting_public") {
+        $0.tag = "is_meeting_public"
+        $0.title = "Can anyone attend this meeting?"
+        $0.value = true
+      }
+
+      <<< SwitchRow("is_invite_enabled_for_invitees"){
+          $0.title = "Can invitees invite other people?"
+          $0.hidden = .function(["is_meeting_public"], { form -> Bool in
+              let row: RowOf<Bool>! = form.rowBy(tag: "is_meeting_public")
+              return row.value ?? true == true
+          })
+      }
+
       <<< SwitchRow("is_chat_enabled") {
         $0.title = "*Add chat collaboration to meeting"
         $0.disabled = true
@@ -462,6 +524,24 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
       self.meetingBuilder = self.meetingBuilder.add(key: "owner_id", value: meetingOwner)
     }
 
+    // Check if invites exists
+    if let meetingInvitePhoneNumbersRow = form.rowBy(tag: "meeting_invite_phone_numbers") as? TokenTableRow<EPContact>, let meetingInvitePhoneNumbers = meetingInvitePhoneNumbersRow.value {
+      var meetingInvitePhoneNumbersArray = [[String: Any]]()
+      for invitePhoneNumbers in meetingInvitePhoneNumbers {
+        meetingInvitePhoneNumbersArray.append(invitePhoneNumbers.dictionaryRep)
+      }
+      self.meetingBuilder = self.meetingBuilder.add(key: "meeting_invite_phone_numbers", value: meetingInvitePhoneNumbersArray)
+    }
+
+    // Check if meeting is public
+    if let isMeetingPublicRow = form.rowBy(tag: "is_meeting_public") as? SwitchRow, let isMeetingPublic = isMeetingPublicRow.value {
+      self.meetingBuilder = self.meetingBuilder.add(key: "is_meeting_public", value: isMeetingPublic)
+    }
+
+    if let isMeetingPublicRow = form.rowBy(tag: "is_invite_enabled_for_invitees") as? SwitchRow, let isMeetingPublic = isMeetingPublicRow.value {
+      self.meetingBuilder = self.meetingBuilder.add(key: "is_invite_enabled_for_invitees", value: isMeetingPublic)
+    }
+
     guard let _ = meetingBuilder.retrieve(forKey: "meeting_name") as? String,
       let _ = meetingBuilder.retrieve(forKey: "start_date") as? Date,
       let _ = meetingBuilder.retrieve(forKey: "end_date") as? Date,
@@ -503,11 +583,21 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
   func handleError(viewModel: RootedContent.DisplayError.ViewModel) {
     displayFailure(with: viewModel.errorTitle, and: viewModel.errorMessage, afterAnimating: sendToFriendsButton)
+    if let meeting = viewModel.meeting {
+      removeFromCalendar(meeting)
+    }
+  }
+
+  // MARK: - Use Case: Remove meeting from users calendar
+  private func removeFromCalendar(_ meeting: Meeting) {
+    var request = RootedContent.RemoveFromCalendar.Request()
+    request.meeting = meeting
+    interactor?.removeMeetingFromCalendar(request: request)
   }
 
   // MARK: - Use Case: Send message containing meeting data to MSMessage
   func sendResponse(to meeting: Meeting) {
-    guard let meetingname = meeting.meetingName, let startdate = meeting.meetingDate?.startDate?.toDate()?.date, let _ = meeting.meetingDate?.endDate?.toDate()?.date, let message = EngagementFactory.Meetings.meetingToMessage(meeting) else {
+    guard let meetingid = meeting.id, let meetingname = meeting.meetingName, let startdate = meeting.meetingDate?.startDate?.toDate()?.date, let _ = meeting.meetingDate?.endDate?.toDate()?.date, let message = EngagementFactory.Meetings.meetingToMessage(meeting) else {
       return self.displayFailure(with: "Oops!", and: "Something went wrong while sending message. Please try again.", afterAnimating: self.sendToFriendsButton)
     }
     conversationManager.send(message: message, of: .insert) { (success, error) in
@@ -519,13 +609,53 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
             let pasteboard = UIPasteboard.general
             pasteboard.string = String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
 
-            self.displayError(with: "Copied to Clipboard!", and: "Event invitation was copied to your clipboard.", withCompletion: {
+            let yesAction = UIAlertAction(title: "Share with Invitees via Group Chat", style: .default) { action in
+              let messageComposeController = MFMessageComposeViewController()
+              messageComposeController.messageComposeDelegate = self
+
+              var recipients = [String]()
+              for phone in meeting.meetingInvitePhoneNumbers! {
+                recipients.append(phone.phone ?? "")
+              }
+
+              messageComposeController.recipients = recipients
+
+              // tell messages to use the default message template layout
+              let layout = MSMessageTemplateLayout()
+              layout.caption = String(format: kCaptionStringWithUrl, arguments: [meetingname, startdate.toString(.rooted), PathBuilder.build(.Test, in: .Main, with: "/public/events/\(meetingid)")])
+
+              // create a message and tell it the content and layout
+              let message = MSMessage()
+              message.layout = layout
+
+              messageComposeController.message = message
+              messageComposeController.body = String(format: kCaptionStringWithUrl, arguments: [meetingname, startdate.toString(.rooted), PathBuilder.build(.Custom(testBaseURL), in: .Main, with: "/public/events/\(meetingid)")])
+              self.present(messageComposeController, animated: true, completion: nil)
+
+            }
+
+            let noAction = UIAlertAction(title: "Done", style: .default) {
+              action in
               self.dismiss(animated: true, completion: nil)
-            })
+            }
+
+            HUDFactory.displayAlert(with: "Copied to Clipboard!", message: "Event invitation was copied to your clipboard. Want to share with invitees via Group Chat?", and: [yesAction, noAction], on: self)
           })
         })
       }
     }
+  }
+
+  //  Primary delegate functions
+  func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+      switch result {
+      case .cancelled:
+        controller.dismiss(animated: true, completion: nil)
+        self.dismissView()
+      case .failed, .sent:
+        controller.dismiss(animated: true, completion: nil)
+        self.dismissView()
+      }
   }
 
   // MARK: - Use Case: Notify user that message was copied to clipboard
@@ -533,6 +663,77 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
   @IBAction func cancelAction(_ sender: UIButton) {
     dismissView()
   }
+
+  var contactsForInvite = [EPContact]() {
+    didSet {
+      if self.contactsForInvite.count > 0 {
+        self.start()
+      } else {
+        if let invitePhoneRow = form.rowBy(tag: "meeting_invite_phone_numbers") as? TokenTableRow<EPContact> {
+          invitePhoneRow.value = Set<EPContact>()
+          invitePhoneRow.reload()
+        }
+      }
+    }
+  }
+
+  func epContactPicker(_: EPContactsPicker, didContactFetchFailed error : NSError) { }
+
+  func epContactPicker(_: EPContactsPicker, didCancel error : NSError) { }
+
+  func epContactPicker(_: EPContactsPicker, didSelectContact contact : EPContact) {
+    contactsForInvite.removeAll()
+    contactsForInvite.append(contact)
+  }
+
+  func epContactPicker(_: EPContactsPicker, didSelectMultipleContacts contacts : [EPContact]) {
+    contactsForInvite.removeAll()
+    contactsForInvite = contacts
+  }
+
+  func start(at: Int = 0) {
+    var atIndex = at
+    guard atIndex < contactsForInvite.count else {
+      return
+    }
+    let selectedContact = contactsForInvite[at]
+    switch selectedContact.phoneNumbers.count {
+    case let x where x == 1:
+      selectedContact.selectedPhoneNumber = selectedContact.phoneNumbers[0]
+      atIndex += 1
+      if let invitePhoneRow = form.rowBy(tag: "meeting_invite_phone_numbers") as? TokenTableRow<EPContact> {
+        invitePhoneRow.value = Set(contactsForInvite)
+        invitePhoneRow.reload()
+      }
+      self.start(at: atIndex)
+    case let x where x > 1:
+      let alert = UIAlertController(title: "Select Phone Number for \(selectedContact.displayName())", message: "\(selectedContact.displayName()) has more than 1 phone number. Select the one you would like to send an invite to", preferredStyle: .actionSheet)
+      for phoneNumber in selectedContact.phoneNumbers {
+        let phoneAction = UIAlertAction(title: "Choose \(phoneNumber.phoneNumber)", style: .default) { action in
+          selectedContact.selectedPhoneNumber = phoneNumber
+          atIndex += 1
+
+          if let invitePhoneRow = self.form.rowBy(tag: "meeting_invite_phone_numbers") as? TokenTableRow<EPContact> {
+            invitePhoneRow.value = Set(self.contactsForInvite)
+            invitePhoneRow.reload()
+          }
+
+          self.start(at: atIndex)
+        }
+        alert.addAction(phoneAction)
+      }
+      let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { action in
+        atIndex += 1
+        self.start(at: atIndex)
+        alert.dismiss(animated: true, completion: nil)
+      }
+      alert.addAction(cancelAction)
+      self.present(alert, animated: true, completion: nil)
+    default:
+      break
+    }
+  }
+
 }
 
 // MARK: - WWCalendarTimeSelectorProtocol

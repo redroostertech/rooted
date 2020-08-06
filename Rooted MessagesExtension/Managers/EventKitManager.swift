@@ -135,7 +135,7 @@ class EventKitManager: NSObject {
 
   private func insertEvent(_ event: EKEvent, into calendar: EKCalendar?, update meeting: Meeting, completion: @escaping (Meeting?, Bool, Error?) -> Void) {
      event.calendar = calendar
-     event.addAlarm(EKAlarm(relativeOffset: -10800))
+     event.addAlarm(EKAlarm(relativeOffset: -3600))
      event.addAlarm(EKAlarm(relativeOffset: -86400))
      if !eventAlreadyExists(event: event) {
        do {
@@ -172,6 +172,11 @@ class EventKitManager: NSObject {
     let predicate = eventStore.predicateForEvents(withStart: startdate, end: enddate, calendars: calendars)
 
     let events = eventStore.events(matching: predicate)
+
+    if events.count == 0 {
+      completion(nil, false, RError.customError("There was an error retreiving the meeting."))
+    }
+
     for event in events {
       if let eventTitle = event.title, let meetingName = meeting.meetingName, eventTitle == "ROOTED INVITATION: \(meetingName)" {
         do {
@@ -182,8 +187,6 @@ class EventKitManager: NSObject {
         }
       }
     }
-
-    completion(nil, false, RError.customError("There was an error retreiving the meeting."))
   }
 
   // MARK: - Use Case: Fetching events from a particular calendar

@@ -1,5 +1,6 @@
 import UIKit
 import Messages
+import MessageUI
 import iMessageDataKit
 import EventKit
 import MapKit
@@ -10,20 +11,18 @@ import OnboardKit
 import Aztec
 import WordPressEditor
 import EggRating
+import EachNavigationBar
 
-class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLogic, MeetingsManagerDelegate, RootedCellDelegate, FloatingMenuBtnAction, AuthenticationLogic {
+class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLogic, MeetingsManagerDelegate, RootedCellDelegate, FloatingMenuBtnAction, AuthenticationLogic, MFMessageComposeViewControllerDelegate {
 
   // MARK: - IBOutlets
-  @IBOutlet private weak var refreshButton: UIButton!
-  @IBOutlet private weak var calendarButton: UIButton!
   @IBOutlet private weak var segmentedControl: ScrollableSegmentedControl!
   @IBOutlet private weak var segmentControlHeightConstraint: NSLayoutConstraint!
   @IBOutlet private weak var collectionView: UICollectionView!
   @IBOutlet private weak var menuButton: UIButton!
-  @IBOutlet private weak var welcomeLabel: UILabel!
-  @IBOutlet private weak var welcomeLabelHeightConstraint: NSLayoutConstraint!
   @IBOutlet private weak var activityCountLabel: UILabel!
   @IBOutlet private weak var activityCountLabelHeightConstraint: NSLayoutConstraint!
+  @IBOutlet private weak var topConstraint: NSLayoutConstraint!
 
   // Floating Menu
   public var floatingMenu: FloatingMenuBtn?
@@ -31,14 +30,64 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   private var menuSelection = 0
   private var menuItemImages: [UIImage] {
     if isDebug {
-    return [UIImage(named: "calendar-plus-sm")!, UIImage(named: "gear-outlined-symbol-sm")!, UIImage(named: "nine-oclock-on-circular-clock-sm")!, UIImage(named: "cube-of-notes-stack-sm")!]
+      return [
+        UIImage(named: "calendar-plus-sm")!,
+        UIImage(named: "gear-outlined-symbol-sm")!,
+        UIImage(named: "nine-oclock-on-circular-clock-sm")!,
+        UIImage(named: "cube-of-notes-stack-sm")!
+      ]
     } else {
-      return [UIImage(named: "calendar-plus-sm")!, UIImage(named: "gear-outlined-symbol-sm")!]
+      return [
+        UIImage(named: "calendar-plus-sm")!,
+        UIImage(named: "gear-outlined-symbol-sm")!
+      ]
     }
   }
 
   // MARK: - Private Properties
   private var interactor: RootedContentBusinessLogic?
+  private var welcomeTitle = ""
+  private var navigationBar: EachNavigationBar?
+
+  private var navBarHeight: CGFloat = 100
+  private var navBar: EachNavigationBar {
+    let statusBarHeight: CGFloat = 0
+
+    let navbar = EachNavigationBar(viewController: self)
+    navbar.frame = CGRect(x: 0, y: statusBarHeight, width: UIScreen.main.bounds.width, height: navBarHeight)
+    navbar.barTintColor = .systemOrange
+    navbar.prefersLargeTitles = true
+
+    navbar.shadow = .none
+    navbar.items = [ navItem ]
+    navbar.tintColor = .white
+    navbar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+    navbar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+
+    return navbar
+  }
+
+  private var navItem: UINavigationItem {
+    let navitem = UINavigationItem()
+    navitem.title = welcomeTitle
+
+    let viewCalendarBarButton = UIBarButtonItem(image: UIImage(named: "weekly-calendar-sm")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(goToViewCalendar))
+    viewCalendarBarButton.tintColor = .white
+
+    let refreshBarButton = UIBarButtonItem(image: UIImage(named: "refresh-old")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(refreshMeetings))
+    refreshBarButton.tintColor = .white
+
+    let filterButton = UIBarButtonItem(image: UIImage(named: "cube-of-notes-stack-sm")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(showFilterOptions))
+    filterButton.tintColor = .white
+
+    if isDebug {
+      navitem.rightBarButtonItems = [ refreshBarButton, viewCalendarBarButton, filterButton ]
+    } else {
+      navitem.rightBarButtonItems = [ refreshBarButton, filterButton ]
+    }
+    navitem.largeTitleDisplayMode = .always
+    return navitem
+  }
 
   // MARK: - Public Propreties
   public var anonymousUser: UserProfileData?
@@ -69,10 +118,27 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     presenter.viewController = viewController
   }
 
+  // MARK: View lifecycle
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    DispatchQueue.main.async {
+      self.navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     setupUI()
     NotificationCenter.default.addObserver(self, selector: #selector(refreshMeetings), name: Notification.Name(rawValue: kNotificationMyInvitesReload), object: nil)
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    switch presentationStyle {
+    case .expanded:
+    setupManagedSession()
+    default: break
+    }
   }
 
   override func willBecomeActive(with conversation: MSConversation) {
@@ -127,8 +193,8 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   // MARK: - Use Case: Setup the UI for the view
   private func setupUI() {
     setup(collectionView: collectionView)
-    setupSegmentedControl()
     setupMenuButton()
+    setupNavBar()
   }
 
   private func setupMenuButton() {
@@ -163,24 +229,22 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     segmentedControl.underlineSelected = true
     segmentedControl.selectedSegmentIndex = menuSelection
     segmentedControl.fixedSegmentWidth = true
-    segmentedControl.addTarget(self, action: #selector(self.segmentSelected(sender:)), for: .valueChanged)
+//    segmentedControl.addTarget(self, action: #selector(self.segmentSelected(sender:)), for: .valueChanged)
   }
 
   private func configureCompactUI() {
+
     // Set layout option
     layoutOption = .horizontalList
+
+    // hide navigation bar
+    hideNavigationBar()
 
     // Hide segment control
     hideSegmentControl()
 
     // Clear `UITableView`
     clearTable()
-
-    // Hide top buttons
-    hideTopBarButtons()
-
-    // Hide `WelcomeLabel`
-    hideWelcomeLabel()
 
     // Hide `ActivityCountLabel`
     hideActivityCountLabel()
@@ -190,52 +254,42 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     // Set layout option
     layoutOption = .list
 
+    // hide navigation bar
+    showNavigationBar()
+
     // Show segment control
     showSegmentControl()
 
     // Clear `UITableView`
     clearTable()
 
-    // Show top buttons
-    showTopBarButtons()
-
-    // Show `WelcomeLabel`
-    showWelcomeLabel()
-
     // Show `ActivityCountLabel`
-    showActivityCountLabel()
+    hideActivityCountLabel()
   }
 
-  private func hideTopBarButtons() {
-    // Hide `CalendarButton`
-    hideCalendarButton()
-
-    // Hide `RefreshButton`
-    hideRefreshButton()
+  private func setupNavBar() {
+    welcomeTitle = "Welcome!"
+    updateNavBar()
   }
 
-  private func showTopBarButtons() {
-    // Show `RefreshButton`
-    showRefreshButton()
-
-    // Show `CalendarButton`
-    showCalendarButton()
+  private func updateNavBar() {
+    navigationBar = navBar
   }
 
-  private func hideCalendarButton() {
-    calendarButton.isHidden = true
+  private func showNavigationBar() {
+    if let navigationbar = navigationBar {
+      self.view.addSubview(navigationbar)
+      self.topConstraint.constant += self.navBarHeight * 0.20
+    }
   }
 
-  private func showCalendarButton() {
-    calendarButton.isHidden = false
-  }
-
-  private func hideRefreshButton() {
-    refreshButton.isHidden = true
-  }
-
-  private func showRefreshButton() {
-    refreshButton.isHidden = false
+  private func hideNavigationBar() {
+    for subView in view.subviews {
+      if let navigationbar = subView as? EachNavigationBar {
+        navigationbar.removeFromSuperview()
+        self.topConstraint.constant -= self.navBarHeight * 0.20
+      }
+    }
   }
 
   private func hideSegmentControl() {
@@ -244,14 +298,6 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   private func showSegmentControl() {
     segmentControlHeightConstraint.constant = 49
-  }
-
-  private func hideWelcomeLabel() {
-    welcomeLabelHeightConstraint.constant = 0
-  }
-
-  private func showWelcomeLabel() {
-    welcomeLabelHeightConstraint.constant = 55
   }
 
   private func hideActivityCountLabel() {
@@ -285,12 +331,6 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     })
   }
 
-  private func presentDetailsView(for meeting: Meeting) {
-    let viewModel = RootedCellViewModel(data: meeting, delegate: self)
-    let destination = InviteDetailsViewController.setupViewController(meeting: viewModel)
-    self.present(destination, animated: true, completion: nil)
-  }
-
   // MARK: - Use Case: Set up a managed session
   func setupManagedSession() {
     NavigationCoordinator.performExpandedNavigation(from: self, {
@@ -309,8 +349,8 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
         // Update heads up display labels
         // Parse full name
-        self.updateLabel(self.welcomeLabel, text: "Hello, \(currentUserFirstName)!")
-        self.updateLabel(self.activityCountLabel, text: "Upcoming meetings today")
+        self.welcomeTitle = "Hello, \(currentUserFirstName)!"
+        self.updateNavBar()
 
         // Check calendar permissions
         self.checkCalendarPermissions()
@@ -334,16 +374,47 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
       let selectedmessage = ConversationManager.shared.selectedMessage,
       selectedmessage.md.string(forKey: kMessageTitleKey) != nil,
       let meeting = EngagementFactory.Meetings.messageToMeeting(selectedmessage) else { return }
+
+    // If JSON string exists and can be serialized into a `Meeting` object, present the details of the meeting
     presentDetailsView(for: meeting)
+  }
+
+  // MARK: - Use Case: Present `InviteDetailsViewController` if a meeting json string is provided
+  private func presentDetailsView(for meeting: Meeting) {
+    let viewModel = RootedCellViewModel(data: meeting, delegate: self)
+    let destination = InviteDetailsViewController.setupViewController(meeting: viewModel)
+    self.present(destination, animated: true, completion: nil)
+  }
+
+  // MARK: - Use Case: Present `InviteDetailsViewController` if a meeting json string is provided
+  private func presentParticipantsView(for meeting: Meeting) {
+    let viewModel = RootedCellViewModel(data: meeting, delegate: self)
+    let destination = ViewParticipantsViewController.setupViewController(meeting: viewModel)
+    self.present(destination, animated: true, completion: nil)
   }
 
   // MARK: - Use Case: Retrieve meetings for user
   func retrieveMeetings() {
+    // Set menu selection
+    menuSelection = 0
+
     showHUD()
     var request = RootedContent.RetrieveMeetings.Request()
     request.meetingManagerDelegate = self
     request.contentDB = .remote
     interactor?.retrieveMeetings(request: request)
+  }
+
+  // MARK: - Use Case: Retrieve meetings that current user sent
+  func retrieveSentMeetings() {
+    // Set menu selection
+    menuSelection = 1
+
+    showHUD()
+    var request = RootedContent.RetrieveSentMeetings.Request()
+    request.meetingManagerDelegate = self
+    request.contentDB = .remote
+    interactor?.retrieveSentMeetings(request: request)
   }
 
   func didFailToLoad(_ manager: Any?, error: Error) {
@@ -360,38 +431,9 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
     dismissHUD()
     guard let meetings = viewModel.meetings else { return }
 
-    // Update activity label
-    updateLabel(activityCountLabel, text: "You have \(meetings.count) upcoming meetings")
-
     // Update table for meetings
     let rootedCollectionViewModel = EngagementFactory.Meetings.convert(contextWrappers: meetings, for: menuSelection, withDelegate: self)
     loadCells(cells: rootedCollectionViewModel)
-  }
-
-  // MARK: - Use Case: App needs to quickly update text value within a UILabel
-  private func updateLabel(_ label: UILabel, text: String) {
-    label.text = text
-  }
-
-  // MARK: - Use Case: App should handle selection within `ScrollableSegmentedControl` to update the type of meeting data that is displayed in the table view
-  @objc
-  private func segmentSelected(sender: ScrollableSegmentedControl) {
-    menuSelection = sender.selectedSegmentIndex
-    dismissMenu()
-    switch menuSelection {
-    case 1:
-      self.retrieveSentMeetings()
-    default:
-      self.retrieveMeetings()
-    }
-  }
-
-  func retrieveSentMeetings() {
-    showHUD()
-    var request = RootedContent.RetrieveSentMeetings.Request()
-    request.meetingManagerDelegate = self
-    request.contentDB = .remote
-    interactor?.retrieveSentMeetings(request: request)
   }
 
   // MARK: - IBActions
@@ -475,104 +517,180 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   // MARK: - RootedCellDelegate
   // MARK: - Use Case: As a user, I would like to perform additional actions on items in the table view
   func performActions(_ cell: UICollectionViewCell, ofType: ActionType, on viewModel: Any?) {
-    guard let viewmodel = viewModel as? RootedCellViewModel else { return }
+    guard let viewmodel = viewModel as? RootedCellViewModel, let meeting = viewmodel.data else { return }
 
-    if let meeting = viewmodel.data {
+    RRLogger.log(message: "RootedCellDelegate performActions(_:on:) was called", owner: self)
 
-      RRLogger.log(message: "RootedCellDelegate performActions(_:on:) was called", owner: self)
+    NavigationCoordinator.performExpandedNavigation(from: self) {
 
-      NavigationCoordinator.performExpandedNavigation(from: self) {
+      // MARK: - Use Case: Show an alert for a user to perform more actions
+      let alert = UIAlertController(title: "Quick Actions", message: "You can perform any of the following actions on this event invite.", preferredStyle: .actionSheet)
 
-        // MARK: - Use Case: Show an alert for a user to perform more actions
-        let alert = UIAlertController(title: "Quick Actions", message: "You can perform any of the following actions on this event invite.", preferredStyle: .actionSheet)
+      // MARK: - Use Case: View details from the table view
+      let viewDetails = UIAlertAction(title: "View Details", style: .default, handler: { action in
+        NavigationCoordinator.performExpandedNavigation(from: self) {
+          self.presentDetailsView(for: meeting)
+        }
+      })
+      alert.addAction(viewDetails)
 
-        // MARK: - Use Case: View details from the table view
-        let viewDetails = UIAlertAction(title: "View Details", style: .default, handler: { action in
-          let destination = InviteDetailsViewController.setupViewController(meeting: viewmodel)
-          NavigationCoordinator.performExpandedNavigation(from: self) {
-            self.present(destination, animated: true, completion: nil)
-          }
-        })
-        alert.addAction(viewDetails)
+      // MARK: - Use Case: View participant information
+      let viewParticipants = UIAlertAction(title: "Confirmed Participants (\(meeting.participants?.count ?? 0))", style: .default, handler: { action in
+        NavigationCoordinator.performExpandedNavigation(from: self) {
+          self.presentParticipantsView(for: meeting)
+        }
+      })
+      alert.addAction(viewParticipants)
 
-        // MARK: - Use Case: View participant information
-        let viewParticipants = UIAlertAction(title: "Confirmed Participants (\(meeting.participants?.count ?? 0))", style: .default, handler: { action in
-          let destination = ViewParticipantsViewController.setupViewController(meeting: viewmodel)
-          NavigationCoordinator.performExpandedNavigation(from: self) {
-            self.present(destination, animated: true, completion: nil)
-          }
-        })
-        alert.addAction(viewParticipants)
+      // Check if the current user is the owner of the meeting
+      // If current user is NOT the owner of the event, then user should ONLY be able to remove their attendance from the meeting
+      if let meetingOwner = meeting.ownerId, let currentUserId = SessionManager.shared.currentUser?.uid, meetingOwner != currentUserId {
 
-        if let meetingOwner = meeting.ownerId, let currentUserId = SessionManager.shared.currentUser?.uid, meetingOwner != currentUserId {
+        if let meetingParticipants = meeting.meetingParticipantsIds, meetingParticipants.contains(currentUserId) {
 
-          if let meetingParticipants = meeting.meetingParticipantsIds, meetingParticipants.contains(currentUserId) {
+          // Check if meeting is already cancelled
+          if let meetingStatus = meeting.meetingStatusId {
+
+            if meetingStatus == 1 {
+
+              // MARK: - Use Case: View details from the table view
+              let decline = UIAlertAction(title: "Remove from Calendar", style: .destructive, handler: { action in
+                self.removeFromCalendar(meeting)
+              })
+              alert.addAction(decline)
+
+            } else {
+
+              // MARK: - Use Case: Add event from the table view
+              let addToCalendar = UIAlertAction(title: "Add to Calendar", style: .default, handler: { action in
+                self.addToCalendar(meeting)
+              })
+              alert.addAction(addToCalendar)
+
+              // MARK: - Use Case: Remove event from calendar
+              let removeFromCalendar = UIAlertAction(title: "Remove from Calendar", style: .destructive, handler: { action in
+                self.removeFromCalendar(meeting)
+              })
+              alert.addAction(removeFromCalendar)
+
+              // MARK: - Use Case: Decline attendance to meeting
+              let decline = UIAlertAction(title: "Remove Attendance", style: .destructive, handler: { action in
+                self.declineInvite(meeting: meeting)
+              })
+              alert.addAction(decline)
+
+            }
+
+          } else {
+
+            // MARK: - Use Case: Add event from the table view
+            let addToCalendar = UIAlertAction(title: "Add to Calendar", style: .default, handler: { action in
+              self.addToCalendar(meeting)
+            })
+            alert.addAction(addToCalendar)
+
+            // MARK: - Use Case: Remove event from calendar
+            let removeFromCalendar = UIAlertAction(title: "Remove from Calendar", style: .destructive, handler: { action in
+              self.removeFromCalendar(meeting)
+            })
+            alert.addAction(removeFromCalendar)
+
             // MARK: - Use Case: View details from the table view
-            let decline = UIAlertAction(title: "Remove Attendance", style: .default, handler: { action in
-              self.declineInvite(meeting: viewmodel)
+            let decline = UIAlertAction(title: "Remove Attendance", style: .destructive, handler: { action in
+              self.declineInvite(meeting: meeting)
             })
             alert.addAction(decline)
+
+          }
+        }
+
+      } else {
+        
+        // If current user is the owner of the event, then user should be able to:
+        // - Invite others by sharing into conversation
+        // - Delete the meeting (Removes from DB)
+        // - Cancel the meeting (Does not remove from DB)
+
+        // MARK: - Use Case: Share a meeting from the table view
+        let share = UIAlertAction(title: "Share to Current Conversation", style: .default, handler: { action in
+          self.share(meeting: meeting)
+        })
+        alert.addAction(share)
+
+        // Check if meeting is already cancelled
+        if let meetingStatus = meeting.meetingStatusId {
+
+          if meetingStatus == 1 {
+
+            // MARK: - Use Case: Delete a meeting from the table view
+            let delete = UIAlertAction(title: "Delete Meeting", style: .destructive, handler: { action in
+              self.delete(viewmodel)
+            })
+            alert.addAction(delete)
+
+          } else {
+
+            // MARK: - Use Case: Add event from the table view
+            let addToCalendar = UIAlertAction(title: "Add to Calendar", style: .default, handler: { action in
+              self.addToCalendar(meeting)
+            })
+            alert.addAction(addToCalendar)
+
+            // MARK: - Use Case: Remove event from calendar
+            let removeFromCalendar = UIAlertAction(title: "Remove from Calendar", style: .destructive, handler: { action in
+              self.removeFromCalendar(meeting)
+            })
+            alert.addAction(removeFromCalendar)
+
+            // MARK: - Use Case: Delete a meeting from the table view
+            let cancel = UIAlertAction(title: "Cancel Meeting", style: .destructive, handler: { action in
+              self.cancel(viewmodel)
+            })
+            alert.addAction(cancel)
+
+            // MARK: - Use Case: Delete a meeting from the table view
+            let delete = UIAlertAction(title: "Delete Meeting", style: .destructive, handler: { action in
+              self.delete(viewmodel)
+            })
+            alert.addAction(delete)
           }
         } else {
 
-          // MARK: - Use Case: Share a meeting from the table view
-          let share = UIAlertAction(title: "Share to Conversation", style: .default, handler: { action in
-            self.share(meeting: meeting)
+          // MARK: - Use Case: Add event from the table view
+          let addToCalendar = UIAlertAction(title: "Add to Calendar", style: .default, handler: { action in
+            self.addToCalendar(meeting)
           })
-          alert.addAction(share)
+          alert.addAction(addToCalendar)
 
+          // MARK: - Use Case: Remove event from calendar
+          let removeFromCalendar = UIAlertAction(title: "Remove from Calendar", style: .destructive, handler: { action in
+            self.removeFromCalendar(meeting)
+          })
+          alert.addAction(removeFromCalendar)
 
           // MARK: - Use Case: Delete a meeting from the table view
-          let delete = UIAlertAction(title: "Cancel Meeting", style: .destructive, handler: { action in
+          let cancel = UIAlertAction(title: "Cancel Meeting", style: .destructive, handler: { action in
+            self.cancel(viewmodel)
+          })
+          alert.addAction(cancel)
+
+          // MARK: - Use Case: Delete a meeting from the table view
+          let delete = UIAlertAction(title: "Delete Meeting", style: .destructive, handler: { action in
             self.delete(viewmodel)
           })
           alert.addAction(delete)
-
         }
-
-        // MARK: - Use Case: Dismiss the action sheet if a desired function is not available
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-          // Do something on cancel
-        })
-        alert.addAction(cancel)
-
-        // Show the alert
-        self.present(alert, animated: true, completion: nil)
       }
+
+      // MARK: - Use Case: Dismiss the action sheet if a desired function is not available
+      let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+        // Do something on cancel
+      })
+      alert.addAction(cancel)
+
+      // Show the alert
+      self.present(alert, animated: true, completion: nil)
     }
-  }
-
-  // MARK: - Use Case: Decline the meeting
-  private func declineInvite(meeting: RootedCellViewModel) {
-    let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { action in
-      self.removeFromCalendar(meeting: meeting)
-    })
-
-    let noAction = UIAlertAction(title: "No", style: .cancel, handler: { action in
-      // Do something if user changes their mind
-    })
-
-    HUDFactory.displayAlert(with: "Remove Attendance", message: "Are you sure you are not attending the meeting anymore?", and: [yesAction, noAction], on: self)
-  }
-
-  func removeFromCalendar(meeting: RootedCellViewModel) {
-    var request = RootedContent.RemoveFromCalendar.Request()
-    request.meeting = meeting
-    interactor?.removeMeetingFromCalendar(request: request)
-  }
-
-  func declineMeeting(meeting: Meeting) {
-    var request = RootedContent.DeclineMeeting.Request()
-    request.meeting = meeting
-    request.branchEventID = kBranchInviteAccepted
-    request.saveType = .receive
-    request.contentDB = .remote
-    interactor?.declineMeeting(request: request)
-  }
-
-  func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel) {
-    guard let meeting = viewModel.meeting else { return }
-    retrieveMeetings()
   }
 
   // MARK: - Use Case: Share a meeting from the table view by inserting it into the current conversation
@@ -600,6 +718,33 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
         self.displayError(with: "Copied to Clipboard!", and: "Event invitation was copied to your clipboard.")
       }
     }
+  }
+
+  // MARK: - Use Case: Remove attendance by declining the meeting
+  private func declineInvite(meeting: Meeting) {
+    let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { action in
+      self.declineMeeting(meeting)
+    })
+
+    let noAction = UIAlertAction(title: "No", style: .cancel, handler: { action in
+      // Do something if user changes their mind
+    })
+
+    HUDFactory.displayAlert(with: "Remove Attendance", message: "Are you sure you are not attending the meeting anymore?", and: [yesAction, noAction], on: self)
+  }
+
+  func declineMeeting(_ meeting: Meeting) {
+    var request = RootedContent.DeclineMeeting.Request()
+    request.meeting = meeting
+    request.branchEventID = kBranchInviteAccepted
+    request.saveType = .receive
+    request.contentDB = .remote
+    interactor?.declineMeeting(request: request)
+  }
+
+  func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel) {
+    guard let mting = viewModel.meeting else { return }
+    removeFromCalendar(mting)
   }
 
   // MARK: - Use Case: Delete a meeting from the table view
@@ -631,39 +776,134 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
   func onDidDeleteMeeting(viewModel: RootedContent.DeleteMeeting.ViewModel) {
     dismissHUD()
-    showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
+
+    DispatchQueue.main.async {
+      self.showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
+    }
 
     // Try to remove from Calendar
-    removeFromCalendar(viewModel.meeting)
-
-    // Refresh
-    refreshMeetings()
+    guard let meeting = viewModel.meeting?.data else { return }
+    removeFromCalendar(meeting)
   }
 
   func didDeleteInvite(_ manager: Any?, invite: MeetingContextWrapper) {
-    print("Did delete invite")
+    RRLogger.log(message: "Meeting was successfully deleted.", owner: self)
     showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
   }
 
+  // MARK: - Use Case: Cancel a meeting from the table view
+  private func cancel(_ meeting: RootedCellViewModel?) {
+    // MARK: - Use Case: Show a confirmation to the user due to the action not being able to be undone
+    let alert = UIAlertController(title: kCancelTitle, message: kCancelMessage, preferredStyle: .alert)
+
+    // MARK: - Use Case: Delete a meeting from local storage and remove from calendar
+    let yes = UIAlertAction(title: "Yes", style: .default, handler: { action in
+      self.showHUD()
+
+      var request = RootedContent.CancelMeeting.Request()
+      request.meetingManagerDelegate = self
+      request.meeting = meeting
+      request.contentDB = .remote
+      self.interactor?.cancelMeeting(request: request)
+
+    })
+    alert.addAction(yes)
+
+    // MARK: - Use Case: Cancel the deletion action
+    let no = UIAlertAction(title: "No", style: .default, handler: { action in
+      alert.dismiss(animated: true, completion: nil)
+    })
+    alert.addAction(no)
+
+    self.present(alert, animated: true, completion: nil)
+  }
+
+  func onDidCancelMeeting(viewModel: RootedContent.CancelMeeting.ViewModel) {
+    dismissHUD()
+    showError(title: "Meeting Cancelled", message: "Meeting was successfully cancelled.", style: .alert, defaultButtonText: "OK")
+
+    // Try to remove from Calendar
+    guard let meeting = viewModel.meeting?.data else { return }
+    removeFromCalendar(meeting)
+  }
+
   // MARK: - Use Case: Remove meeting from users calendar
-  private func removeFromCalendar(_ meeting: RootedCellViewModel?) {
-    guard let subject = meeting else {
-      RRLogger.log(message: "There was an error trying to remove the meeting. Please try again.", owner: self)
-      return
-    }
+  private func removeFromCalendar(_ meeting: Meeting) {
     var request = RootedContent.RemoveFromCalendar.Request()
-    request.meeting = subject
-    self.interactor?.removeMeetingFromCalendar(request: request)
+    request.meeting = meeting
+    interactor?.removeMeetingFromCalendar(request: request)
   }
 
   func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
     RRLogger.log(message: "Successfully removed meeting from calendar", owner: self)
-    guard let meeting = viewModel.meeting?.data else { return }
-    declineMeeting(meeting: meeting)
+
+    guard let meeting = viewModel.meeting, let meetingid = meeting.id, let meetingname = meeting.meetingName, let startdate = meeting.meetingDate?.startDate?.toDate()?.date, let _ = meeting.meetingDate?.endDate?.toDate()?.date else {
+      return
+    }
+
+    let pasteboard = UIPasteboard.general
+    pasteboard.string = String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
+
+    let yesAction = UIAlertAction(title: "Share Updates via Group Chat", style: .default) { action in
+      let messageComposeController = MFMessageComposeViewController()
+      messageComposeController.messageComposeDelegate = self
+
+      var recipients = [String]()
+      for phone in meeting.meetingInvitePhoneNumbers! {
+        recipients.append(phone.phone ?? "")
+      }
+
+      messageComposeController.recipients = recipients
+
+      // tell messages to use the default message template layout
+      let layout = MSMessageTemplateLayout()
+      layout.caption = "CANCELLED " + String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
+
+      // create a message and tell it the content and layout
+      let message = MSMessage()
+      message.layout = layout
+
+      messageComposeController.message = message
+      messageComposeController.body = "CANCELLED " + String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
+      self.present(messageComposeController, animated: true, completion: nil)
+
+    }
+
+    let noAction = UIAlertAction(title: "Done", style: .default) {
+      action in
+      self.refreshMeetings()
+    }
+
+    HUDFactory.displayAlert(with: "Removed from Calendar", message: "Meeting was successfully removed from your calendar.", and: [yesAction, noAction], on: self)
   }
 
   func onFailedCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
     RRLogger.log(message: "Failed to remove meeting from calendar. Error message: \(viewModel.errorMessage)", owner: self)
+    showError(title: "Error", message: "Meeting was already removed from your calendar or something went wrong. Please try again.", style: .alert, defaultButtonText: "OK")
+  }
+
+  //  Primary delegate functions
+  func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+      switch result {
+      case .cancelled:
+        controller.dismiss(animated: true, completion: nil)
+        self.refreshMeetings()
+      case .failed, .sent:
+        controller.dismiss(animated: true, completion: nil)
+        self.refreshMeetings()
+      }
+  }
+
+  // MARK: - Use Case: Add meeting to users calendar
+  private func addToCalendar(_ meeting: Meeting) {
+    var request = RootedContent.AddToCalendar.Request()
+    request.meeting = meeting
+    interactor?.addToCalendar(request: request)
+  }
+
+  func onSuccessfulCalendarAdd(viewModel: RootedContent.AddToCalendar.ViewModel) {
+    RRLogger.log(message: "Successfully removed meeting from calendar", owner: self)
+    showError(title: "Added to Calendar", message: "Meeting was successfully added to your calendar.", style: .alert, defaultButtonText: "OK")
   }
 
   // MARK: - Routing Logic
@@ -699,7 +939,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   // MARK: - Use Case: Go to `AvailabilityNavigationViewController`
   func goToAvailabilityNavigationView() {
     let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
-    let destinationVC = sb.instantiateViewController(withIdentifier: kViewControllerAvailabilityNavigation) as! AvailabilityViewController
+    let destinationVC = sb.instantiateViewController(withIdentifier: kViewControllerAvailabilityNavigation) as! UINavigationController
     present(destinationVC, animated: true, completion: nil)
   }
 
@@ -737,6 +977,34 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   // MARK: - Use Case: On failed login attempt, resume setting up the view controller
   func handleFailedLogin(_ sender: PhoneLoginViewController, reason: String) {
     // Don't do anything yet
+  }
+
+  // MARK: - Use Case: Show an alert for filtering meetings
+  @objc
+  func showFilterOptions() {
+    // MARK: - Use Case: Show an alert for a user to perform more actions
+    let alert = UIAlertController(title: "Filter Meetings", message: "", preferredStyle: .actionSheet)
+
+    // MARK: - Use Case: Show all meetings
+    let viewAll = UIAlertAction(title: "All Upcoming", style: .default, handler: { action in
+      self.retrieveMeetings()
+    })
+    alert.addAction(viewAll)
+
+    // MARK: - Use Case: Show sent meeting
+    let viewSent = UIAlertAction(title: "Sent", style: .default, handler: { action in
+      self.retrieveSentMeetings()
+    })
+    alert.addAction(viewSent)
+
+    // MARK: - Use Case: Dismiss the action sheet if a desired function is not available
+    let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
+      // Do something on cancel
+    })
+    alert.addAction(cancel)
+
+    // Show the alert
+    self.present(alert, animated: true, completion: nil)
   }
 }
 
@@ -781,16 +1049,24 @@ extension MyInvitesViewController {
         button.setTitleColor(.lightGray, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16.0, weight: .semibold)
       }
-      let page = OnboardPage(title: "Welcome to Rooted!",
-                                 imageName: "calendar",
-                                 description: "Grant access to your calendar to start creating and receiving meeting invites that sync to your calendar, set reminders and keep up with your schedule.",
-                                 advanceButtonTitle: "Decide Later",
-                                 actionButtonTitle: "Enable Calendar Access",
-                                 action: { [weak self] completion in
-                                  self?.checkCalendarPermissions()
-                                  self?.dismiss(animated: true, completion: nil)
+      let calendarPermissions = OnboardPage(title: "Calendar Access",
+                                            imageName: "calendar-wt",
+                                            description: "Grant access to your calendar to start creating and receiving meeting invites that sync to your calendar, set reminders and keep up with your schedule.",
+                                            advanceButtonTitle: "Decide Later",
+                                            actionButtonTitle: "Enable Access to Calendar",
+                                            action: { [weak self] completion in
+                                              self?.checkCalendarPermissions()
       })
-      let onboardingViewController = OnboardViewController(pageItems: [page],
+      let contactPermissions = OnboardPage(title: "Contact Access",
+                                           imageName: "contacts-wt",
+                                           description: "Grant access to your contacts to start adding people from your contacts to your meetings.",
+                                           advanceButtonTitle: "Decide Later",
+                                           actionButtonTitle: "Enable Access to Contacts",
+                                           action: { [weak self] completion in
+                                            self?.checkContactPermissions()
+                                            self?.dismiss(animated: true, completion: nil)
+      })
+      let onboardingViewController = OnboardViewController(pageItems: [calendarPermissions, contactPermissions],
                                                            appearanceConfiguration: appearance)
       onboardingViewController.presentFrom(self, animated: true)
     }
@@ -812,10 +1088,23 @@ extension MyInvitesViewController {
     } else {
       self.showCalendarError()
     }
+
+    // Check Contact Permissions
+    checkContactPermissions()
   }
 
   private func showCalendarError() {
      self.showError(title: kCalendarPermissions, message: kCalendarAccess)
+  }
+
+  // MARK: - Use Case: Check if app has access to Contacts permissions
+  func checkContactPermissions() {
+    let request = RootedContent.CheckContactPermissions.Request()
+    interactor?.checkContactPermissions(request: request)
+  }
+
+  func handleContactPermissions(viewModel: RootedContent.CheckContactPermissions.ViewModel) {
+    RRLogger.log(message: "Contacts Permissions: \(viewModel.isGranted)", owner: self)
   }
 
   // MARK: - Use Case: As a business, we want to limit access to creating more than (n) meetings based on account type
@@ -846,6 +1135,18 @@ extension MyInvitesViewController {
 
   // MARK: - Use Case: Go to Calendar view
   @IBAction func calendarButtonAction(_ sender: UIButton) {
-    // show calendar view
+    goToViewCalendar()
+  }
+
+  // MARK: - Use Case: Go to `ViewCalendarViewController`
+  @objc
+  func goToViewCalendar() {
+    let request = RootedContent.ViewCalendar.Request()
+    interactor?.goToViewCalendar(request: request)
+  }
+
+  func presentViewCalendar(viewModel: RootedContent.ViewCalendar.ViewModel) {
+    let destination = ViewCalendarViewController.setupViewController()
+    present(destination, animated: true, completion: nil)
   }
 }

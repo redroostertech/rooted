@@ -25,12 +25,16 @@ enum Registration {
       var success: Bool?
       var userId: String?
       var userData: UserProfileData?
+      var publicKey: String?
+      var privateKey: String?
     }
 
     struct ViewModel {
       var success: Bool?
       var userId: String?
       var userData: UserProfileData?
+      var publicKey: String?
+      var privateKey: String?
     }
   }
 
@@ -38,6 +42,8 @@ enum Registration {
     struct Request {
       var userId: String?
       var userData: UserProfileData?
+      var publicKey: String?
+      var privateKey: String?
     }
 
     struct Response {

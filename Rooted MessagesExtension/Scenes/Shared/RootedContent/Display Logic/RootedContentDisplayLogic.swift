@@ -13,8 +13,12 @@ protocol RootedContentDisplayLogic: class {
   func presentPhoneLoginViewController()
 
   func handleBranchIOResponse(viewModel: RootedContent.SetupBranchIO.ViewModel)
+
   func handleCalendarPermissions(viewModel: RootedContent.CheckCalendarPermissions.ViewModel)
   func handleCalendarPermissionsCheck(viewModel: RootedContent.CheckCalendarPermissions.ViewModel)
+
+  func handleContactPermissions(viewModel: RootedContent.CheckContactPermissions.ViewModel)
+  func handleContactPermissionsCheck(viewModel: RootedContent.CheckContactPermissions.ViewModel)
 
   func handleMaximumLimitReached(viewModel: RootedContent.CheckMaximumMeetingsReached.ViewModel)
   func presentCreateNewMeetingView(viewModel: RootedContent.CreateNewMeeting.ViewModel)
@@ -31,12 +35,14 @@ protocol RootedContentDisplayLogic: class {
 
   func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel)
   func onDidDeleteMeeting(viewModel: RootedContent.DeleteMeeting.ViewModel)
+  func onDidCancelMeeting(viewModel: RootedContent.CancelMeeting.ViewModel)
 
   func onSuccessfulAcceptance(viewModel: RootedContent.AcceptMeeting.ViewModel)
   func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel)
 
   func didRefreshSession(viewModel: RootedContent.RefreshSession.ViewModel)
 
+  func presentViewCalendar(viewModel: RootedContent.ViewCalendar.ViewModel)
 }
 
 extension RootedContentDisplayLogic {
@@ -44,8 +50,13 @@ extension RootedContentDisplayLogic {
   func presentPhoneLoginViewController() { }
 
   func handleBranchIOResponse(viewModel: RootedContent.SetupBranchIO.ViewModel) { }
+
   func handleCalendarPermissions(viewModel: RootedContent.CheckCalendarPermissions.ViewModel) { }
   func handleCalendarPermissionsCheck(viewModel: RootedContent.CheckCalendarPermissions.ViewModel) { }
+
+  func handleContactPermissions(viewModel: RootedContent.CheckContactPermissions.ViewModel) { }
+  func handleContactPermissionsCheck(viewModel: RootedContent.CheckContactPermissions.ViewModel) { }
+
   func handleMaximumLimitReached(viewModel: RootedContent.CheckMaximumMeetingsReached.ViewModel) { }
   func presentCreateNewMeetingView(viewModel: RootedContent.CreateNewMeeting.ViewModel) { }
   func presentInfoView(viewModel: RootedContent.InfoView.ViewModel) { }
@@ -61,9 +72,12 @@ extension RootedContentDisplayLogic {
 
   func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) { }
   func onDidDeleteMeeting(viewModel: RootedContent.DeleteMeeting.ViewModel) { }
+  func onDidCancelMeeting(viewModel: RootedContent.CancelMeeting.ViewModel) { }
 
   func onSuccessfulAcceptance(viewModel: RootedContent.AcceptMeeting.ViewModel) { }
   func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel) { }
 
   func didRefreshSession(viewModel: RootedContent.RefreshSession.ViewModel) { }
+
+  func presentViewCalendar(viewModel: RootedContent.ViewCalendar.ViewModel) { }
 }

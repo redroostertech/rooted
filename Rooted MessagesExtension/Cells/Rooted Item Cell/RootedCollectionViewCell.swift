@@ -15,6 +15,7 @@ class RootedCollectionViewCell: UICollectionViewCell {
   @IBOutlet weak var dateLabel: UILabel!
   @IBOutlet weak var actionsButton: UIButton!
   @IBOutlet weak var ownershipLabel: UILabel!
+  @IBOutlet weak var statusLabel: UILabel!
 
   private weak var delegate: RootedCellDelegate?
   private var participants = [UserProfileShortData]()
@@ -54,6 +55,16 @@ class RootedCollectionViewCell: UICollectionViewCell {
       } else {
         self.isOwnedByCurrentUser = true
       }
+
+      if let meetingStatus = meeting.meetingStatusId {
+        if meetingStatus == 1 {
+          self.statusLabel.isHidden = false
+        } else {
+          self.statusLabel.isHidden = true
+        }
+      } else {
+        self.statusLabel.isHidden = true
+      }
     }
   }
 
@@ -74,10 +85,18 @@ class RootedCollectionViewCell: UICollectionViewCell {
   override func awakeFromNib() {
     super.awakeFromNib()
     titleLabel.adjustsFontSizeToFitWidth = true
+
     mainContentView.applyCornerRadius(0.10)
     mainContentView.backgroundColor = .groupTableViewBackground
+
     ownershipLabel.applyCornerRadius()
     ownershipLabel.textAlignment = .center
+
+    statusLabel.applyCornerRadius()
+    statusLabel.textAlignment = .center
+    statusLabel.backgroundColor = .systemRed
+    statusLabel.textColor = .white
+    statusLabel.text = "Cancelled"
   }
 
   func configure(viewModel: RootedCellViewModel, layout: LayoutOption) {

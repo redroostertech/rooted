@@ -29,7 +29,13 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
   var interactor: SettingsBusinessLogic?
   var router: (NSObjectProtocol & SettingsRoutingLogic & SettingsDataPassing)?
 
-  // MARK: Object lifecycle
+  // MARK: - Lifecycle methods
+  static func setupViewController(meeting: RootedCellViewModel) -> SettingsViewController {
+    let storyboard = UIStoryboard(name: kStoryboardMain, bundle: nil)
+    let viewController = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
+    return viewController
+  }
+
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     setup()
@@ -62,37 +68,31 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
       self.view.bringSubviewToFront(self.actionsContainerView)
     }
   }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    DispatchQueue.main.async {
+      self.navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
 
     guard let loggedInUser = SessionManager.shared.currentUser else { return }
-    // Section 1:
-    // Full Name
-    // Email Address
-    // Change Password
-    // Allow Calendar Access
-    // Allow Location Access
 
-    // Section 2
-    // About Rooted
-    // Privacy Policy
-
-    // Section 3
-    // Logout
-    // Footer: Version Number
     form
-    +++ Section("Account Settings")
-      <<< LabelRow() {
-        $0.title = "Full Name"
-        $0.value = loggedInUser.fullName ?? ""
-    }
+    +++ Section("Profile")
+      <<< ButtonRow("Edit Profile") {
+          $0.title = $0.tag
+          $0.presentationMode = .show(controllerProvider: .callback(builder: {
+            let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
+            let destinationVC = sb.instantiateViewController(withIdentifier: kEditProfileViewController) as! EditProfileViewController
+            return destinationVC
+          }), onDismiss: nil)
+      }
 
-      <<< LabelRow() {
-        $0.title = "Email Address"
-        $0.value = loggedInUser.email ?? ""
-    }
-
+      +++ Section("Settings")
       <<< LabelRow() {
           $0.title = "Default Calendar"
         $0.value = EventKitManager.defaultRootedCalendar
@@ -135,6 +135,7 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
     }
 
       <<< SwitchRow() {
+        $0.tag = "locationAccessRow"
         $0.title = "Allow Location Access"
         $0.value = CLLocationManager.authorizationStatus() == .authorizedAlways || CLLocationManager.authorizationStatus() == .authorizedWhenInUse
         $0.onChange { row in
@@ -154,10 +155,31 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
         }
     }
 
-    +++ Section()
+      <<< SwitchRow() {
+              $0.tag = "contactsAccessRow"
+              $0.title = "Allow Contacts Access"
+              $0.value = ContactKitManager.authStatus
+              $0.onChange { row in
+                let okAction = UIAlertAction(title: "OK", style: .cancel, handler: { action in
+                })
+                HUDFactory.displayAlert(with: "Contacts Permissions", message: "To update the your contacts permissions go to your settings app and allow access to your contacts.", and: [okAction], on: self)
+      //          if row.value == true {
+      //            EventKitManager().getCalendarPermissions { access in
+      //              (form?.rowBy(tag: "calendarAccessRow") as! SwitchRow).value = access
+      //            }
+      //          } else {
+      //
+      //          }
+      //          if let bundleId = Bundle.main.bundleIdentifier {
+      //            self.openInMessagingURL(urlString: "\(UIApplication.openSettingsURLString)&path=LOCATION_SERVICES/\(bundleId)")
+      //          }
+              }
+          }
+
+    +++ Section("General")
       <<< ButtonRow("About Rooted") {
         $0.title = $0.tag
-        $0.presentationMode = .popover(controllerProvider: .callback(builder: {
+        $0.presentationMode = .show(controllerProvider: .callback(builder: {
           let sb = UIStoryboard(name: kStoryboardMain, bundle: nil)
           let destinationVC = sb.instantiateViewController(withIdentifier: kInfoViewController) as! InfoViewController
           return destinationVC
@@ -166,7 +188,7 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
 
       <<< ButtonRow("Privacy Policy") {
       $0.title = $0.tag
-        $0.presentationMode = .popover(controllerProvider: .callback(builder: {
+        $0.presentationMode = .show(controllerProvider: .callback(builder: {
         let destinationVC = UIViewController()
         let webView = WKWebView(frame: destinationVC.view.frame)
         let urlRequest = URLRequest(url: URL(string: "https://termsfeed.com/terms-conditions/72b8fed5b38e082d48c9889e4d1276a9")!)
@@ -190,6 +212,8 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
       <<< ButtonRow("Logout") {
         $0.title = $0.tag
         $0.presentationMode = .none
+      }.cellSetup { (cell, row) in
+        cell.tintColor = .systemRed
       }.onCellSelection { [weak self] _, _ in
       // MARK: - Use Case: Show an alert for a user to perform more actions
       let alert = UIAlertController(title: "Logout", message: "You are about to logout. Are you sure?", preferredStyle: .alert)

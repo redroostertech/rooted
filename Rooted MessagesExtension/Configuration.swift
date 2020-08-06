@@ -21,7 +21,7 @@ public let maximumInvites = 3
 public let kPagination : UInt = 10
 public let kMaxConcurrentImageDownloads = 2
 
-public var isDebug = false
+public var isDebug = true
 
 public let kLocalBaseURL = "http://localhost:3000/"
 public let kTestBaseURL = "https://rooted-test-web.herokuapp.com/"
@@ -144,6 +144,9 @@ public let kRegistrationViewController = "RegistrationViewController"
 public let kInfoViewController = "InfoViewController"
 public let kSettingsNavigationController = "SettingsNavigationController"
 public let kSettingsViewController = "SettingsViewController"
+public let kEditProfileNavigationController = "EditProfileNavigationController"
+public let kEditProfileViewController = "EditProfileViewController"
+public let kUpdateValueViewController = "UpdateValueViewController"
 
 // MARK: - Segues
 public let kGoToDashboardSegue = "goToDashboard"
@@ -154,7 +157,10 @@ public let kGoToAddInviteVC = "goToAddInviteVC"
 // MARK: - User Experience Strings
 public let kDeleteTitle = "Delete Invite"
 public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
+public let kCancelTitle = "Cancel Invite"
+public let kCancelMessage = "You are about to cancel this meeting. Are you sure?"
 public let kCaptionString = "ROOTED INVITATION: %@ on %@"
+public let kCaptionStringWithUrl = "ROOTED INVITATION: %@ on %@.\n\n%@"
 public let kBackText = "Back"
 
 // MARK: - NotificationCenter Methods

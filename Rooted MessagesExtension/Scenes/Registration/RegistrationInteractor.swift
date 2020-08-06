@@ -11,6 +11,8 @@
 //
 
 import UIKit
+import SwiftyRSA
+import RNCryptor
 
 protocol RegistrationBusinessLogic {
   func registerViaEmailAndPassword(request: Registration.RegisterViaEmailAndPassword.Request)
@@ -36,59 +38,87 @@ class RegistrationInteractor: RegistrationBusinessLogic, RegistrationDataStore {
       self.presenter?.handleError(response: error)
       return
     }
-    let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
-    let params: [String: String] = [
-      "action": "email_registration",
-      "email": email,
-      "password": password,
-      "full_name": fullName,
-      "phone_number_string": phoneNumber
-    ]
-    let apiService = Api()
-    apiService.performRequest(path: path,
-                              method: .post,
-                              parameters: params) { (results, error) in
 
-                                guard error == nil else {
-                                  RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
-                                  var error = Registration.HandleError.Response()
-                                  error.errorMessage = "Something went wrong. Please try again."
-                                  error.errorTitle = "Oops!"
-                                  self.presenter?.handleError(response: error)
-                                  return
-                                }
+    do {
+      let keyPair = try SwiftyRSA.generateRSAKeyPair(sizeInBits: 2048)
 
-                                guard let resultsDict = results as? [String: Any] else {
-                                  RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
-                                  var error = Registration.HandleError.Response()
-                                  error.errorMessage = "Something went wrong. Please try again."
-                                  error.errorTitle = "Oops!"
-                                  self.presenter?.handleError(response: error)
-                                  return
-                                }
+      // Generate public key to be used for encryption of data to send to someone else
+      let publicKey = keyPair.publicKey
+      let publicKeyString = try publicKey.base64String()
 
-                                RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+      // Generate private key to be used for decryption of data for you
+      let privateKey = keyPair.privateKey
+      let privateKeyString = try privateKey.base64String()
 
-                                if let success = resultsDict["success"] as? Bool {
-                                  if success {
-                                    if let data = resultsDict["data"] as? [String: Any] {
-                                      var response = Registration.RegisterViaEmailAndPassword.Response()
-                                      response.userId = data["uid"] as? String ?? ""
-                                      response.userData = UserProfileData(JSON: (data["user"] as? [[String: Any]])?.first ?? [:])
-                                      self.presenter?.onSuccessfulRegistration(response: response)
+      let privateData = Data(base64Encoded: privateKeyString)!
+
+      let encrypted = RNCryptor.encrypt(data: privateData, withPassword: password)
+      let encryptedString = encrypted.base64EncodedString()
+
+      let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
+      let params: [String: String] = [
+        "action": "email_registration",
+        "email": email,
+        "password": password,
+        "full_name": fullName,
+        "phone_number_string": phoneNumber,
+        "public_key_string": publicKeyString,
+        "private_key_encrypted_string": encryptedString
+      ]
+      let apiService = Api()
+      apiService.performRequest(path: path,
+                                method: .post,
+                                parameters: params) { (results, error) in
+
+                                  guard error == nil else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = Registration.HandleError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    error.errorTitle = "Oops!"
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  guard let resultsDict = results as? [String: Any] else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = Registration.HandleError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    error.errorTitle = "Oops!"
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                  if let success = resultsDict["success"] as? Bool {
+                                    if success {
+                                      if let data = resultsDict["data"] as? [String: Any] {
+                                        var response = Registration.RegisterViaEmailAndPassword.Response()
+                                        response.userId = data["uid"] as? String ?? ""
+                                        response.userData = UserProfileData(JSON: (data["user"] as? [[String: Any]])?.first ?? [:])
+                                        response.publicKey = publicKeyString
+                                        response.privateKey = privateKeyString
+                                        self.presenter?.onSuccessfulRegistration(response: response)
+                                      } else {
+                                        var error = Registration.HandleError.Response()
+                                        error.errorMessage = "Something went wrong. Please try again."
+                                        error.errorTitle = "Oops!"
+                                        self.presenter?.handleError(response: error)
+                                      }
                                     } else {
                                       var error = Registration.HandleError.Response()
-                                      error.errorMessage = "Something went wrong. Please try again."
+                                      error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
                                       error.errorTitle = "Oops!"
                                       self.presenter?.handleError(response: error)
                                     }
-                                  } else {
-                                    var error = Registration.HandleError.Response()
-                                    error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
-                                    error.errorTitle = "Oops!"
-                                    self.presenter?.handleError(response: error)
                                   }
-                                }
+      }
+    } catch {
+      var error = Registration.HandleError.Response()
+      error.errorMessage = "Something went wrong. Please try again."
+      error.errorTitle = "Oops!"
+      self.presenter?.handleError(response: error)
+      return
     }
   }
 
@@ -96,10 +126,10 @@ class RegistrationInteractor: RegistrationBusinessLogic, RegistrationDataStore {
     if let userid = request.userId {
       var response = Registration.SetSession.Response()
       if let user = request.userData {
-        SessionManager.start(with: user)
+        SessionManager.start(with: user, publicKey: request.publicKey, privateKey: request.privateKey)
         response.userData = user
       } else {
-        SessionManager.start(with: userid)
+        SessionManager.start(with: userid, publicKey: request.publicKey, privateKey: request.privateKey)
       }
       response.userId = userid
       self.presenter?.startUserSession(response: response)

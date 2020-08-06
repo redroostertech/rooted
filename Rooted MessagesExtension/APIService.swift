@@ -9,20 +9,22 @@
 import Foundation
 import Alamofire
 
-private let localBaseURL = "https://localhost:3000/"
-private let testBaseURL = "https://rooted-test-web.herokuapp.com/"
-private let liveURL = "https://rootedapp.herokuapp.com/"
+public let localBaseURL = "https://localhost:3000/"
+public let testBaseURL = "https://rooted-test-web.herokuapp.com/"
+public let liveURL = "https://rootedapp.herokuapp.com/"
 
 enum Api_V2 {
   case Analytics
   case Auth
   case Core
+  case Main
 
   var bucket: String {
     switch self {
     case .Auth: return "auth/"
     case .Analytics: return "analytics/"
     case .Core: return "core/"
+    case .Main: return ""
     }
   }
 }
@@ -30,8 +32,8 @@ enum Api_V2 {
 final class PathBuilder {
   public static func build(_ path: Api.Service, in service: Api_V2, with endpoint: String) -> String {
     if isDebug {
-      RRLogger.log(message: "Using url: \(Api.Service.Test.url)", owner: self)
-      return String(format: "%@%@%@", arguments: [Api.Service.Test.url, service.bucket, endpoint])
+      RRLogger.log(message: "Using url: \(path.url)", owner: self)
+      return String(format: "%@%@%@", arguments: [path.url, service.bucket, endpoint])
     } else {
       RRLogger.log(message: "Using url: \(Api.Service.Live.url)", owner: self)
       return String(format: "%@%@%@", arguments: [Api.Service.Live.url, service.bucket, endpoint])

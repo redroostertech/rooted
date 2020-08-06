@@ -40,7 +40,7 @@ class SessionManager {
   }
 
   // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity; app needs to start a session using profile data
-  static func start(with user: UserProfileData) {
+  static func start(with user: UserProfileData, publicKey: String? = nil, privateKey: String? = nil) {
 
     let defaultsManager = KeychainManager.shared
 
@@ -50,6 +50,10 @@ class SessionManager {
       // Start a new session with the provided user object
       if let userJsonString = user.toJSONString() {
         let _ = defaultsManager.setDefault(withData: userJsonString, forKey: kSessionUser)
+      }
+
+      if let publickey = publicKey, let privatekey = privateKey {
+        let _ = defaultsManager.setDefault(publicKey: publickey, privateKey: privatekey)
       }
 
       // Capture the date that a new session was created
@@ -67,7 +71,7 @@ class SessionManager {
   }
 
   // MARK: - Use Case: As a user, when I boot up my app, I want to keep track of my activity; app needs to start a session using profile data
-  static func start(with id: String) {
+  static func start(with id: String, publicKey: String? = nil, privateKey: String? = nil) {
 
     let defaultsManager = KeychainManager.shared
 
@@ -107,9 +111,10 @@ class SessionManager {
     let _ = defaultsManager.deleteDefault(forKey: kSessionCart)
   }
 
-  static func refreshSession() {
+  static func refreshSession(_ completion: (() -> Void)? = nil) {
     guard let currentUser = SessionManager.shared.currentUser, let email = currentUser.email, let token = currentUser.token else {
       SessionManager.clearSession()
+      completion?()
       return
     }
     let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
@@ -126,12 +131,14 @@ class SessionManager {
                                 guard error == nil else {
                                   RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
                                   SessionManager.clearSession()
+                                  completion?()
                                   return
                                 }
 
                                 guard let resultsDict = results as? [String: Any] else {
                                   RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
                                   SessionManager.clearSession()
+                                  completion?()
                                   return
                                 }
 
@@ -141,12 +148,18 @@ class SessionManager {
                                   if success {
                                     if let data = resultsDict["data"] as? [String: Any], let uid = data["uid"] as? String, let userDataDict = (data["user"] as? [[String: Any]])?.first, let userData = UserProfileData(JSON: userDataDict) {
                                       SessionManager.refresh(with: userData)
+                                      completion?()
                                     } else {
                                       SessionManager.clearSession()
+                                      completion?()
                                     }
                                   } else {
                                     SessionManager.clearSession()
+                                    completion?()
                                   }
+                                } else {
+                                  SessionManager.clearSession()
+                                  completion?()
                                 }
     }
   }

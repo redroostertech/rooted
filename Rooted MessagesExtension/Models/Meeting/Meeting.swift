@@ -31,12 +31,13 @@ public class Meeting: Mappable {
   public var meetingLocation: RLocation?
   public var meetingDate: MeetingDateClass?
   public var meetingParticipantsIds: [String]?
+  public var meetingInvitePhoneNumbers: [Invites]?
   public var meetingAgendaItemIds, meetingFilesIds, remindOnIds: [Int]?
-  public var requireResponse, isPublic: Bool?
+  public var requireResponse, isPublic, isMeetingPublic, isInviteEnabledForInvitees: Bool?
   public var meetingResponseIds: [Int]?
   public var createdAt, updatedAt: String?
 
-  public var owner, participants: [UserProfileData]?
+  public var owner, participants, declinedParticipants: [UserProfileData]?
   public var agendaItems: [AgendaItem]?
   public var files: [Media]?
   public var reminders: [Reminders]?
@@ -63,6 +64,7 @@ public class Meeting: Mappable {
     meetingLocation <- map["meeting_location"]
     meetingDate <- map["meeting_date"]
     meetingParticipantsIds <- map["meeting_participants_ids"]
+    meetingInvitePhoneNumbers <- map["meeting_invite_phone_numbers"]
     meetingAgendaItemIds <- map["meeting_agenda_item_ids"]
     meetingFilesIds <- map["meeting_files_ids"]
     remindOnIds <- map["remind_on_ids"]
@@ -81,6 +83,9 @@ public class Meeting: Mappable {
     calendarId <- map["calendar_id"]
     meetingAgendaItems <- map["agenda_items_strings"]
     isChatEnabled <- map["is_chat_enabled"]
+    isMeetingPublic <- map["is_meeting_public"]
+    isInviteEnabledForInvitees <- map["is_invite_enabled_for_invitees"]
+    declinedParticipants <- map["declined_participants"]
   }
 }
 

@@ -59,6 +59,9 @@ open class BaseRow: BaseRowType {
     /// The title will be displayed in the textLabel of the row.
     public var title: String?
 
+    /// The color of the title
+    public var titleColor: UIColor?
+
     /// Parameter used when creating the cell for this row.
     public var cellStyle = UITableViewCell.CellStyle.value1
 

@@ -207,7 +207,7 @@ class RegistrationViewController: FormMessagesAppViewController, RegistrationDis
 
   // MARK: - Use Case: When a user provides their email, full name, phone number and a password, try to create an account them in via Firebase
   func registerViaEmailAndPassword() {
-    showHUD()
+    showHUD(withText: "Creating your account...")
     var request = Registration.RegisterViaEmailAndPassword.Request()
     request.email = (form.rowBy(tag: kFormEmailAddress) as? EmailRow)?.value ?? ""
     request.password = (form.rowBy(tag: kFormPassword) as? PasswordRow)?.value ?? ""
@@ -232,10 +232,15 @@ class RegistrationViewController: FormMessagesAppViewController, RegistrationDis
     startUserSession(with: viewModel.userId, and: viewModel.userData)
   }
 
-  func startUserSession(with userId: String?, and userData: UserProfileData?) {
+  func startUserSession(with userId: String?,
+                        and userData: UserProfileData?,
+                        publicKey: String? = nil,
+                        privateKey: String? = nil) {
     var request = Registration.SetSession.Request()
     request.userId = userId
     request.userData = userData
+    request.publicKey = publicKey
+    request.privateKey = privateKey
     interactor?.startUserSession(request: request)
   }
 
@@ -259,6 +264,12 @@ extension RegistrationViewController {
   func showHUD() {
     DispatchQueue.main.async {
       self.progressHUD?.show()
+    }
+  }
+
+  func showHUD(withText text: String) {
+    DispatchQueue.main.async {
+      self.progressHUD?.show(withText: text)
     }
   }
 

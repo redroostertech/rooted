@@ -67,6 +67,10 @@ extension String {
         return !isEmpty && range(of: "[^a-zA-Z0-9]", options: .regularExpression) == nil
     }
 
+  var isAlphabet: Bool {
+      return !isEmpty && range(of: "[^a-zA-Z]", options: .regularExpression) == nil
+  }
+
     //validate Password
     var isValidPassword: Bool {
         do {
@@ -113,11 +117,11 @@ extension String {
     }
 
     func substring(_ from: Int) -> String {
-        return self.substring(from: self.characters.index(self.startIndex, offsetBy: from))
+        return self.substring(from: self.index(self.startIndex, offsetBy: from))
     }
 
     var length: Int {
-        return self.characters.count
+        return self.count
     }
 
     func equalsIgnoreCase(str:String)->Bool{

@@ -45,7 +45,7 @@ let kButtonForgotPassword = kSubtitleForgotYourPassword
 
 class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplayLogic, UITextFieldDelegate {
 
-  @IBOutlet var loginButton: UIButton!
+  @IBOutlet weak var loginButton: UIButton!
   @IBOutlet weak var forgotPasswordButton: UIButton!
   @IBOutlet weak var subTitleLabel: UILabel!
 
@@ -237,7 +237,7 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
 
   // MARK: - Use Case: When a user provides their email and a password, try to log them in via Firebase
   func loginViaEmailAndPassword() {
-    showHUD()
+    showHUD(withText: "Logging you in...")
     var request = PhoneLogin.LoginViaEmailAndPassword.Request()
     request.email = (form.rowBy(tag: kFormEmailAddress) as? EmailRow)?.value ?? ""
     request.password = (form.rowBy(tag: kFormPassword) as? PasswordRow)?.value ?? ""
@@ -290,6 +290,12 @@ extension PhoneLoginViewController {
   func showHUD() {
     DispatchQueue.main.async {
       self.progressHUD?.show()
+    }
+  }
+
+  func showHUD(withText text: String) {
+    DispatchQueue.main.async {
+      self.progressHUD?.show(withText: text)
     }
   }
 

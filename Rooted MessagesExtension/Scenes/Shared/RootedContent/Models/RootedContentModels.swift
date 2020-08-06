@@ -45,6 +45,19 @@ enum RootedContent {
     }
   }
 
+  // MARK: - Use Case: Check if app has access to Contacts permissions
+  enum CheckContactPermissions {
+    struct Request { }
+
+    struct Response {
+      var isGranted = false
+    }
+
+    struct ViewModel {
+      var isGranted = false
+    }
+  }
+
   // MARK: - Use Case: As a business, we want to limit access to creating more than (n) meetings based on account type
   enum CheckMaximumMeetingsReached {
     struct Request { }
@@ -129,6 +142,15 @@ enum RootedContent {
     struct ViewModel { }
   }
 
+  // MARK: - Use Case: Go to view calendar view
+  enum ViewCalendar {
+    struct Request { }
+
+    struct Response { }
+
+    struct ViewModel { }
+  }
+
   // MARK: - Use Case: Add meeting to calendar
   enum AddToCalendar {
     struct Request {
@@ -163,25 +185,43 @@ enum RootedContent {
     }
   }
 
-  // MARK: - Use Case: Add meeting to calendar
+  // MARK: - Use Case: Remove meeting to calendar
   enum RemoveFromCalendar {
     struct Request {
-      var meeting: RootedCellViewModel?
+      var meeting: Meeting?
     }
 
     struct Response {
-      var meeting: RootedCellViewModel?
+      var meeting: Meeting?
       var errorMessage: String = ""
     }
 
     struct ViewModel {
-      var meeting: RootedCellViewModel?
+      var meeting: Meeting?
       var errorMessage: String = ""
     }
   }
 
   // MARK: - Use Case: Delete meeting for user
   enum DeleteMeeting {
+    struct Request {
+      var meeting: RootedCellViewModel?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var meetingManagerDelegate: MeetingsManagerDelegate?
+    }
+
+    struct Response {
+      var meeting: RootedCellViewModel?
+    }
+
+    struct ViewModel {
+      var meeting: RootedCellViewModel?
+    }
+  }
+
+  // MARK: - Use Case: Delete meeting for user
+  enum CancelMeeting {
     struct Request {
       var meeting: RootedCellViewModel?
       var userId: String?
@@ -301,11 +341,13 @@ enum RootedContent {
     struct Response {
       var errorTitle: String = ""
       var errorMessage: String = ""
+      var meeting: Meeting?
     }
 
     struct ViewModel {
       var errorTitle: String = ""
       var errorMessage: String = ""
+      var meeting: Meeting?
     }
   }
 }

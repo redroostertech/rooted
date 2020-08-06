@@ -82,6 +82,20 @@
 		D7255F91241387600048F8D8 /* EmptyHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F8F241387600048F8D8 /* EmptyHeader.swift */; };
 		D7255F92241387600048F8D8 /* EmptyHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7255F90241387600048F8D8 /* EmptyHeader.xib */; };
 		D7255F9424154C460048F8D8 /* AvailabilityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7255F9324154C460048F8D8 /* AvailabilityViewController.swift */; };
+		D730FA1E24C9C84B000EA8AF /* PhoneVerificationPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA1824C9C84B000EA8AF /* PhoneVerificationPresenter.swift */; };
+		D730FA1F24C9C84B000EA8AF /* PhoneVerificationWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA1924C9C84B000EA8AF /* PhoneVerificationWorker.swift */; };
+		D730FA2024C9C84B000EA8AF /* PhoneVerificationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA1A24C9C84B000EA8AF /* PhoneVerificationRouter.swift */; };
+		D730FA2124C9C84B000EA8AF /* PhoneVerificationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA1B24C9C84B000EA8AF /* PhoneVerificationModels.swift */; };
+		D730FA2224C9C84B000EA8AF /* PhoneVerificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA1C24C9C84B000EA8AF /* PhoneVerificationViewController.swift */; };
+		D730FA2324C9C84B000EA8AF /* PhoneVerificationInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA1D24C9C84B000EA8AF /* PhoneVerificationInteractor.swift */; };
+		D730FA6C24CA5729000EA8AF /* ContactManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA6B24CA5729000EA8AF /* ContactManager.swift */; };
+		D730FA7524CA6E94000EA8AF /* CollectionViewTokenCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA6E24CA6E93000EA8AF /* CollectionViewTokenCell.swift */; };
+		D730FA7624CA6E94000EA8AF /* String+TokenRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA6F24CA6E93000EA8AF /* String+TokenRow.swift */; };
+		D730FA7724CA6E94000EA8AF /* TRCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA7024CA6E93000EA8AF /* TRCollectionViewCell.swift */; };
+		D730FA7824CA6E94000EA8AF /* TokenRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA7124CA6E94000EA8AF /* TokenRow.swift */; };
+		D730FA7924CA6E94000EA8AF /* TRTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA7224CA6E94000EA8AF /* TRTableViewCell.swift */; };
+		D730FA7A24CA6E94000EA8AF /* TokenCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA7324CA6E94000EA8AF /* TokenCell.swift */; };
+		D730FA7B24CA6E94000EA8AF /* TableViewTokenCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730FA7424CA6E94000EA8AF /* TableViewTokenCell.swift */; };
 		D73725CE249E6F7A00336EFC /* ForgotPasswordPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73725C8249E6F7A00336EFC /* ForgotPasswordPresenter.swift */; };
 		D73725CF249E6F7A00336EFC /* ForgotPasswordWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73725C9249E6F7A00336EFC /* ForgotPasswordWorker.swift */; };
 		D73725D0249E6F7A00336EFC /* ForgotPasswordRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73725CA249E6F7A00336EFC /* ForgotPasswordRouter.swift */; };
@@ -89,6 +103,26 @@
 		D73725D2249E6F7A00336EFC /* ForgotPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73725CC249E6F7A00336EFC /* ForgotPasswordViewController.swift */; };
 		D73725D3249E6F7A00336EFC /* ForgotPasswordInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73725CD249E6F7A00336EFC /* ForgotPasswordInteractor.swift */; };
 		D744F2D32416DC3B00F14CA8 /* Availability.swift in Sources */ = {isa = PBXBuildFile; fileRef = D744F2D22416DC3B00F14CA8 /* Availability.swift */; };
+		D7467DE424D4674600B50A2E /* EditProfilePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DDE24D4674600B50A2E /* EditProfilePresenter.swift */; };
+		D7467DE524D4674600B50A2E /* EditProfileWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DDF24D4674600B50A2E /* EditProfileWorker.swift */; };
+		D7467DE624D4674600B50A2E /* EditProfileRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DE024D4674600B50A2E /* EditProfileRouter.swift */; };
+		D7467DE724D4674600B50A2E /* EditProfileModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DE124D4674600B50A2E /* EditProfileModels.swift */; };
+		D7467DE824D4674600B50A2E /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DE224D4674600B50A2E /* EditProfileViewController.swift */; };
+		D7467DE924D4674600B50A2E /* EditProfileInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DE324D4674600B50A2E /* EditProfileInteractor.swift */; };
+		D7467DF124D4D45500B50A2E /* UpdateValuePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DEB24D4D45500B50A2E /* UpdateValuePresenter.swift */; };
+		D7467DF224D4D45500B50A2E /* UpdateValueWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DEC24D4D45500B50A2E /* UpdateValueWorker.swift */; };
+		D7467DF324D4D45500B50A2E /* UpdateValueRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DED24D4D45500B50A2E /* UpdateValueRouter.swift */; };
+		D7467DF424D4D45500B50A2E /* UpdateValueModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DEE24D4D45500B50A2E /* UpdateValueModels.swift */; };
+		D7467DF524D4D45500B50A2E /* UpdateValueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DEF24D4D45500B50A2E /* UpdateValueViewController.swift */; };
+		D7467DF624D4D45500B50A2E /* UpdateValueInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DF024D4D45500B50A2E /* UpdateValueInteractor.swift */; };
+		D7467DFD24D98A6D00B50A2E /* ImageViewerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467DFB24D98A6D00B50A2E /* ImageViewerCell.swift */; };
+		D7467DFE24D98A6D00B50A2E /* ImageViewerCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7467DFC24D98A6D00B50A2E /* ImageViewerCell.xib */; };
+		D7467E0724DAAF3D00B50A2E /* EPContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467E0124DAAF3D00B50A2E /* EPContactCell.swift */; };
+		D7467E0824DAAF3D00B50A2E /* EPConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467E0224DAAF3D00B50A2E /* EPConstants.swift */; };
+		D7467E0924DAAF3D00B50A2E /* EPContactsPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467E0324DAAF3D00B50A2E /* EPContactsPicker.swift */; };
+		D7467E0A24DAAF3D00B50A2E /* EPExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467E0424DAAF3D00B50A2E /* EPExtensions.swift */; };
+		D7467E0B24DAAF3D00B50A2E /* EPContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7467E0524DAAF3D00B50A2E /* EPContact.swift */; };
+		D7467E0C24DAAF3D00B50A2E /* EPContactCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7467E0624DAAF3D00B50A2E /* EPContactCell.xib */; };
 		D747BAB7240EBB0700E571CF /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747BAB6240EBB0600E571CF /* SessionManager.swift */; };
 		D747BAB9240EE5D600E571CF /* RegistrationForm.xib in Resources */ = {isa = PBXBuildFile; fileRef = D747BAB8240EE5D600E571CF /* RegistrationForm.xib */; };
 		D747BABB240EE64900E571CF /* RegistrationForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D747BABA240EE64900E571CF /* RegistrationForm.swift */; };
@@ -381,6 +415,20 @@
 		D7255F8F241387600048F8D8 /* EmptyHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyHeader.swift; sourceTree = "<group>"; };
 		D7255F90241387600048F8D8 /* EmptyHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmptyHeader.xib; sourceTree = "<group>"; };
 		D7255F9324154C460048F8D8 /* AvailabilityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailabilityViewController.swift; sourceTree = "<group>"; };
+		D730FA1824C9C84B000EA8AF /* PhoneVerificationPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneVerificationPresenter.swift; sourceTree = "<group>"; };
+		D730FA1924C9C84B000EA8AF /* PhoneVerificationWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneVerificationWorker.swift; sourceTree = "<group>"; };
+		D730FA1A24C9C84B000EA8AF /* PhoneVerificationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneVerificationRouter.swift; sourceTree = "<group>"; };
+		D730FA1B24C9C84B000EA8AF /* PhoneVerificationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneVerificationModels.swift; sourceTree = "<group>"; };
+		D730FA1C24C9C84B000EA8AF /* PhoneVerificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneVerificationViewController.swift; sourceTree = "<group>"; };
+		D730FA1D24C9C84B000EA8AF /* PhoneVerificationInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneVerificationInteractor.swift; sourceTree = "<group>"; };
+		D730FA6B24CA5729000EA8AF /* ContactManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactManager.swift; sourceTree = "<group>"; };
+		D730FA6E24CA6E93000EA8AF /* CollectionViewTokenCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewTokenCell.swift; sourceTree = "<group>"; };
+		D730FA6F24CA6E93000EA8AF /* String+TokenRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+TokenRow.swift"; sourceTree = "<group>"; };
+		D730FA7024CA6E93000EA8AF /* TRCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TRCollectionViewCell.swift; sourceTree = "<group>"; };
+		D730FA7124CA6E94000EA8AF /* TokenRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenRow.swift; sourceTree = "<group>"; };
+		D730FA7224CA6E94000EA8AF /* TRTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TRTableViewCell.swift; sourceTree = "<group>"; };
+		D730FA7324CA6E94000EA8AF /* TokenCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenCell.swift; sourceTree = "<group>"; };
+		D730FA7424CA6E94000EA8AF /* TableViewTokenCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewTokenCell.swift; sourceTree = "<group>"; };
 		D73725C8249E6F7A00336EFC /* ForgotPasswordPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordPresenter.swift; sourceTree = "<group>"; };
 		D73725C9249E6F7A00336EFC /* ForgotPasswordWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordWorker.swift; sourceTree = "<group>"; };
 		D73725CA249E6F7A00336EFC /* ForgotPasswordRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordRouter.swift; sourceTree = "<group>"; };
@@ -388,6 +436,26 @@
 		D73725CC249E6F7A00336EFC /* ForgotPasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordViewController.swift; sourceTree = "<group>"; };
 		D73725CD249E6F7A00336EFC /* ForgotPasswordInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordInteractor.swift; sourceTree = "<group>"; };
 		D744F2D22416DC3B00F14CA8 /* Availability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Availability.swift; sourceTree = "<group>"; };
+		D7467DDE24D4674600B50A2E /* EditProfilePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfilePresenter.swift; sourceTree = "<group>"; };
+		D7467DDF24D4674600B50A2E /* EditProfileWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileWorker.swift; sourceTree = "<group>"; };
+		D7467DE024D4674600B50A2E /* EditProfileRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileRouter.swift; sourceTree = "<group>"; };
+		D7467DE124D4674600B50A2E /* EditProfileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileModels.swift; sourceTree = "<group>"; };
+		D7467DE224D4674600B50A2E /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
+		D7467DE324D4674600B50A2E /* EditProfileInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileInteractor.swift; sourceTree = "<group>"; };
+		D7467DEB24D4D45500B50A2E /* UpdateValuePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateValuePresenter.swift; sourceTree = "<group>"; };
+		D7467DEC24D4D45500B50A2E /* UpdateValueWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateValueWorker.swift; sourceTree = "<group>"; };
+		D7467DED24D4D45500B50A2E /* UpdateValueRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateValueRouter.swift; sourceTree = "<group>"; };
+		D7467DEE24D4D45500B50A2E /* UpdateValueModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateValueModels.swift; sourceTree = "<group>"; };
+		D7467DEF24D4D45500B50A2E /* UpdateValueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateValueViewController.swift; sourceTree = "<group>"; };
+		D7467DF024D4D45500B50A2E /* UpdateValueInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateValueInteractor.swift; sourceTree = "<group>"; };
+		D7467DFB24D98A6D00B50A2E /* ImageViewerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewerCell.swift; sourceTree = "<group>"; };
+		D7467DFC24D98A6D00B50A2E /* ImageViewerCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageViewerCell.xib; sourceTree = "<group>"; };
+		D7467E0124DAAF3D00B50A2E /* EPContactCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EPContactCell.swift; sourceTree = "<group>"; };
+		D7467E0224DAAF3D00B50A2E /* EPConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EPConstants.swift; sourceTree = "<group>"; };
+		D7467E0324DAAF3D00B50A2E /* EPContactsPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EPContactsPicker.swift; sourceTree = "<group>"; };
+		D7467E0424DAAF3D00B50A2E /* EPExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EPExtensions.swift; sourceTree = "<group>"; };
+		D7467E0524DAAF3D00B50A2E /* EPContact.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EPContact.swift; sourceTree = "<group>"; };
+		D7467E0624DAAF3D00B50A2E /* EPContactCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EPContactCell.xib; sourceTree = "<group>"; };
 		D747BAB6240EBB0600E571CF /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		D747BAB8240EE5D600E571CF /* RegistrationForm.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegistrationForm.xib; sourceTree = "<group>"; };
 		D747BABA240EE64900E571CF /* RegistrationForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationForm.swift; sourceTree = "<group>"; };
@@ -744,6 +812,33 @@
 			path = "Tag List View";
 			sourceTree = "<group>";
 		};
+		D730FA2424C9C851000EA8AF /* PhoneVerifactionScene */ = {
+			isa = PBXGroup;
+			children = (
+				D730FA1824C9C84B000EA8AF /* PhoneVerificationPresenter.swift */,
+				D730FA1924C9C84B000EA8AF /* PhoneVerificationWorker.swift */,
+				D730FA1A24C9C84B000EA8AF /* PhoneVerificationRouter.swift */,
+				D730FA1B24C9C84B000EA8AF /* PhoneVerificationModels.swift */,
+				D730FA1C24C9C84B000EA8AF /* PhoneVerificationViewController.swift */,
+				D730FA1D24C9C84B000EA8AF /* PhoneVerificationInteractor.swift */,
+			);
+			path = PhoneVerifactionScene;
+			sourceTree = "<group>";
+		};
+		D730FA6D24CA6E87000EA8AF /* TokenRow */ = {
+			isa = PBXGroup;
+			children = (
+				D730FA6E24CA6E93000EA8AF /* CollectionViewTokenCell.swift */,
+				D730FA6F24CA6E93000EA8AF /* String+TokenRow.swift */,
+				D730FA7424CA6E94000EA8AF /* TableViewTokenCell.swift */,
+				D730FA7324CA6E94000EA8AF /* TokenCell.swift */,
+				D730FA7124CA6E94000EA8AF /* TokenRow.swift */,
+				D730FA7024CA6E93000EA8AF /* TRCollectionViewCell.swift */,
+				D730FA7224CA6E94000EA8AF /* TRTableViewCell.swift */,
+			);
+			path = TokenRow;
+			sourceTree = "<group>";
+		};
 		D73725C7249E6F3B00336EFC /* Forgot Password */ = {
 			isa = PBXGroup;
 			children = (
@@ -755,6 +850,54 @@
 				D73725CD249E6F7A00336EFC /* ForgotPasswordInteractor.swift */,
 			);
 			path = "Forgot Password";
+			sourceTree = "<group>";
+		};
+		D7467DDD24D4672F00B50A2E /* EditProfileScene */ = {
+			isa = PBXGroup;
+			children = (
+				D7467DDE24D4674600B50A2E /* EditProfilePresenter.swift */,
+				D7467DDF24D4674600B50A2E /* EditProfileWorker.swift */,
+				D7467DE024D4674600B50A2E /* EditProfileRouter.swift */,
+				D7467DE124D4674600B50A2E /* EditProfileModels.swift */,
+				D7467DE224D4674600B50A2E /* EditProfileViewController.swift */,
+				D7467DE324D4674600B50A2E /* EditProfileInteractor.swift */,
+			);
+			path = EditProfileScene;
+			sourceTree = "<group>";
+		};
+		D7467DEA24D4D43900B50A2E /* UpdateValue */ = {
+			isa = PBXGroup;
+			children = (
+				D7467DEB24D4D45500B50A2E /* UpdateValuePresenter.swift */,
+				D7467DEC24D4D45500B50A2E /* UpdateValueWorker.swift */,
+				D7467DED24D4D45500B50A2E /* UpdateValueRouter.swift */,
+				D7467DEE24D4D45500B50A2E /* UpdateValueModels.swift */,
+				D7467DEF24D4D45500B50A2E /* UpdateValueViewController.swift */,
+				D7467DF024D4D45500B50A2E /* UpdateValueInteractor.swift */,
+			);
+			path = UpdateValue;
+			sourceTree = "<group>";
+		};
+		D7467DFF24D98A7400B50A2E /* Image Viewer Cell */ = {
+			isa = PBXGroup;
+			children = (
+				D7467DFB24D98A6D00B50A2E /* ImageViewerCell.swift */,
+				D7467DFC24D98A6D00B50A2E /* ImageViewerCell.xib */,
+			);
+			path = "Image Viewer Cell";
+			sourceTree = "<group>";
+		};
+		D7467E0024DAAF3D00B50A2E /* Contacts Picker */ = {
+			isa = PBXGroup;
+			children = (
+				D7467E0124DAAF3D00B50A2E /* EPContactCell.swift */,
+				D7467E0224DAAF3D00B50A2E /* EPConstants.swift */,
+				D7467E0324DAAF3D00B50A2E /* EPContactsPicker.swift */,
+				D7467E0424DAAF3D00B50A2E /* EPExtensions.swift */,
+				D7467E0524DAAF3D00B50A2E /* EPContact.swift */,
+				D7467E0624DAAF3D00B50A2E /* EPContactCell.xib */,
+			);
+			path = "Contacts Picker";
 			sourceTree = "<group>";
 		};
 		D747BABD240FF76500E571CF /* Empty Data Set */ = {
@@ -798,6 +941,7 @@
 		D75711F123D8813600BDD6A0 /* Controls */ = {
 			isa = PBXGroup;
 			children = (
+				D7467E0024DAAF3D00B50A2E /* Contacts Picker */,
 				D7E2823724A6B7CA004CF478 /* Scrollable View Controller */,
 				D7E2823524A6B775004CF478 /* Sweet Alert */,
 				D706F15F24210C0700C40130 /* Tag List View */,
@@ -864,6 +1008,7 @@
 				D79A5EAE2406C987006DAA7A /* ConversationManager.swift */,
 				BA1314D9225BFCB90089EDE0 /* MeetingsManager.swift */,
 				D70741D02417198100115998 /* AvailabilityManager.swift */,
+				D730FA6B24CA5729000EA8AF /* ContactManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -873,6 +1018,7 @@
 			children = (
 				D79A5EB62406D784006DAA7A /* Rooted Item Cell */,
 				D79A5EB72406D7A2006DAA7A /* My Invite */,
+				D7467DFF24D98A7400B50A2E /* Image Viewer Cell */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -956,6 +1102,7 @@
 		D79A5EDC2407FF90006DAA7A /* Rows */ = {
 			isa = PBXGroup;
 			children = (
+				D730FA6D24CA6E87000EA8AF /* TokenRow */,
 				D7E2820A24A37F1D004CF478 /* ImageRow */,
 				D7C3B9382416880F00B22E8F /* CalendarViewRow.swift */,
 				D7C3B936241687A700B22E8F /* DateRangeRow */,
@@ -1233,6 +1380,8 @@
 		D7DDDA1124703F630061C15B /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				D7467DEA24D4D43900B50A2E /* UpdateValue */,
+				D7467DDD24D4672F00B50A2E /* EditProfileScene */,
 				D74E948824C20E1A00E8C577 /* Calendar */,
 				D73725C7249E6F3B00336EFC /* Forgot Password */,
 				D790B5A024858FD900A69192 /* Chat */,
@@ -1248,6 +1397,7 @@
 				D7B758E8245DB4E4005CD0C9 /* AvailabilityScene */,
 				D706F1592420932700C40130 /* AvailabilitySelectionViewController.swift */,
 				D7E2823024A6AAD7004CF478 /* ViewParticipantsScene */,
+				D730FA2424C9C851000EA8AF /* PhoneVerifactionScene */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -1485,6 +1635,8 @@
 				D747BAEB2411C6B200E571CF /* CustomHeader.xib in Resources */,
 				D787A26823E1EB41001795D3 /* GoogleService-Info.plist in Resources */,
 				D7C3B9312416762D00B22E8F /* DateRangeVC.xib in Resources */,
+				D7467E0C24DAAF3D00B50A2E /* EPContactCell.xib in Resources */,
+				D7467DFE24D98A6D00B50A2E /* ImageViewerCell.xib in Resources */,
 				BA068C0B2245AD7D00A0EE9B /* Assets.xcassets in Resources */,
 				BA98DD90225101210070BC39 /* MyInviteCell.xib in Resources */,
 				D747BAB9240EE5D600E571CF /* RegistrationForm.xib in Resources */,
@@ -1581,8 +1733,11 @@
 				D70741DC2419A2A200115998 /* MeetingTimeLengthDictionary.swift in Sources */,
 				D75711FA23D8832200BDD6A0 /* RProgressHUD.swift in Sources */,
 				D79A5F442407FF91006DAA7A /* MultipleSelectorViewController.swift in Sources */,
+				D730FA7824CA6E94000EA8AF /* TokenRow.swift in Sources */,
 				D79A5F4A2407FF91006DAA7A /* RuleRange.swift in Sources */,
 				D701DC6D23E8DC6B00A45E9B /* PaymentInformation.swift in Sources */,
+				D7467E0924DAAF3D00B50A2E /* EPContactsPicker.swift in Sources */,
+				D7467DE524D4674600B50A2E /* EditProfileWorker.swift in Sources */,
 				D79A5F0F2407FF91006DAA7A /* CellType.swift in Sources */,
 				D73725CE249E6F7A00336EFC /* ForgotPasswordPresenter.swift in Sources */,
 				D75711EF23D811E000BDD6A0 /* DateCollectionViewCell.swift in Sources */,
@@ -1591,6 +1746,7 @@
 				D79A5F7824083038006DAA7A /* SuggestionTableViewCell.swift in Sources */,
 				D7DDDA2D247172EE0061C15B /* APIService.swift in Sources */,
 				D79A5F422407FF91006DAA7A /* TriplePickerRow.swift in Sources */,
+				D730FA7724CA6E94000EA8AF /* TRCollectionViewCell.swift in Sources */,
 				D79A5EC324071117006DAA7A /* ListableCellType.swift in Sources */,
 				D79A5F1B2407FF91006DAA7A /* Validation.swift in Sources */,
 				BA1314DA225BFCB90089EDE0 /* MeetingsManager.swift in Sources */,
@@ -1614,10 +1770,12 @@
 				D706F15E242094E700C40130 /* UIImage+Extensions.swift in Sources */,
 				D7B758D7245B70D6005CD0C9 /* RootedContentDisplayLogic.swift in Sources */,
 				D701DC6323E8DBF600A45E9B /* Action.swift in Sources */,
+				D7467DF324D4D45500B50A2E /* UpdateValueRouter.swift in Sources */,
 				D7DDDA36247327FD0061C15B /* RegistrationWorker.swift in Sources */,
 				D79A5F4B2407FF91006DAA7A /* RuleLength.swift in Sources */,
 				D79A5F4C2407FF91006DAA7A /* RuleRequired.swift in Sources */,
 				D79A5F412407FF91006DAA7A /* SwitchRow.swift in Sources */,
+				D7467DF624D4D45500B50A2E /* UpdateValueInteractor.swift in Sources */,
 				D79A5FA0240960F5006DAA7A /* String+Timepiece.swift in Sources */,
 				D70741D82419A0C200115998 /* EngagementFactory.swift in Sources */,
 				D79A5F352407FF91006DAA7A /* GenericMultipleSelectorRow.swift in Sources */,
@@ -1648,22 +1806,29 @@
 				D75711ED23D811E000BDD6A0 /* DateTimePicker+CollectionView.swift in Sources */,
 				BA1314E0225C08610089EDE0 /* MSMessages+Extensions.swift in Sources */,
 				D7DF8D0C24841CC3005C116A /* UIImage+SaveTo.swift in Sources */,
+				D730FA7924CA6E94000EA8AF /* TRTableViewCell.swift in Sources */,
 				D79A5F5D240811FD006DAA7A /* SplitRowValue.swift in Sources */,
 				D79A5F9B240960F5006DAA7A /* NSCalendar+Timepiece.swift in Sources */,
 				D79A5F242407FF91006DAA7A /* SliderRow.swift in Sources */,
 				D79A5F5C240811FD006DAA7A /* SplitRowCellTableView.swift in Sources */,
+				D730FA7A24CA6E94000EA8AF /* TokenCell.swift in Sources */,
 				D701DC4B23E8DBF600A45E9B /* Option.swift in Sources */,
+				D7467DE724D4674600B50A2E /* EditProfileModels.swift in Sources */,
 				D79A5F1D2407FF91006DAA7A /* Section.swift in Sources */,
 				D7B758C2245B26DD005CD0C9 /* NavigationCoordinator.swift in Sources */,
 				D79A5F9A240960F5006DAA7A /* NSDateComponents+Timepiece.swift in Sources */,
 				D7DDDA59247943F70061C15B /* SettingsPresenter.swift in Sources */,
 				D79A5F112407FF91006DAA7A /* InlineRowType.swift in Sources */,
+				D7467E0824DAAF3D00B50A2E /* EPConstants.swift in Sources */,
 				D79A5F432407FF91006DAA7A /* PushRow.swift in Sources */,
 				D79A5F212407FF91006DAA7A /* Row.swift in Sources */,
+				D7467E0724DAAF3D00B50A2E /* EPContactCell.swift in Sources */,
+				D7467DF424D4D45500B50A2E /* UpdateValueModels.swift in Sources */,
 				D79A5F342407FF91006DAA7A /* OptionsRow.swift in Sources */,
 				D701DC6823E8DBF600A45E9B /* Poll.swift in Sources */,
 				D7A18AED24063B330039A295 /* BaseAppViewController.swift in Sources */,
 				D79A5F492407FF91006DAA7A /* RuleEqualsToRow.swift in Sources */,
+				D730FA1F24C9C84B000EA8AF /* PhoneVerificationWorker.swift in Sources */,
 				D7DDDA5B247943F70061C15B /* SettingsRouter.swift in Sources */,
 				D74E949024C20E3700E8C577 /* ViewCalendarWorker.swift in Sources */,
 				D701DC5F23E8DBF600A45E9B /* MeetingDateClass.swift in Sources */,
@@ -1674,12 +1839,15 @@
 				D71F075423E0CA6E0039F572 /* UISearchBar+Ectensions.swift in Sources */,
 				D747BABB240EE64900E571CF /* RegistrationForm.swift in Sources */,
 				D747BAB7240EBB0700E571CF /* SessionManager.swift in Sources */,
+				D7467DE824D4674600B50A2E /* EditProfileViewController.swift in Sources */,
 				D74E948F24C20E3700E8C577 /* ViewCalendarPresenter.swift in Sources */,
 				D79A5F3F2407FF91006DAA7A /* PopoverSelectorRow.swift in Sources */,
 				BA0D0EDC2248019B00209993 /* InviteDetailsViewController.swift in Sources */,
 				D7E2820D24A37F1D004CF478 /* ImagePickerController.swift in Sources */,
 				D701DC6F23E9459B00A45E9B /* HUDFactory.swift in Sources */,
+				D730FA7B24CA6E94000EA8AF /* TableViewTokenCell.swift in Sources */,
 				D79A5F7C24083038006DAA7A /* SuggestionCollectionCell.swift in Sources */,
+				D7467DF124D4D45500B50A2E /* UpdateValuePresenter.swift in Sources */,
 				D79A5F312407FF91006DAA7A /* DecimalFormatter.swift in Sources */,
 				D79A5F372407FF91006DAA7A /* FieldsRow.swift in Sources */,
 				D7DDDA1A24703F860061C15B /* PhoneLoginWorker.swift in Sources */,
@@ -1691,10 +1859,12 @@
 				D79A5F302407FF91006DAA7A /* FieldRow.swift in Sources */,
 				D79A5F382407FF91006DAA7A /* DoublePickerInputRow.swift in Sources */,
 				D7DDDA5E247943F70061C15B /* SettingsInteractor.swift in Sources */,
+				D730FA6C24CA5729000EA8AF /* ContactManager.swift in Sources */,
 				D79A5F1F2407FF91006DAA7A /* SelectableRowType.swift in Sources */,
 				BA98DD4E224EC2AD0070BC39 /* MyInvitesViewController.swift in Sources */,
 				D79A5F3D2407FF91006DAA7A /* ActionSheetRow.swift in Sources */,
 				D79A5EB52406D77B006DAA7A /* RootedCollectionViewCell.swift in Sources */,
+				D7467E0B24DAAF3D00B50A2E /* EPContact.swift in Sources */,
 				D790B5A92485991A00A69192 /* ChatRouter.swift in Sources */,
 				D790B5A82485991A00A69192 /* ChatWorker.swift in Sources */,
 				D79A5F482407FF91006DAA7A /* PickerInputRow.swift in Sources */,
@@ -1735,6 +1905,7 @@
 				D79A5F7624083038006DAA7A /* SuggestionTableCell.swift in Sources */,
 				D7DDDA4D24780B3F0061C15B /* SweetAlert.swift in Sources */,
 				D79A5F292407FF91006DAA7A /* TextAreaRow.swift in Sources */,
+				D7467DE924D4674600B50A2E /* EditProfileInteractor.swift in Sources */,
 				D79A5F7A24083038006DAA7A /* SuggestionCollectionViewCell.swift in Sources */,
 				D79A5F3A2407FF91006DAA7A /* DateInlineRow.swift in Sources */,
 				D701DC6023E8DBF600A45E9B /* MeetingStatus.swift in Sources */,
@@ -1744,20 +1915,26 @@
 				D701DC6423E8DBF600A45E9B /* Reminders.swift in Sources */,
 				D7B758C9245B302F005CD0C9 /* RootedContentPresenter.swift in Sources */,
 				D79A5F2D2407FF91006DAA7A /* SelectorRow.swift in Sources */,
+				D7467DE424D4674600B50A2E /* EditProfilePresenter.swift in Sources */,
 				D7DF8D0824841A70005C116A /* EditorDemoController.swift in Sources */,
+				D730FA7524CA6E94000EA8AF /* CollectionViewTokenCell.swift in Sources */,
 				D79A5F152407FF91006DAA7A /* RowProtocols.swift in Sources */,
 				D79A5EAD2406B2A7006DAA7A /* Error.swift in Sources */,
 				D7DDDA5D247943F70061C15B /* SettingsViewController.swift in Sources */,
 				BA0D0EF3224A6B7600209993 /* TextField+Extensions.swift in Sources */,
+				D730FA2124C9C84B000EA8AF /* PhoneVerificationModels.swift in Sources */,
+				D730FA1E24C9C84B000EA8AF /* PhoneVerificationPresenter.swift in Sources */,
 				D701DB8423E8DBF600A45E9B /* PhoneNumber.swift in Sources */,
 				D7B758CC245B302F005CD0C9 /* RootedContentModels.swift in Sources */,
 				D790B5A72485991A00A69192 /* ChatPresenter.swift in Sources */,
 				D7E2815B24A23EC6004CF478 /* KeychainManager.swift in Sources */,
+				D7467DF224D4D45500B50A2E /* UpdateValueWorker.swift in Sources */,
 				D79A5F462407FF91006DAA7A /* SelectorAlertController.swift in Sources */,
 				D79A5F262407FF91006DAA7A /* StepperRow.swift in Sources */,
 				D7255F91241387600048F8D8 /* EmptyHeader.swift in Sources */,
 				D79A5F322407FF91006DAA7A /* Protocols.swift in Sources */,
 				D74E949324C20E3700E8C577 /* ViewCalendarViewController.swift in Sources */,
+				D730FA7624CA6E94000EA8AF /* String+TokenRow.swift in Sources */,
 				D701DB8523E8DBF600A45E9B /* AgendaItem.swift in Sources */,
 				D79A5F9E240960F5006DAA7A /* WWCalendarTimeSelector.swift in Sources */,
 				D74E949424C20E3700E8C577 /* ViewCalendarInteractor.swift in Sources */,
@@ -1766,19 +1943,24 @@
 				D7DF8D0E24841CC3005C116A /* MediaInserter.swift in Sources */,
 				D7DDDA1E24703F860061C15B /* PhoneLoginInteractor.swift in Sources */,
 				D79A5F182407FF91006DAA7A /* RowControllerType.swift in Sources */,
+				D730FA2324C9C84B000EA8AF /* PhoneVerificationInteractor.swift in Sources */,
 				D7DDDA5A247943F70061C15B /* SettingsWorker.swift in Sources */,
 				D79A5F7B24083038006DAA7A /* SuggestionCell.swift in Sources */,
+				D7467DE624D4674600B50A2E /* EditProfileRouter.swift in Sources */,
 				D79A5F502407FF91006DAA7A /* RuleClosure.swift in Sources */,
 				D7A18AEF24063BB00039A295 /* DefaultsManager.swift in Sources */,
 				D7DF8D0D24841CC3005C116A /* TextViewAttachmentDelegateProvider.swift in Sources */,
+				D730FA2024C9C84B000EA8AF /* PhoneVerificationRouter.swift in Sources */,
 				D701DC5B23E8DBF600A45E9B /* UserPreference.swift in Sources */,
 				D79A5F122407FF91006DAA7A /* PresenterRowType.swift in Sources */,
 				D79A5F2E2407FF91006DAA7A /* DateInlineFieldRow.swift in Sources */,
+				D7467DF524D4D45500B50A2E /* UpdateValueViewController.swift in Sources */,
 				D7F1AAEE240C393100210504 /* RandomStringGenerator.swift in Sources */,
 				D747BADD2411404100E571CF /* FloatingMenuBtn.swift in Sources */,
 				D7DDDA3A247327FD0061C15B /* RegistrationInteractor.swift in Sources */,
 				D79A5F102407FF91006DAA7A /* Cell.swift in Sources */,
 				D79A5F402407FF91006DAA7A /* ButtonRow.swift in Sources */,
+				D7467DFD24D98A6D00B50A2E /* ImageViewerCell.swift in Sources */,
 				D79A5F9C240960F5006DAA7A /* Int+Timepiece.swift in Sources */,
 				D7C3B9392416880F00B22E8F /* CalendarViewRow.swift in Sources */,
 				D701DC6723E8DBF600A45E9B /* PollResponse.swift in Sources */,
@@ -1801,9 +1983,11 @@
 				D79A5F222407FF91006DAA7A /* NavigationAccessoryView.swift in Sources */,
 				D79A5F5A240811FD006DAA7A /* SplitRow.swift in Sources */,
 				D79A5F3E2407FF91006DAA7A /* PickerRow.swift in Sources */,
+				D7467E0A24DAAF3D00B50A2E /* EPExtensions.swift in Sources */,
 				BA98DD8F225101210070BC39 /* MyInviteCell.swift in Sources */,
 				D701DC6223E8DBF600A45E9B /* RLocation.swift in Sources */,
 				D701DC6623E8DBF600A45E9B /* Coordinates.swift in Sources */,
+				D730FA2224C9C84B000EA8AF /* PhoneVerificationViewController.swift in Sources */,
 				D787A26A23E1EC2F001795D3 /* AppInitializer.swift in Sources */,
 				D747BAC4240FF77100E571CF /* EmptyDataSetView.swift in Sources */,
 				D79A5EBD240710D9006DAA7A /* RootedCellDelegate.swift in Sources */,
@@ -1957,7 +2141,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = "Rooted MessagesExtension/Rooted MessagesExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = "Rooted MessagesExtension/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1982,7 +2166,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
 				CODE_SIGN_ENTITLEMENTS = "Rooted MessagesExtension/Rooted MessagesExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = "Rooted MessagesExtension/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -2007,7 +2191,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = Rooted/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -2026,7 +2210,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2PSWQPK482;
 				INFOPLIST_FILE = Rooted/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;

@@ -11,6 +11,8 @@
 //
 
 import UIKit
+import SwiftyRSA
+import RNCryptor
 
 protocol PhoneLoginBusinessLogic {
   func loginViaEmailAndPassword(request: PhoneLogin.LoginViaEmailAndPassword.Request)
@@ -77,11 +79,32 @@ class PhoneLoginInteractor: PhoneLoginBusinessLogic, PhoneLoginDataStore {
 
                                 if let success = resultsDict["success"] as? Bool {
                                   if success {
-                                    if let data = resultsDict["data"] as? [String: Any] {
+                                    if let data = resultsDict["data"] as? [String: Any], let userData = UserProfileData(JSON: (data["user"] as? [[String: Any]])?.first ?? [:]) {
                                       var response = PhoneLogin.LoginViaEmailAndPassword.Response()
-                                      response.userId = data["uid"] as? String ?? ""
-                                      response.userData = UserProfileData(JSON: (data["user"] as? [[String: Any]])?.first ?? [:])
-                                      self.presenter?.onSuccessfulEmailAndPasswordLogin(response: response)
+                                      response.userId = userData.uid ?? ""
+                                      response.userData = userData
+
+                                      // TODO: - When working on encryption continue work here
+                                      do {
+//                                        let privateKey: PrivateKey?
+                                        guard let privateKeyEncryptedString = userData.privateKeyEncryptedString, let privateKeyEncrytptedData = Data(base64Encoded: privateKeyEncryptedString) else {
+                                          self.presenter?.onSuccessfulEmailAndPasswordLogin(response: response)
+                                          return
+                                        }
+                                        let privateKeyData = try RNCryptor.decrypt(data: privateKeyEncrytptedData, withPassword: password)
+                                        let privateKeyString = privateKeyData.base64EncodedString()
+//                                        privateKey = try PrivateKey(base64Encoded: privateKeyString)
+
+                                        response.privateKey = privateKeyString
+                                        response.publicKey = userData.publicKeyString
+
+                                        self.presenter?.onSuccessfulEmailAndPasswordLogin(response: response)
+
+                                      } catch let error as NSError {
+                                        print(error)
+                                        self.presenter?.onSuccessfulEmailAndPasswordLogin(response: response)
+                                        return
+                                      }
                                     } else {
                                       var error = PhoneLogin.HandleError.Response()
                                       error.errorMessage = "Something went wrong. Please try again."
@@ -102,7 +125,7 @@ class PhoneLoginInteractor: PhoneLoginBusinessLogic, PhoneLoginDataStore {
     if let userid = request.userId {
       var response = PhoneLogin.SetSession.Response()
       if let user = request.userData {
-        SessionManager.start(with: user)
+        SessionManager.start(with: user, publicKey: user.publicKeyString)
         response.userData = user
       } else {
         SessionManager.start(with: userid)

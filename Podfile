@@ -32,7 +32,10 @@ target 'Rooted MessagesExtension' do
   pod 'WordPress-Editor-iOS'
   pod 'Gridicons'
   pod 'KeychainSwift'
+  pod 'SwiftyRSA'
+  pod 'RNCryptor', '~> 5.0'
   pod 'EggRating', :git => 'https://github.com/redroostertech/EGGRating.git', :commit => 'ad32b475b74ef1aae896d8d8a6f96d0851ffdffb'
   pod 'CalendarKit'
-  
+  pod 'EachNavigationBar', :git => 'https://github.com/redroostertech/EachNavigationBar.git', :branch => 'iMessage_Port'
+  pod 'CLTokenInputView'
 end

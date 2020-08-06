@@ -127,38 +127,108 @@ extension ViewParticipantsViewController {
 extension ViewParticipantsViewController: UITableViewDataSource, UITableViewDelegate {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 3
     }
 
+  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    switch section {
+    case 0: return "Invited"
+    case 1: return "Accepted"
+    case 2: return "Declined"
+    default: return ""
+    }
+  }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      return meeting?.data?.participants?.count ?? 0
+      switch section {
+      case 0: return meeting?.data?.meetingInvitePhoneNumbers?.count ?? 0
+      case 1: return meeting?.data?.participants?.count ?? 0
+      case 2: return meeting?.data?.declinedParticipants?.count ?? 0
+      default: return 0
+      }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      guard let mtng = meeting?.data, let meetingParticipants = mtng.participants else { return UITableViewCell() }
-      let meetingParticipant = meetingParticipants[indexPath.row]
-      let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+      guard let mtng = meeting?.data else { return UITableViewCell() }
+      switch indexPath.section {
+      case 0:
+        guard let meetingParticipants = mtng.meetingInvitePhoneNumbers else { return UITableViewCell() }
+        let meetingParticipant = meetingParticipants[indexPath.row]
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+        cell.selectionStyle = .none
+        cell.backgroundColor = .clear
+        cell.textLabel?.textColor = .darkText
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        cell.textLabel?.numberOfLines = 2
+        cell.detailTextLabel?.textColor = .lightGray
 
-      cell.selectionStyle = .none
-      cell.backgroundColor = .clear
-      cell.textLabel?.textColor = .darkText
-      cell.textLabel?.lineBreakMode = .byWordWrapping
-      cell.textLabel?.numberOfLines = 2
-      cell.detailTextLabel?.textColor = .lightGray
+        cell.textLabel?.text = meetingParticipant.firstName ?? ""
+        cell.detailTextLabel?.text = meetingParticipant.phone ?? ""
 
-      cell.textLabel?.text = meetingParticipant.fullName ?? ""
-      if let meetingOwner = mtng.ownerId {
+        return cell
+      case 1:
+        guard let meetingParticipants = mtng.participants else { return UITableViewCell() }
+        let meetingParticipant = meetingParticipants[indexPath.row]
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
 
-        if meetingOwner == meetingParticipant.uid ?? "" {
-          cell.textLabel?.text! += "(Organizer)"
+        cell.selectionStyle = .none
+        cell.backgroundColor = .clear
+        cell.textLabel?.textColor = .darkText
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        cell.textLabel?.numberOfLines = 2
+        cell.detailTextLabel?.textColor = .lightGray
+
+        cell.textLabel?.text = meetingParticipant.fullName ?? ""
+        if let meetingOwner = mtng.ownerId {
+
+          if meetingOwner == meetingParticipant.uid ?? "" {
+            cell.textLabel?.text! += "(Organizer)"
+          }
+
+          if let currentUserId = SessionManager.shared.currentUser?.uid, meetingParticipant.uid ?? "" != currentUserId {
+            cell.detailTextLabel?.text = meetingParticipant.email ?? ""
+          } else {
+            cell.detailTextLabel?.text = "You"
+          }
         }
+        return cell
+      case 2:
+        guard let meetingParticipants = mtng.declinedParticipants else { return UITableViewCell() }
+        let meetingParticipant = meetingParticipants[indexPath.row]
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
 
-        if let currentUserId = SessionManager.shared.currentUser?.uid, meetingParticipant.uid ?? "" != currentUserId {
-          cell.detailTextLabel?.text = meetingParticipant.email ?? ""
-        } else {
-          cell.detailTextLabel?.text = "You"
+        cell.selectionStyle = .none
+        cell.backgroundColor = .clear
+        cell.textLabel?.textColor = .darkText
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        cell.textLabel?.numberOfLines = 2
+        cell.detailTextLabel?.textColor = .lightGray
+
+        cell.textLabel?.text = meetingParticipant.fullName ?? ""
+        if let meetingOwner = mtng.ownerId {
+
+          if meetingOwner == meetingParticipant.uid ?? "" {
+            cell.textLabel?.text! += "(Organizer)"
+          }
+
+          if let currentUserId = SessionManager.shared.currentUser?.uid, meetingParticipant.uid ?? "" != currentUserId {
+            cell.detailTextLabel?.text = meetingParticipant.email ?? ""
+          } else {
+            cell.detailTextLabel?.text = "You"
+          }
         }
+        return cell
+      default:
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+        cell.selectionStyle = .none
+        cell.backgroundColor = .clear
+        cell.textLabel?.textColor = .darkText
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        cell.textLabel?.numberOfLines = 2
+        cell.detailTextLabel?.textColor = .lightGray
+        cell.textLabel?.text = "No data available"
+        return cell
       }
-      return cell
+
     }
 }

@@ -22,6 +22,8 @@
 	<true/>
 	<key>NSCalendarsUsageDescription</key>
 	<string>Rooted needs access to your calendar to add created invites to it.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Rooted needs access to your contacts to search for and add contacts to invites.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Rooted needs access to your location to search for and add locations to invites.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

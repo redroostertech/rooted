@@ -10,13 +10,14 @@
 
 import Foundation
 import ObjectMapper
+import SwiftyRSA
 
 // MARK: - UserProfileData
 public class UserProfileData: Mappable {
-  public var id, uid, key, token: String?
+  public var id, uid, key, token, privateKeyEncryptedString : String?
   public var firstName, lastName, fullName, phoneNumber, email: String?
   public var jobTitle, companyName, bio: String?
-  public var cardOnFile, initialSetup: Bool?
+  public var isPhoneVerified, cardOnFile, initialSetup: Bool?
 
   public var location: RLocation?
   public var userPreferences: [UserPreference]?
@@ -29,6 +30,23 @@ public class UserProfileData: Mappable {
   public var createdAt, lastLogin: String?
 
   public var meetings: [Meeting]?
+
+  public var publicKeyString: String? {
+    didSet {
+      do {
+        guard let publickeystring = self.publicKeyString else {
+          return
+        }
+        self.publicKey = try PublicKey(base64Encoded: publickeystring)
+      } catch let error as NSError {
+        print(error)
+        return
+      }
+    }
+  }
+
+  public var publicKey: PublicKey?
+  public var privateKey: PrivateKey?
 
   required public init?(map: Map) { }
 
@@ -57,6 +75,11 @@ public class UserProfileData: Mappable {
     lastLogin <- map["lastLogin"]
 
     meetings <- map["meetings"]
+
+    isPhoneVerified <- map["is_phone_verified"]
+
+    publicKeyString <- map["public_key_string"]
+    privateKeyEncryptedString <- map["private_key_encrypted_string"]
   }
 }
 

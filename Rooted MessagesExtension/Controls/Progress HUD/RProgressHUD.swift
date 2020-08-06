@@ -18,19 +18,20 @@ public class RProgressHUD {
     parent = view
   }
 
-  public func show() {
+  public func show(withText text: String = "Updating app...") {
     
     guard let appWindow = parent else { return }
 
     let spinnerView = UIView.init(frame: appWindow.bounds)
-    spinnerView.backgroundColor = UIColor.gradientColor1.withAlphaComponent(1.0)
+    spinnerView.backgroundColor = UIColor.systemOrange.withAlphaComponent(1.0)
     let ai = UIActivityIndicatorView.init(style: .whiteLarge)
     ai.startAnimating()
     ai.center = spinnerView.center
 
-    let label = UILabel(frame: CGRect(x: spinnerView.center.x - CGFloat(62), y: spinnerView.center.y + CGFloat(50), width: CGFloat(124), height: CGFloat(24)))
+    let label = UILabel(frame: CGRect(x: spinnerView.center.x - CGFloat(100), y: spinnerView.center.y + CGFloat(50), width: CGFloat(200), height: CGFloat(24)))
     label.textColor = .white
-    label.text = "Updating app..."
+    label.textAlignment = .center
+    label.text = text
 
     spinnerView.addSubview(label)
     spinnerView.addSubview(ai)

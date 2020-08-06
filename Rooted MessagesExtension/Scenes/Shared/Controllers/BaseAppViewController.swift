@@ -79,6 +79,7 @@ open class BaseAppViewController: MSMessagesAppViewController {
   }
 
   // MARK: - Use Case: Dismiss the view
+  @objc
   func dismissView() {
     postNotification(withName: kNotificationMyInvitesReload) {
       self.dismiss(animated: true, completion: nil)

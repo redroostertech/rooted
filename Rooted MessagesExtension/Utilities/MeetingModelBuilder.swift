@@ -115,6 +115,18 @@ class MeetingModelBuilder {
         meetingDict["owner_id"] = meetingOwner
       }
 
+      if let meetingInvitePhoneNumbers = retrieve(forKey: "meeting_invite_phone_numbers") as? [[String: Any]] {
+        meetingDict["meeting_invite_phone_numbers"] = meetingInvitePhoneNumbers
+      }
+
+      if let isMeetingPublic = retrieve(forKey: "is_meeting_public") as? Bool {
+        meetingDict["is_meeting_public"] = isMeetingPublic
+      }
+
+      if let isInviteEnabledForInvitees = retrieve(forKey: "is_invite_enabled_for_invitees") as? Bool {
+        meetingDict["is_invite_enabled_for_invitees"] = isInviteEnabledForInvitees
+      }
+
       meetingDict["id"] = RanStringGen(length: 26).returnString()
       meetingDict["dashboard_section_id"] = 1
       meeting = Meeting(JSON: meetingDict)
@@ -124,3 +136,4 @@ class MeetingModelBuilder {
     }
   }
 }
+

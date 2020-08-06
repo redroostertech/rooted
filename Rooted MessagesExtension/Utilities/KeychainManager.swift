@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftyRSA
 import KeychainSwift
 
 public enum KeychainSwiftInterfaceAccessOptions {
@@ -73,6 +74,18 @@ public extension KeychainManager {
       return false
     }
   }
+
+  func setDefault(publicKey: String, privateKey: String) -> Bool {
+      do {
+        let keychain = KeychainSwift()
+        keychain.set(publicKey, forKey: Bundle.main.bundleIdentifier! + "publicKey")
+        keychain.set(privateKey, forKey: Bundle.main.bundleIdentifier! + "privateKey")
+        return true
+      } catch let error as NSError {
+          print(error)
+          return false
+      }
+  }
 }
 
 // MARK: - Retrieve data from keychain
@@ -100,6 +113,30 @@ public extension KeychainManager {
   func retrieveDataDefault(forKey key: String) -> Data? {
     return keychain.getData(key)
   }
+
+  func retrievePublicKey() -> PublicKey? {
+      do {
+          let keychain = KeychainSwift()
+          let public64String = keychain.get(Bundle.main.bundleIdentifier! + "publicKey")
+          let publicKey = try PublicKey(base64Encoded: public64String!)
+          return publicKey
+      } catch let error as NSError {
+          print(error)
+          return nil
+      }
+  }
+
+  func retrievePrivateKey() -> PrivateKey? {
+      do {
+          let keychain = KeychainSwift()
+          let private64String = keychain.get(Bundle.main.bundleIdentifier! + "privateKey")
+          let privateKey = try PrivateKey(base64Encoded: private64String!)
+          return privateKey
+      } catch let error as NSError {
+          print(error)
+          return nil
+      }
+  }
 }
 
 // MARK: - Delete data from keychain
@@ -110,5 +147,9 @@ public extension KeychainManager {
 
   func deleteDefault(forKey key: String) -> Bool {
     return keychain.delete(key)
+  }
+
+  func clearKeychain() {
+    keychain.clear()
   }
 }

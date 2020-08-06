@@ -18,11 +18,13 @@ enum RootedContentManagerType {
 protocol RootedContentBusinessLogic: class {
   func setupBranchIO(request: RootedContent.SetupBranchIO.Request)
   func checkCalendarPermissions(request: RootedContent.CheckCalendarPermissions.Request)
+  func checkContactPermissions(request: RootedContent.CheckContactPermissions.Request)
   func getCalendarPermissions(request: RootedContent.CheckCalendarPermissions.Request)
   func retrieveMeetings(request: RootedContent.RetrieveMeetings.Request)
   func retrieveMeetingById(request: RootedContent.RetrieveMeetingById.Request)
   func retrieveSentMeetings(request: RootedContent.RetrieveSentMeetings.Request)
   func deleteMeeting(request: RootedContent.DeleteMeeting.Request)
+  func cancelMeeting(request: RootedContent.CancelMeeting.Request)
   func goToCreateNewMeetingView(request: RootedContent.CreateNewMeeting.Request)
   func saveMeeting(request: RootedContent.SaveMeeting.Request)
   func addToCalendar(request: RootedContent.AddToCalendar.Request)
@@ -34,6 +36,7 @@ protocol RootedContentBusinessLogic: class {
   func acceptMeeting(request: RootedContent.AcceptMeeting.Request)
   func declineMeeting(request: RootedContent.DeclineMeeting.Request)
   func refreshSession(request: RootedContent.RefreshSession.Request)
+  func goToViewCalendar(request: RootedContent.ViewCalendar.Request)
 }
 
 protocol RootedContentDataStore {
@@ -54,6 +57,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
   private var meetingsManager = MeetingsManager()
   private var coreDataManager = CoreDataManager()
   private var eventKitManager = EventKitManager()
+  private var contactKitManager = ContactKitManager()
   private var availabilityManager = AvailabilityManager()
 
   func retrieveErrorMessage(_ error: Error) -> String {
@@ -98,6 +102,14 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
       response.isGranted = granted
       self.isCalendarPermissionGranted = granted
       self.presenter?.handleCalendarPermissions(response: response)
+    }
+  }
+
+  func checkContactPermissions(request: RootedContent.CheckContactPermissions.Request) {
+    var response = RootedContent.CheckContactPermissions.Response()
+    contactKitManager.getPermissions { granted in
+      response.isGranted = granted
+      self.presenter?.handleContactPermissions(response: response)
     }
   }
 
@@ -348,7 +360,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
       return
     }
 
-    guard let meeting = request.meeting?.data, let meetingId = meeting.id else {
+    guard let meeting = request.meeting?.data, let meetingId = meeting.id, let ownerId = meeting.ownerId else {
       var response = RootedContent.DisplayError.Response()
       response.errorMessage = "Something went wrong. Please try again."
       self.presenter?.handleError(response: response)
@@ -412,15 +424,86 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
     }
   }
 
-  // MARK: - Use Case: Remove meeting from users calendar
-  func removeMeetingFromCalendar(request: RootedContent.RemoveFromCalendar.Request) {
-    
+  // MARK: - Use Case: As a user, I want to be able to cancel a meeting
+  func cancelMeeting(request: RootedContent.CancelMeeting.Request) {
     guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
       self.presenter?.onPresentPhoneLoginViewController()
       return
     }
 
-    guard let meeting = request.meeting?.data else { return }
+    guard let meeting = request.meeting?.data, let meetingId = meeting.id else {
+      var response = RootedContent.DisplayError.Response()
+      response.errorMessage = "Something went wrong. Please try again."
+      self.presenter?.handleError(response: response)
+      return
+    }
+
+    branchWorker.customEvent(withName: kBranchMeetingDeleteMeeting)
+    switch request.contentDB {
+    case .remote:
+      let path = PathBuilder.build(.Test, in: .Core, with: "eggman")
+      let params: [String: Any] = [
+        "action": "cancel_meeting",
+        "meeting_id": meetingId,
+        "user_id": userId
+      ]
+      let apiService = Api()
+      apiService.performRequest(path: path,
+                                method: .post,
+                                parameters: params) { (results, error) in
+
+                                  guard error == nil else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  guard let resultsDict = results as? [String: Any] else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                  if let success = resultsDict["success"] as? Bool {
+                                    if success {
+
+                                      var response = RootedContent.CancelMeeting.Response()
+                                      response.meeting = request.meeting
+
+                                      // Refresh removed meeting
+                                      SessionManager.refreshSession()
+
+                                      self.presenter?.onDidCancelMeeting(response: response)
+
+                                    } else {
+                                      var error = RootedContent.DisplayError.Response()
+                                      error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
+                                      self.presenter?.handleError(response: error)
+                                    }
+                                  }
+      }
+    default:
+      guard let meeting = request.meeting?.managedObject else { return }
+      meetingsManager.delegate = request.meetingManagerDelegate
+      meetingsManager.deleteMeeting(meeting)
+    }
+  }
+
+  // MARK: - Use Case: Remove meeting from users calendar
+  func removeMeetingFromCalendar(request: RootedContent.RemoveFromCalendar.Request) {
+    
+    guard SessionManager.shared.sessionExists, let _ = SessionManager.shared.currentUser?.uid else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
+    guard let meeting = request.meeting else { return }
     eventKitManager.removeFromCalendar(meeting: meeting) { (mtng, success, error) in
       if let err = error {
         var response = RootedContent.RemoveFromCalendar.Response()
@@ -474,7 +557,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
       let path = PathBuilder.build(.Test, in: .Core, with: "eggman")
       let params: [String: Any] = [
         "action": "save_meeting",
-        "data": meeting.toJSON(),
+        "data": meeting.toJSONString()!,
       ]
       let apiService = Api()
       apiService.performRequest(path: path,
@@ -486,6 +569,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
                                     var error = RootedContent.DisplayError.Response()
                                     error.errorMessage = "Something went wrong. Please try again."
                                     error.errorTitle = "Oops!"
+                                    error.meeting = meeting
                                     self.presenter?.handleError(response: error)
                                     return
                                   }
@@ -495,6 +579,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
                                     var error = RootedContent.DisplayError.Response()
                                     error.errorMessage = "Something went wrong. Please try again."
                                     error.errorTitle = "Oops!"
+                                    error.meeting = meeting
                                     self.presenter?.handleError(response: error)
                                     return
                                   }
@@ -515,12 +600,14 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
                                         var error = RootedContent.DisplayError.Response()
                                         error.errorMessage = "Something went wrong. Please try again."
                                         error.errorTitle = "Oops!"
+                                        error.meeting = meeting
                                         self.presenter?.handleError(response: error)
                                       }
                                     } else {
                                       var error = RootedContent.DisplayError.Response()
                                       error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
                                       error.errorTitle = "Oops!"
+                                      error.meeting = meeting
                                       self.presenter?.handleError(response: error)
                                     }
                                   }
@@ -828,6 +915,24 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
    let response = RootedContent.InfoView.Response()
    self.presenter?.presentInfoView(response: response)
   }
+
+  // MARK: - Use Case: Go to `ViewCalendarViewController`
+  func goToViewCalendar(request: RootedContent.ViewCalendar.Request) {
+    guard SessionManager.shared.sessionExists else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
+    guard let calendarAccessGranted = isCalendarPermissionGranted, calendarAccessGranted else {
+      let request = RootedContent.CheckCalendarPermissions.Request()
+      self.checkCalendarPermissions(request: request)
+      return
+    }
+
+    let response = RootedContent.ViewCalendar.Response()
+    self.presenter?.presentViewCalendar(response: response)
+  }
+
 }
 
 extension RootedContentInteractor {

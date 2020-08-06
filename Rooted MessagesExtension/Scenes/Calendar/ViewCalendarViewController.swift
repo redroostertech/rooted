@@ -11,79 +11,82 @@
 //
 
 import UIKit
+import CalendarKit
+import DateToolsSwift
 
-protocol ViewCalendarDisplayLogic: class
-{
-  func displaySomething(viewModel: ViewCalendar.Something.ViewModel)
-}
+protocol ViewCalendarDisplayLogic: class { }
 
-class ViewCalendarViewController: UIViewController, ViewCalendarDisplayLogic
-{
+class ViewCalendarViewController: DayViewController, ViewCalendarDisplayLogic {
+
   var interactor: ViewCalendarBusinessLogic?
-  var router: (NSObjectProtocol & ViewCalendarRoutingLogic & ViewCalendarDataPassing)?
+//  var router: (NSObjectProtocol & ViewCalendarRoutingLogic & ViewCalendarDataPassing)?
+
+  // MARK: - Lifecycle methods
+  static func setupViewController() -> ViewCalendarViewController {
+    let storyboard = UIStoryboard(name: kStoryboardMain, bundle: nil)
+    let viewController = storyboard.instantiateViewController(withIdentifier: "ViewCalendarViewController") as! ViewCalendarViewController
+    return viewController
+  }
 
   // MARK: Object lifecycle
-  
-  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)
-  {
+  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     setup()
   }
   
-  required init?(coder aDecoder: NSCoder)
-  {
+  required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
     setup()
   }
   
   // MARK: Setup
-  
-  private func setup()
-  {
+  private func setup() {
     let viewController = self
     let interactor = ViewCalendarInteractor()
     let presenter = ViewCalendarPresenter()
-    let router = ViewCalendarRouter()
+//    let router = ViewCalendarRouter()
     viewController.interactor = interactor
-    viewController.router = router
+//    viewController.router = router
     interactor.presenter = presenter
     presenter.viewController = viewController
-    router.viewController = viewController
-    router.dataStore = interactor
-  }
-  
-  // MARK: Routing
-  
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?)
-  {
-    if let scene = segue.identifier {
-      let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
-      if let router = router, router.responds(to: selector) {
-        router.perform(selector, with: segue)
-      }
-    }
+//    router.viewController = viewController
+//    router.dataStore = interactor
   }
   
   // MARK: View lifecycle
-  
-  override func viewDidLoad()
-  {
+  override func viewDidLoad() {
     super.viewDidLoad()
-    doSomething()
+    dayView.autoScrollToFirstEvent = true
   }
-  
-  // MARK: Do something
-  
-  //@IBOutlet weak var nameTextField: UITextField!
-  
-  func doSomething()
-  {
-    let request = ViewCalendar.Something.Request()
-    interactor?.doSomething(request: request)
+
+  override func eventsForDate(_ date: Date) -> [EventDescriptor] {
+    var events = [Event]()
+
+    let event = Event()
+    event.startDate = .today()
+    event.endDate = .tomorrow()
+    event.text = "Test event"
+    event.color = .cyan
+    event.textColor = .brown
+
+    events.append(event)
+
+    return events
   }
-  
-  func displaySomething(viewModel: ViewCalendar.Something.ViewModel)
-  {
-    //nameTextField.text = viewModel.name
+
+  override func dayViewDidSelectEventView(_ eventView: EventView) {
+    print("Event has been selected, navigate to details")
+  }
+
+  override func dayViewDidLongPressEventView(_ eventView: EventView) {
+    print("Event has been long pressed")
+  }
+
+  override func dayView(dayView: DayView, didMoveTo date: Date) {
+    print("DayView = \(dayView) did move to = \(date)")
+  }
+
+  override func dayView(dayView: DayView, willMoveTo date: Date) {
+    print("DayVew = \(dayView) will move to = \(date)")
   }
 }

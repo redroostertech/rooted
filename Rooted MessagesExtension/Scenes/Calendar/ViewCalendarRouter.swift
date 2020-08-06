@@ -12,18 +12,14 @@
 
 import UIKit
 
-@objc protocol ViewCalendarRoutingLogic
-{
-  //func routeToSomewhere(segue: UIStoryboardSegue?)
+@objc protocol ViewCalendarRoutingLogic {
 }
 
-protocol ViewCalendarDataPassing
-{
+protocol ViewCalendarDataPassing {
   var dataStore: ViewCalendarDataStore? { get }
 }
 
-class ViewCalendarRouter: NSObject, ViewCalendarRoutingLogic, ViewCalendarDataPassing
-{
+class ViewCalendarRouter: NSObject, ViewCalendarRoutingLogic, ViewCalendarDataPassing {
   weak var viewController: ViewCalendarViewController?
   var dataStore: ViewCalendarDataStore?
   

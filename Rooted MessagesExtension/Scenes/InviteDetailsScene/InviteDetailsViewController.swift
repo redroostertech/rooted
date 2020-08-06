@@ -275,7 +275,22 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
       })
       return
     }
-    loadFormWith(meeting: meeting)
+    if let endDate = meeting.meetingDate?.endDate?.toDate()?.date {
+      if Date.today().isGreaterThanDate(endDate) {
+        let alert = UIAlertController(title: "Meeting Ended", message: "The selected meeting ended on \(endDate.toString(.rooted)). No action is required at this time.", preferredStyle: .alert)
+
+        // MARK: - Use Case: Show all meetings
+        let okAction = UIAlertAction(title: "Ok", style: .default, handler: { action in
+          self.dismissView()
+        })
+        alert.addAction(okAction)
+
+        // Show the alert
+        self.present(alert, animated: true, completion: nil)
+      } else {
+        self.loadFormWith(meeting: meeting)
+      }
+    }
   }
 
   // MARK: - Use Case: Check if app has access to calendar permissions
@@ -310,7 +325,9 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
   // MARK: - Use Case: Check if user is logged in and if not, show login screen
   func presentPhoneLoginViewController() {
     dismissHUD()
-    showError(title: "Login In", message: "You are not logged in. Please do so and try again.", style: .alert, defaultButtonText: "OK")
+    showError(title: "Log In", message: "You are not logged in. Please do so and try again.", style: .alert, defaultButtonText: "OK", withCompletion: {
+      self.dismissView()
+    })
   }
 
   // MARK: - Use Case: On Successful login resume setting up the view controller
@@ -335,20 +352,8 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
       guard let mting = self.meeting?.data else {
         return self.displayFailure(with: "Oops!", and: "There was an error adding event to your calendar. Please try again.", afterAnimating: self.acceptInviteButton)
       }
-      self.addMeetingToCalendar(meeting: mting)
+      self.acceptMeeting(meeting: mting)
     }
-  }
-
-  // MARK: - Use Case: Add meeting to calendar
-  func addMeetingToCalendar(meeting: Meeting) {
-    var request = RootedContent.AddToCalendar.Request()
-    request.meeting = meeting
-    interactor?.addToCalendar(request: request)
-  }
-
-  func onSuccessfulCalendarAdd(viewModel: RootedContent.AddToCalendar.ViewModel) {
-    guard let meeting = viewModel.meeting else { return }
-    acceptMeeting(meeting: meeting)
   }
 
   // MARK: - Use Case: Accept meeting and add user as a participant
@@ -362,6 +367,18 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
   }
 
   func onSuccessfulAcceptance(viewModel: RootedContent.AcceptMeeting.ViewModel) {
+    guard let meeting = viewModel.meeting else { return }
+    addMeetingToCalendar(meeting: meeting)
+  }
+
+  // MARK: - Use Case: Add meeting to calendar
+  func addMeetingToCalendar(meeting: Meeting) {
+    var request = RootedContent.AddToCalendar.Request()
+    request.meeting = meeting
+    interactor?.addToCalendar(request: request)
+  }
+
+  func onSuccessfulCalendarAdd(viewModel: RootedContent.AddToCalendar.ViewModel) {
     guard let meeting = viewModel.meeting else { return }
     sendResponse(.accept, to: meeting)
   }
@@ -436,25 +453,45 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
 
   private func declineInvite() {
     startAnimating(declineInviteButton) {
-      guard let mting = self.meeting, let _ = mting.data else {
+      guard let mting = self.meeting?.data else {
         return self.displayFailure(with: "Oops!", and: "There was an error adding event to your calendar. Please try again.", afterAnimating: self.acceptInviteButton)
       }
-      self.removeFromCalendar(meeting: mting)
+      let alertAction = UIAlertController(title: "Remove Attendance", message: "Are you sure you are not attending the meeting anymore?", preferredStyle: .alert)
+      let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { action in
+        self.declineMeeting(mting)
+      })
+
+      let noAction = UIAlertAction(title: "No", style: .default, handler: { action in
+        // Do something if user changes their mind
+        self.stopAnimating(self.declineInviteButton, for: .none) {
+          alertAction.dismiss(animated: true, completion: nil)
+        }
+      })
+      alertAction.addAction(yesAction)
+      alertAction.addAction(noAction)
+      self.present(alertAction, animated: true, completion: nil)
     }
   }
 
-  func removeFromCalendar(meeting: RootedCellViewModel) {
-    var request = RootedContent.RemoveFromCalendar.Request()
-    request.meeting = meeting
-    interactor?.removeMeetingFromCalendar(request: request)
+  // MARK: - Use Case: Remove attendance by declining the meeting
+  private func declineInvite(meeting: Meeting) {
+    let alertAction = UIAlertController(title: "Remove Attendance", message: "Are you sure you are not attending the meeting anymore?", preferredStyle: .alert)
+    let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { action in
+      self.declineMeeting(meeting)
+    })
+
+    let noAction = UIAlertAction(title: "No", style: .cancel, handler: { action in
+      // Do something if user changes their mind
+      self.stopAnimating(self.declineInviteButton, for: .none) {
+        alertAction.dismiss(animated: true, completion: nil)
+      }
+    })
+    alertAction.addAction(noAction)
+    alertAction.addAction(yesAction)
+    present(alertAction, animated: true, completion: nil)
   }
 
-  func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
-    guard let meeting = viewModel.meeting?.data else { return }
-    declineMeeting(meeting: meeting)
-  }
-
-  func declineMeeting(meeting: Meeting) {
+  func declineMeeting(_ meeting: Meeting) {
     var request = RootedContent.DeclineMeeting.Request()
     request.meeting = meeting
     request.branchEventID = kBranchInviteAccepted
@@ -464,10 +501,24 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
   }
 
   func onSuccessfulDecline(viewModel: RootedContent.DeclineMeeting.ViewModel) {
+    guard let mting = viewModel.meeting else { return }
+    removeFromCalendar(mting)
+  }
+
+  // MARK: - Use Case: Remove meeting from users calendar
+  private func removeFromCalendar(_ meeting: Meeting) {
+    var request = RootedContent.RemoveFromCalendar.Request()
+    request.meeting = meeting
+    interactor?.removeMeetingFromCalendar(request: request)
+  }
+
+  func onSuccessfulCalendarRemoval(viewModel: RootedContent.RemoveFromCalendar.ViewModel) {
+    RRLogger.log(message: "Successfully removed meeting from calendar", owner: self)
     guard let meeting = viewModel.meeting else { return }
     sendResponse(.decline, to: meeting)
   }
 
+  // NOT IN USE ANYMORE
   func deleteFromLocalStorage(meeting: RootedCellViewModel?) {
     var request = RootedContent.DeleteMeeting.Request()
     request.meetingManagerDelegate = self
@@ -478,11 +529,6 @@ class InviteDetailsViewController: FormMessagesAppViewController, RootedContentD
   func didDeleteInvite(_ manager: Any?, invite: MeetingContextWrapper) {
     showError(title: "Meeting Deleted", message: "Meeting was successfully deleted.", style: .alert, defaultButtonText: "OK")
   }
-
-//  private func declineMeeting(_ meeting: RootedCellViewModel?) {
-//    guard let mting = meeting?.data else { return }
-//    sendResponse(.decline, to: mting)
-//  }
 
   // MARK: - Use Case: Accept the meeting, save it locally, and add it to your calendar
   @IBAction func back(_ sender: UIButton) {

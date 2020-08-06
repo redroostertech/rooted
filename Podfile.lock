@@ -224,7 +224,9 @@ PODS:
   - Branch/Core (0.33.1)
   - CalendarKit (0.13.11):
     - DateToolsSwift
+  - CLTokenInputView (2.3.0)
   - DateToolsSwift (5.0.0)
+  - EachNavigationBar (1.14.4)
   - EggRating (0.1.6):
     - RateView
   - Firebase/Analytics (6.25.0):
@@ -371,6 +373,7 @@ PODS:
     - PhoneNumberKit/PhoneNumberKitCore
   - PromisesObjC (1.2.8)
   - RateView (1.2)
+  - RNCryptor (5.1.0)
   - SDWebImage (5.8.0):
     - SDWebImage/Core (= 5.8.0)
   - SDWebImage/Core (5.8.0)
@@ -379,6 +382,9 @@ PODS:
   - SwiftyCodeView (0.3.6):
     - SwiftyCodeView/Core (= 0.3.6)
   - SwiftyCodeView/Core (0.3.6)
+  - SwiftyRSA (1.6.0):
+    - SwiftyRSA/ObjC (= 1.6.0)
+  - SwiftyRSA/ObjC (1.6.0)
   - WordPress-Aztec-iOS (1.19.2)
   - WordPress-Editor-iOS (1.19.2):
     - WordPress-Aztec-iOS (= 1.19.2)
@@ -387,6 +393,8 @@ DEPENDENCIES:
   - Alamofire (= 4.9.1)
   - Branch
   - CalendarKit
+  - CLTokenInputView
+  - EachNavigationBar (from `https://github.com/redroostertech/EachNavigationBar.git`, branch `iMessage_Port`)
   - EggRating (from `https://github.com/redroostertech/EGGRating.git`, commit `ad32b475b74ef1aae896d8d8a6f96d0851ffdffb`)
   - Firebase/Analytics
   - Firebase/Auth
@@ -402,9 +410,11 @@ DEPENDENCIES:
   - ObjectMapper (~> 3.1)
   - OnboardKit
   - PhoneNumberKit (~> 3.1)
+  - RNCryptor (~> 5.0)
   - SSSpinnerButton
   - SwiftDate (~> 5.0)
   - SwiftyCodeView
+  - SwiftyRSA
   - WordPress-Editor-iOS
 
 SPEC REPOS:
@@ -414,6 +424,7 @@ SPEC REPOS:
     - BoringSSL-GRPC
     - Branch
     - CalendarKit
+    - CLTokenInputView
     - DateToolsSwift
     - Firebase
     - FirebaseAnalytics
@@ -445,19 +456,27 @@ SPEC REPOS:
     - PhoneNumberKit
     - PromisesObjC
     - RateView
+    - RNCryptor
     - SDWebImage
     - SSSpinnerButton
     - SwiftDate
     - SwiftyCodeView
+    - SwiftyRSA
     - WordPress-Aztec-iOS
     - WordPress-Editor-iOS
 
 EXTERNAL SOURCES:
+  EachNavigationBar:
+    :branch: iMessage_Port
+    :git: https://github.com/redroostertech/EachNavigationBar.git
   EggRating:
     :commit: ad32b475b74ef1aae896d8d8a6f96d0851ffdffb
     :git: https://github.com/redroostertech/EGGRating.git
 
 CHECKOUT OPTIONS:
+  EachNavigationBar:
+    :commit: 411d37bd050cbbc75cfc2f1bb9ddfeea69dd2f2d
+    :git: https://github.com/redroostertech/EachNavigationBar.git
   EggRating:
     :commit: ad32b475b74ef1aae896d8d8a6f96d0851ffdffb
     :git: https://github.com/redroostertech/EGGRating.git
@@ -468,7 +487,9 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   Branch: 65d05ffb137ef504777cff6bd4fb6f770f17145a
   CalendarKit: b61b8e08c1891b9a5790d22cc47d98939e15ea72
+  CLTokenInputView: 9dc1ffb7c9d2d81787e69a63c75bd97b0b2d1e76
   DateToolsSwift: 4207ada6ad615d8dc076323d27037c94916dbfa6
+  EachNavigationBar: 9000bc381312c65a86ab1f6c31b526ea675411f6
   EggRating: 378f25f5ac0629e7edfb011f5c5177c63f135e6e
   Firebase: 5719b4f965f76643241a1bb8244483ff6117db39
   FirebaseAnalytics: 93565f3f0f0f50a5d8770850bfe6a82eaba5db27
@@ -500,13 +521,15 @@ SPEC CHECKSUMS:
   PhoneNumberKit: df411d46177d1492da84e10b6c093846dd861452
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
+  RNCryptor: a369134686cd2ad391323cc856b62e591193ba79
   SDWebImage: 84000f962cbfa70c07f19d2234cbfcf5d779b5dc
   SSSpinnerButton: ba9ec6858f2f6fa902a5131d3aec5282588241f8
   SwiftDate: 6329e58969a2de31cea7f1ee1143b247693196e7
   SwiftyCodeView: 0252e3520749a3fda1a9b141873401f8e6c570ad
+  SwiftyRSA: 3b9c9179744217951facc6a3e9ae8d8c97061ffa
   WordPress-Aztec-iOS: d01bf0c5e150ae6a046f06ba63b7cc2762061c0b
   WordPress-Editor-iOS: 5b726489e5ae07b7281a2862d69aba2d5c83f140
 
-PODFILE CHECKSUM: 1fbc1b3cdf884bf6cf9cfe12513e7d51aca14994
+PODFILE CHECKSUM: 512691a6d9c64d6a02116117b2c58972a6a19d13
 
 COCOAPODS: 1.9.1

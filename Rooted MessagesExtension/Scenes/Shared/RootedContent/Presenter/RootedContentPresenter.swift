@@ -18,13 +18,19 @@ protocol RootedContentPresentationLogic {
   func handleBranchIOResponse(response: RootedContent.SetupBranchIO.Response)
   func handleCalendarPermissions(response: RootedContent.CheckCalendarPermissions.Response)
   func handleCalendarPermissionsCheck(response: RootedContent.CheckCalendarPermissions.Response)
+
+  func handleContactPermissions(response: RootedContent.CheckContactPermissions.Response)
+  func handleContactPermissionsCheck(response: RootedContent.CheckContactPermissions.Response)
+
   func handleMaximumLimitReached(response: RootedContent.CheckMaximumMeetingsReached.Response)
 
   func presentCreateNewMeetingView(response: RootedContent.CreateNewMeeting.Response)
   func presentInfoView(response: RootedContent.InfoView.Response)
 
   func onDidFinishLoading(response: RootedContent.RetrieveMeetings.Response)
+  func onDidCancelMeeting(response: RootedContent.CancelMeeting.Response)
   func onDidDeleteMeeting(response: RootedContent.DeleteMeeting.Response)
+
   func handleError(response: RootedContent.DisplayError.Response)
   func onSuccessfulSave(response: RootedContent.SaveMeeting.Response)
   func onSuccessfulCalendarAdd(response: RootedContent.AddToCalendar.Response)
@@ -39,19 +45,26 @@ protocol RootedContentPresentationLogic {
 
   func didRefreshSession(response: RootedContent.RefreshSession.Response)
 
+  func presentViewCalendar(response: RootedContent.ViewCalendar.Response)
 }
 
 extension RootedContentPresentationLogic {
   func onPresentPhoneLoginViewController() { }
 
   func handleBranchIOResponse(response: RootedContent.SetupBranchIO.Response) { }
+
   func handleCalendarPermissions(response: RootedContent.CheckCalendarPermissions.Response) { }
   func handleCalendarPermissionsCheck(response: RootedContent.CheckCalendarPermissions.Response) { }
+
+  func handleContactPermissions(response: RootedContent.CheckContactPermissions.Response) { }
+  func handleContactPermissionsCheck(response: RootedContent.CheckContactPermissions.Response) { }
+
   func handleMaximumLimitReached(response: RootedContent.CheckMaximumMeetingsReached.Response) { }
   func presentCreateNewMeetingView(response: RootedContent.CreateNewMeeting.Response) { }
   func presentInfoView(response: RootedContent.InfoView.Response) { }
 
   func onDidFinishLoading(response: RootedContent.RetrieveMeetings.Response) { }
+  func onDidCancelMeeting(response: RootedContent.CancelMeeting.Response) { }
   func onDidDeleteMeeting(response: RootedContent.DeleteMeeting.Response) { }
 
   func handleError(response: RootedContent.DisplayError.Response) { }
@@ -67,6 +80,8 @@ extension RootedContentPresentationLogic {
   func onSuccessfulDecline(response: RootedContent.DeclineMeeting.Response) { }
 
   func didRefreshSession(response: RootedContent.RefreshSession.Response) { }
+
+  func presentViewCalendar(response: RootedContent.ViewCalendar.Response) { }
 }
 
 class RootedContentPresenter: RootedContentPresentationLogic {
@@ -97,6 +112,18 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     viewController?.handleCalendarPermissionsCheck(viewModel: viewModel)
   }
 
+  func handleContactPermissions(response: RootedContent.CheckContactPermissions.Response) {
+    var viewModel = RootedContent.CheckContactPermissions.ViewModel()
+    viewModel.isGranted = response.isGranted
+    viewController?.handleContactPermissions(viewModel: viewModel)
+  }
+
+  func handleContactPermissionsCheck(response: RootedContent.CheckContactPermissions.Response) {
+    var viewModel = RootedContent.CheckContactPermissions.ViewModel()
+    viewModel.isGranted = response.isGranted
+    viewController?.handleContactPermissionsCheck(viewModel: viewModel)
+  }
+
   // MARK: - Use Case: As a business, we want to limit access to creating more than (n) meetings based on account type
   func handleMaximumLimitReached(response: RootedContent.CheckMaximumMeetingsReached.Response) {
     var viewModel = RootedContent.CheckMaximumMeetingsReached.ViewModel()
@@ -125,6 +152,7 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     var viewModel = RootedContent.DisplayError.ViewModel()
     viewModel.errorTitle = response.errorTitle
     viewModel.errorMessage = response.errorMessage
+    viewModel.meeting = response.meeting
     viewController?.handleError(viewModel: viewModel)
   }
 
@@ -174,6 +202,12 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     viewController?.onDidDeleteMeeting(viewModel: viewModel)
   }
 
+  func onDidCancelMeeting(response: RootedContent.CancelMeeting.Response) {
+    var viewModel = RootedContent.CancelMeeting.ViewModel()
+    viewModel.meeting = response.meeting
+    viewController?.onDidCancelMeeting(viewModel: viewModel)
+  }
+
   func onSuccessfulAcceptance(response: RootedContent.AcceptMeeting.Response) {
     var viewModel = RootedContent.AcceptMeeting.ViewModel()
     viewModel.meeting = response.meeting
@@ -184,5 +218,10 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     var viewModel = RootedContent.DeclineMeeting.ViewModel()
     viewModel.meeting = response.meeting
     viewController?.onSuccessfulDecline(viewModel: viewModel)
+  }
+
+  func presentViewCalendar(response: RootedContent.ViewCalendar.Response) {
+    var viewModel = RootedContent.ViewCalendar.ViewModel()
+    viewController?.presentViewCalendar(viewModel: viewModel)
   }
 }

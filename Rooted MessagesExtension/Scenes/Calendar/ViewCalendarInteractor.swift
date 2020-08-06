@@ -13,30 +13,16 @@
 
 import UIKit
 
-protocol ViewCalendarBusinessLogic
-{
-  func doSomething(request: ViewCalendar.Something.Request)
+protocol ViewCalendarBusinessLogic {
 }
 
-protocol ViewCalendarDataStore
-{
+protocol ViewCalendarDataStore {
   //var name: String { get set }
 }
 
-class ViewCalendarInteractor: ViewCalendarBusinessLogic, ViewCalendarDataStore
-{
+class ViewCalendarInteractor: ViewCalendarBusinessLogic, ViewCalendarDataStore {
   var presenter: ViewCalendarPresentationLogic?
   var worker: ViewCalendarWorker?
-  //var name: String = ""
+
   
-  // MARK: Do something
-  
-  func doSomething(request: ViewCalendar.Something.Request)
-  {
-    worker = ViewCalendarWorker()
-    worker?.doSomeWork()
-    
-    let response = ViewCalendar.Something.Response()
-    presenter?.presentSomething(response: response)
-  }
 }
