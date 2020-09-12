@@ -98,7 +98,8 @@ class EventKitManager: NSObject {
 
     if let calendarIdentifier = UserDefaults.standard.string(forKey: "EventTrackerPrimaryCalendarIdentifier"), let calendar = eventStore.calendar(withIdentifier: calendarIdentifier) {
       let event = EKEvent(eventStore: eventStore)
-      event.title = "ROOTED INVITATION: \(title)"
+//      event.title = "ROOTED EVENT: \(title)"
+      event.title = String(format: kCaptionTitle, arguments: [title])
       event.startDate = startDate
       event.endDate = endDate
       if let loc = location, let name = loc.name, let mapItem = loc.mapItem {
@@ -111,7 +112,8 @@ class EventKitManager: NSObject {
     } else {
       if let calendar = eventStore.defaultCalendarForNewEvents {
         let event = EKEvent(eventStore: eventStore)
-        event.title = "ROOTED INVITATION: \(title)"
+        //      event.title = "ROOTED EVENT: \(title)"
+        event.title = String(format: kCaptionTitle, arguments: [title])
         event.startDate = startDate
         event.endDate = endDate
         if let loc = location, let name = loc.name, let mapItem = loc.mapItem {
@@ -124,7 +126,8 @@ class EventKitManager: NSObject {
       } else {
         let calendar = eventStore.calendars(for: .event).first { $0.type == .calDAV || $0.type == .local }
         let event = EKEvent(eventStore: eventStore)
-        event.title = "ROOTED INVITATION: \(title)"
+        //      event.title = "ROOTED EVENT: \(title)"
+        event.title = String(format: kCaptionTitle, arguments: [title])
         event.startDate = startDate
         event.endDate = endDate
 
@@ -178,7 +181,7 @@ class EventKitManager: NSObject {
     }
 
     for event in events {
-      if let eventTitle = event.title, let meetingName = meeting.meetingName, eventTitle == "ROOTED INVITATION: \(meetingName)" {
+      if let eventTitle = event.title, let meetingName = meeting.meetingName, eventTitle.contains("ROOTED"), eventTitle.contains(meetingName) {
         do {
           try eventStore.remove(event, span: .thisEvent)
           completion(meeting, true, nil)

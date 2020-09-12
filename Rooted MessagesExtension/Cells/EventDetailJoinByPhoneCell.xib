@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="137" id="KGk-i7-Jjw" customClass="EventDetailJoinByPhoneCell" customModule="Rooted_MessagesExtension" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="137"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="137"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aHN-wX-qld">
+                        <rect key="frame" x="16" y="16" width="25" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="25" id="e5P-Cs-5i6"/>
+                            <constraint firstAttribute="height" constant="25" id="vXS-Ax-hq7"/>
+                        </constraints>
+                        <state key="normal" image="phone-auricular-outline"/>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f6g-dd-dHA">
+                        <rect key="frame" x="49" y="16" width="255" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="32" id="kcS-W7-Zas"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" name="AvenirNext-Bold" family="Avenir Next" pointSize="16"/>
+                        <state key="normal" title="Join by phone"/>
+                        <connections>
+                            <action selector="joinByPhoneAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="msJ-L3-8yk"/>
+                        </connections>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Phone number for meeting was not provided" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N9g-sa-H5a">
+                        <rect key="frame" x="49" y="56" width="255" height="54"/>
+                        <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="18"/>
+                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="f6g-dd-dHA" secondAttribute="trailing" constant="16" id="4Lq-3Q-0Hi"/>
+                    <constraint firstItem="f6g-dd-dHA" firstAttribute="leading" secondItem="aHN-wX-qld" secondAttribute="trailing" constant="8" id="6fa-jE-Ad7"/>
+                    <constraint firstItem="N9g-sa-H5a" firstAttribute="leading" secondItem="f6g-dd-dHA" secondAttribute="leading" id="CgN-Gv-Hte"/>
+                    <constraint firstItem="aHN-wX-qld" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="MiO-pV-Z7L"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="N9g-sa-H5a" secondAttribute="bottom" constant="16" id="QRA-hB-gcu"/>
+                    <constraint firstItem="N9g-sa-H5a" firstAttribute="top" secondItem="f6g-dd-dHA" secondAttribute="bottom" constant="8" id="VBV-f8-jRF"/>
+                    <constraint firstItem="aHN-wX-qld" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="xPT-Hy-xHo"/>
+                    <constraint firstItem="f6g-dd-dHA" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="yww-Bi-r2h"/>
+                    <constraint firstItem="N9g-sa-H5a" firstAttribute="trailing" secondItem="f6g-dd-dHA" secondAttribute="trailing" id="zgO-jF-GMB"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="joinByPhoneButton" destination="f6g-dd-dHA" id="EEv-BR-KBD"/>
+                <outlet property="phoneNumberLabel" destination="N9g-sa-H5a" id="un4-GZ-oPv"/>
+            </connections>
+            <point key="canvasLocation" x="137.68115942028987" y="134.93303571428569"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="phone-auricular-outline" width="512" height="512"/>
+    </resources>
+</document>

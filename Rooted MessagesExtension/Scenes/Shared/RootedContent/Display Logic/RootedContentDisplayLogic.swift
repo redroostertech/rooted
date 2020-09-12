@@ -10,6 +10,8 @@ import Foundation
 
 protocol RootedContentDisplayLogic: class {
   func showHUD()
+  func dismissHUD()
+
   func presentPhoneLoginViewController()
 
   func handleBranchIOResponse(viewModel: RootedContent.SetupBranchIO.ViewModel)
@@ -43,10 +45,13 @@ protocol RootedContentDisplayLogic: class {
   func didRefreshSession(viewModel: RootedContent.RefreshSession.ViewModel)
 
   func presentViewCalendar(viewModel: RootedContent.ViewCalendar.ViewModel)
+
+  func onSuccessfulDraftSave(viewModel: RootedContent.SaveMeetingDraft.ViewModel)
 }
 
 extension RootedContentDisplayLogic {
   func showHUD() { }
+  func dismissHUD() { }
   func presentPhoneLoginViewController() { }
 
   func handleBranchIOResponse(viewModel: RootedContent.SetupBranchIO.ViewModel) { }
@@ -80,4 +85,6 @@ extension RootedContentDisplayLogic {
   func didRefreshSession(viewModel: RootedContent.RefreshSession.ViewModel) { }
 
   func presentViewCalendar(viewModel: RootedContent.ViewCalendar.ViewModel) { }
+
+  func onSuccessfulDraftSave(viewModel: RootedContent.SaveMeetingDraft.ViewModel) { }
 }

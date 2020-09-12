@@ -20,7 +20,7 @@ public class MeetingDateClass: Mappable {
   public var endYear, endYearSh: String?
   public var startTime, endTime: Time?
   public var dateString: String?
-  public var startDate, endDate: String?
+  public var startDate, endDate, duration: String?
   public var timeZone: String?
 
   required public init?(map: Map) { }

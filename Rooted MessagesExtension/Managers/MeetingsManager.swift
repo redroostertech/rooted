@@ -100,13 +100,13 @@ class MeetingsManager: NSObject {
 
           if
             // Check if meeting object can be deserialized
-            let meeting = EngagementFactory.Meetings.coreDataToJson(result),
-            // Check that meeting has a start date
-            let _ = meeting.meetingDate?.startDate?.toDate()?.date,
-            // Check that meeting has an end date
-            let endDate = meeting.meetingDate?.endDate?.toDate()?.date,
-            // Check if meeting has an end date greater than today
-            !endDate.timeIntervalSince(Date()).isLess(than: 0) {
+            let meeting = EngagementFactory.Meetings.coreDataToJson(result) {
+//            // Check that meeting has a start date
+//            let _ = meeting.meetingDate?.startDate?.toDate()?.date,
+//            // Check that meeting has an end date
+//            let endDate = meeting.meetingDate?.endDate?.toDate()?.date,
+//            // Check if meeting has an end date greater than today
+//            !endDate.timeIntervalSince(Date()).isLess(than: 0) {
             let meetingWrapper = MeetingContextWrapper(meeting: meeting, managedObject: result)
             self.meetings.append(meetingWrapper)
           }
@@ -248,10 +248,65 @@ class MeetingsManager: NSObject {
     }
   }
 
+  // MARK: - Use Case: Delete a meeting
+  func deleteDraftMeeting(_ managedObject: NSManagedObject) {
+
+    self.delegate?.willDeleteInvite(self)
+
+    // Check if we can convert `NSManagedObject` into a `Meeting` object
+    guard EngagementFactory.Meetings.coreDataToJson(managedObject) != nil, let contextId = managedObject.value(forKey: "id") as? String else {
+      self.delegate?.didFailToLoad(self, error: RError.generalError)
+      return
+    }
+
+    coreDataManager.retrieveMeetingWith(id: contextId, entityName: kEntityMeeting) { (managedObj, error) in
+      if let err = error {
+        self.delegate?.didFailToLoad(self, error: err)
+      } else {
+        guard let managedobj = managedObj?.first else {
+          self.delegate?.didFailToLoad(self, error: RError.generalError)
+          return
+        }
+
+        meetings.removeAll { context -> Bool in
+          if let managedobject = context.managedObject {
+            return managedobject == managedobj
+          }
+          return false
+        }
+
+        self.delete(meeting: managedobj) { (success, error) in
+          if let err = error, success != true {
+            self.delegate?.didFailToLoad(self, error: err)
+          } else {
+            let meetingWrapper = MeetingContextWrapper(meeting: nil, managedObject: managedobj)
+
+            self.retrieveMeetings()
+            
+            self.delegate?.didDeleteInvite(self, invite: meetingWrapper)
+            self.delegate?.didFinishLoading(self, invites: self.meetings)
+          }
+        }
+      }
+    }
+  }
+
   private func delete(meeting: NSManagedObject, _ completion: CoreDataResultsHandler) {
     coreDataManager.delete(object: meeting) { (success, error) in
       completion(success, error)
     }
   }
 
+  // MARK: - Use Case: Delete a meeting
+  func updateMeeting(_ managedObject: NSManagedObject, withValue value: Any, forKey key: String, _ completion: ((Bool, Error?) -> Void)?) {
+
+    managedObject.setValue(value, forKey: key)
+    
+    do {
+      try coreDataManager.managedContext.save()
+      completion?(true, nil)
+    } catch let error {
+      completion?(false, error)
+    }
+  }
 }

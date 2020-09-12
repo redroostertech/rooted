@@ -626,58 +626,7 @@
                     <view key="view" contentMode="scaleToFill" id="lxx-L6-pnY">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RFh-np-7H9">
-                                <rect key="frame" x="0.0" y="609" width="375" height="58"/>
-                                <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Propose New Time" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lgI-R1-Kxi">
-                                        <rect key="frame" x="359" y="8" width="0.0" height="42"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" id="f1M-Wp-OkJ"/>
-                                            <constraint firstAttribute="height" constant="42" id="uc1-QN-RcM"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
-                                        <color key="textColor" red="0.9767052531" green="0.60546392199999999" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XIj-uG-mcv">
-                                        <rect key="frame" x="359" y="8" width="0.0" height="42"/>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bJH-lV-b2B">
-                                        <rect key="frame" x="8" y="8" width="42" height="42"/>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="42" id="OQG-C3-7AT"/>
-                                            <constraint firstAttribute="height" constant="42" id="RRW-4U-kN5"/>
-                                        </constraints>
-                                        <color key="tintColor" cocoaTouchSystemColor="darkTextColor"/>
-                                        <state key="normal" image="arrow-back-icon"/>
-                                        <connections>
-                                            <action selector="back:" destination="zZQ-GW-nC5" eventType="touchUpInside" id="6V6-ro-3YH"/>
-                                            <action selector="back:" destination="5q9-gH-tx0" eventType="touchUpInside" id="SsW-kq-Xci"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstItem="lgI-R1-Kxi" firstAttribute="top" secondItem="RFh-np-7H9" secondAttribute="top" constant="8" id="4iE-gr-9yW"/>
-                                    <constraint firstAttribute="bottom" secondItem="lgI-R1-Kxi" secondAttribute="bottom" constant="8" id="4oX-6e-pAa"/>
-                                    <constraint firstItem="XIj-uG-mcv" firstAttribute="leading" secondItem="lgI-R1-Kxi" secondAttribute="leading" id="7Ph-6b-Reb"/>
-                                    <constraint firstItem="XIj-uG-mcv" firstAttribute="bottom" secondItem="lgI-R1-Kxi" secondAttribute="bottom" id="7ed-6t-FsF"/>
-                                    <constraint firstAttribute="centerY" secondItem="bJH-lV-b2B" secondAttribute="centerY" id="9in-zG-Hl8"/>
-                                    <constraint firstItem="bJH-lV-b2B" firstAttribute="leading" secondItem="RFh-np-7H9" secondAttribute="leading" constant="8" id="Q3S-Og-Los"/>
-                                    <constraint firstItem="XIj-uG-mcv" firstAttribute="trailing" secondItem="lgI-R1-Kxi" secondAttribute="trailing" id="adQ-7F-DAr"/>
-                                    <constraint firstItem="XIj-uG-mcv" firstAttribute="top" secondItem="lgI-R1-Kxi" secondAttribute="top" id="f5j-gq-M3E"/>
-                                    <constraint firstAttribute="trailing" secondItem="lgI-R1-Kxi" secondAttribute="trailing" constant="16" id="jzO-6Q-yOK"/>
-                                </constraints>
-                            </view>
-                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <constraints>
-                            <constraint firstItem="x4Y-lv-1j4" firstAttribute="bottom" secondItem="RFh-np-7H9" secondAttribute="bottom" id="7vO-cT-DKw"/>
-                            <constraint firstItem="RFh-np-7H9" firstAttribute="leading" secondItem="x4Y-lv-1j4" secondAttribute="leading" id="YjG-v2-9IE"/>
-                            <constraint firstItem="RFh-np-7H9" firstAttribute="trailing" secondItem="x4Y-lv-1j4" secondAttribute="trailing" id="gsA-Og-PHl"/>
-                        </constraints>
                         <viewLayoutGuide key="safeArea" id="x4Y-lv-1j4"/>
                     </view>
                 </viewController>

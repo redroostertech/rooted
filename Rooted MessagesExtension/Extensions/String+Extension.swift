@@ -121,7 +121,7 @@ extension String {
     }
 
     var length: Int {
-        return self.count
+        return utf16.count
     }
 
     func equalsIgnoreCase(str:String)->Bool{

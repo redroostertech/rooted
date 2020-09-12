@@ -85,18 +85,7 @@ class EngagementFactory {
     public static func convert(contextWrappers: [MeetingContextWrapper], for menuSelection: Int, withDelegate delegate: RootedCellDelegate?) -> [RootedCollectionViewModel] {
 
       var meetingContextWrappers = [MeetingContextWrapper]()
-
-      switch menuSelection {
-//      case 1:
-//        meetingContextWrappers = contextWrappers.filter { meetingContextWrapper -> Bool in
-//          guard let meeting = meetingContextWrapper.meeting, let dashboardSectionId = meeting.dashboardSectionId else { return false }
-//          return dashboardSectionId == menuSelection
-//        }
-//        break
-      default:
-        meetingContextWrappers = contextWrappers
-        break
-      }
+      meetingContextWrappers = contextWrappers
 
       let rootedCellViewModels: [RootedCellViewModel] = meetingContextWrappers.map { meetingContextWrapper -> RootedCellViewModel in
         let viewModel = RootedCellViewModel(data: meetingContextWrapper.meeting, delegate: delegate)
@@ -104,8 +93,26 @@ class EngagementFactory {
         return viewModel
       }
 
-      return [RootedCollectionViewModel(section: .none, cells: rootedCellViewModels)]
+      switch menuSelection {
+      case 0:
+        return [RootedCollectionViewModel(section: .custom("Upcoming Events"), cells: rootedCellViewModels)]
+      case 1:
+        return [RootedCollectionViewModel(section: .custom("Sent Invites"), cells: rootedCellViewModels)]
+      case 2:
+        return [RootedCollectionViewModel(section: .custom("Invite Drafts"), cells: rootedCellViewModels)]
+      default:
+        return [RootedCollectionViewModel(section: .none, cells: rootedCellViewModels)]
+      }
     }
+
+    public static func convert(viewModels: [RootedCellViewModel], for menuSelection: Int, withDelegate delegate: RootedCellDelegate?) -> [MeetingContextWrapper] {
+        let rootedCellViewModels: [MeetingContextWrapper] = viewModels.map { viewModel -> MeetingContextWrapper in
+          let contextWrapper = MeetingContextWrapper(meeting: viewModel.data, managedObject: viewModel.managedObject)
+          return contextWrapper
+        }
+
+        return rootedCellViewModels
+      }
 
     // MARK: - MeetingResponse
     // Factory methods for quickly creating response objects when a use engages with a `Meeting` object retrieved from a `MSMessage` object

@@ -79,6 +79,7 @@ enum RootedContent {
       var userId: String?
       var contentDB: RootedContentDB = .local
       var meetingManagerDelegate: MeetingsManagerDelegate?
+      var date: Date?
     }
 
     struct Response {
@@ -126,11 +127,17 @@ enum RootedContent {
 
   // MARK: - Use Case: Go to add an meeting view
   enum CreateNewMeeting {
-    struct Request { }
+    struct Request {
+      var draftMeeting: MeetingContextWrapper?
+    }
 
-    struct Response { }
+    struct Response {
+      var draftMeeting: MeetingContextWrapper?
+    }
 
-    struct ViewModel { }
+    struct ViewModel {
+      var draftMeeting: MeetingContextWrapper?
+    }
   }
 
   // MARK: - Use Case: Go to info view
@@ -174,14 +181,17 @@ enum RootedContent {
       var contentDB: RootedContentDB = .local
       var branchEventID = ""
       var saveType: RootedContentManagerType = .none
+      var meetingManagerDelegate: MeetingsManagerDelegate?
     }
 
     struct Response {
       var meeting: Meeting?
+      var contentDB: RootedContentDB = .local
     }
 
     struct ViewModel {
       var meeting: Meeting?
+      var contentDB: RootedContentDB = .local
     }
   }
 
@@ -220,7 +230,7 @@ enum RootedContent {
     }
   }
 
-  // MARK: - Use Case: Delete meeting for user
+  // MARK: - Use Case: Cancel meeting for user
   enum CancelMeeting {
     struct Request {
       var meeting: RootedCellViewModel?
@@ -238,54 +248,26 @@ enum RootedContent {
     }
   }
 
-  // MARK: - Use Case: Retrieve availability for user
-  enum RetrieveAvailability {
+  // MARK: - Use Case: Save meeting
+  enum EditMeeting {
     struct Request {
-      var userId: String?
-      var contentDB: RootedContentDB = .local
-      var availabilityManagerDelegate: AvailabilityManagerDelegate?
-    }
-
-    struct Response {
-
-    }
-
-    struct ViewModel {
-
-    }
-  }
-
-  // MARK: - Use Case: Create availability for user
-  enum SaveAvailability {
-    struct Request {
-      var availability: Availability?
+      var meeting: Meeting?
       var userId: String?
       var contentDB: RootedContentDB = .local
       var branchEventID = ""
       var saveType: RootedContentManagerType = .none
+      var meetingManagerDelegate: MeetingsManagerDelegate?
     }
 
     struct Response {
-      var availability: Availability?
+      var meeting: Meeting?
+      var contentDB: RootedContentDB = .local
     }
 
     struct ViewModel {
-      var availability: Availability?
-    }
-  }
-
-  // MARK: - Use Case: Delete availability for user
-  enum DeleteAvailability {
-    struct Request {
-      var availability: AvailabilityContextWrapper?
-      var userId: String?
+      var meeting: Meeting?
       var contentDB: RootedContentDB = .local
-      var availabilityManagerDelegate: AvailabilityManagerDelegate?
     }
-
-    struct Response { }
-
-    struct ViewModel { }
   }
 
   // MARK: - Use Case: As a user I want to accpet a meeting I receive
@@ -350,4 +332,137 @@ enum RootedContent {
       var meeting: Meeting?
     }
   }
+}
+
+// MARK: - Drafts
+extension RootedContent {
+  // MARK: - Use Case: Retrieve drafts meetings for user
+  enum RetrieveDraftMeetings {
+    struct Request {
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var meetingManagerDelegate: MeetingsManagerDelegate?
+    }
+
+    struct Response {
+      var meetings: [MeetingContextWrapper]?
+    }
+
+    struct ViewModel {
+      var meetings: [MeetingContextWrapper]?
+    }
+  }
+
+  // MARK: - Use Case: Delete draft meeting for user
+  enum DeleteDraftMeeting {
+    struct Request {
+      var meeting: RootedCellViewModel?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var meetingManagerDelegate: MeetingsManagerDelegate?
+      var meetingContext: MeetingContextWrapper?
+    }
+
+    struct Response { }
+
+    struct ViewModel { }
+  }
+
+  // MARK: - Use Case: Save meeting draft
+  enum SaveMeetingDraft {
+    struct Request {
+      var meeting: Meeting?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var branchEventID = ""
+      var saveType: RootedContentManagerType = .none
+      var meetingManagerDelegate: MeetingsManagerDelegate?
+    }
+
+    struct Response {
+      var meeting: Meeting?
+      var contentDB: RootedContentDB = .local
+    }
+
+    struct ViewModel {
+      var meeting: Meeting?
+      var contentDB: RootedContentDB = .local
+    }
+  }
+
+  // MARK: - Use Case: Update draft
+  enum UpdateDraft {
+    struct Request {
+      var meeting: MeetingContextWrapper?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var branchEventID = ""
+      var saveType: RootedContentManagerType = .none
+      var meetingManagerDelegate: MeetingsManagerDelegate?
+    }
+
+    struct Response {
+      var meeting: Meeting?
+      var contentDB: RootedContentDB = .local
+    }
+
+    struct ViewModel {
+      var meeting: Meeting?
+      var contentDB: RootedContentDB = .local
+    }
+  }
+}
+
+// MARK: - Availability
+extension RootedContent {
+  // MARK: - Use Case: Retrieve availability for user
+  enum RetrieveAvailability {
+    struct Request {
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var availabilityManagerDelegate: AvailabilityManagerDelegate?
+    }
+
+    struct Response {
+
+    }
+
+    struct ViewModel {
+
+    }
+  }
+
+  // MARK: - Use Case: Create availability for user
+  enum SaveAvailability {
+    struct Request {
+      var availability: Availability?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var branchEventID = ""
+      var saveType: RootedContentManagerType = .none
+    }
+
+    struct Response {
+      var availability: Availability?
+    }
+
+    struct ViewModel {
+      var availability: Availability?
+    }
+  }
+
+  // MARK: - Use Case: Delete availability for user
+  enum DeleteAvailability {
+    struct Request {
+      var availability: AvailabilityContextWrapper?
+      var userId: String?
+      var contentDB: RootedContentDB = .local
+      var availabilityManagerDelegate: AvailabilityManagerDelegate?
+    }
+
+    struct Response { }
+
+    struct ViewModel { }
+  }
+
 }

@@ -48,7 +48,7 @@ func decodeURL(_ url: URL) {
 //  }
 }
 
-class CreateMeetingViewController: FormMessagesAppViewController, RootedContentDisplayLogic, MFMessageComposeViewControllerDelegate, EPPickerDelegate {
+class CreateMeetingViewController: FormMessagesAppViewController, RootedContentDisplayLogic, MeetingsManagerDelegate {
 
   // MARK: - IBOutlets
   @IBOutlet private weak var sendToFriendsButton: SSSpinnerButton!
@@ -69,14 +69,18 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
   private var eventLength: MeetingTimeLength?
   private var endDate: Date?
   private var selectedLocation: String?
-
-  var invites: [NSManagedObject] = []
+  private var draftTimer: Timer?
 
   private var startDatePicker = WWCalendarTimeSelector.instantiate()
   private var endDatePicker = WWCalendarTimeSelector.instantiate()
 
   private var searchCompleter = MKLocalSearchCompleter()
   private var searchResults = [MKLocalSearchCompletionWrapper]()
+
+  public var draftMeeting: RootedCellViewModel?
+  private var invites: [NSManagedObject] = []
+
+  private var isDeletingDraft = false
 
   // Computed Properties
   private var meetingTime: [MeetingTimeLength] {
@@ -89,12 +93,32 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
     return meetingTimeArray
   }
 
+  private var contactsForInvite = [EPContact]() {
+     didSet {
+       if self.contactsForInvite.count > 0 {
+         self.start()
+       } else {
+         if let invitePhoneRow = form.rowBy(tag: "meeting_invite_phone_numbers") as? TokenTableRow<EPContact> {
+           invitePhoneRow.value = Set<EPContact>()
+           invitePhoneRow.reload()
+         }
+       }
+     }
+   }
+
   // MARK: - Lifecycle methods
   static func setupViewController(meetingDate: MeetingDateClass) -> CreateMeetingViewController {
     let storyboard = UIStoryboard(name: kStoryboardMain, bundle: nil)
     let viewController = storyboard.instantiateViewController(withIdentifier: "MessagesViewController") as! CreateMeetingViewController
     viewController.startDate = meetingDate.startDate?.toDate()?.date
     viewController.endDate = meetingDate.endDate?.toDate()?.date
+    return viewController
+  }
+
+  static func setupViewController(draftMeeting: RootedCellViewModel?) -> CreateMeetingViewController {
+    let storyboard = UIStoryboard(name: kStoryboardMain, bundle: nil)
+    let viewController = storyboard.instantiateViewController(withIdentifier: "MessagesViewController") as! CreateMeetingViewController
+    viewController.draftMeeting = draftMeeting
     return viewController
   }
 
@@ -135,7 +159,15 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
     super.viewWillDisappear(animated)
     DispatchQueue.main.async {
       self.navigationController?.setNavigationBarHidden(false, animated: animated)
+      self.saveDraft()
     }
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    postNotification(withName: kNotificationMyInvitesReload, completion: {
+      // Perform some work here
+    })
   }
 
   override func keyboardWillShow(_ notification:Notification) {
@@ -163,7 +195,7 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: NSNotification.Name.init(rawValue: kNotificationKeyboardWillShowNotification), object: nil)
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: NSNotification.Name.init(rawValue: kNotificationKeyboardWillHideNotification), object: nil)
-   }
+  }
 
   private func setupCreateMeetingButton() {
     actionsContainerView.sendSubviewToBack(createMeetingButton)
@@ -186,39 +218,74 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
             }
             $0.add(rule: ruleRequiredViaClosure)
             $0.validationOptions = .validatesOnChange
-            }.cellUpdate { cell, row in
+          }.cellSetup{ [weak self] (cell, row) in
+            if let meetingName = self?.draftMeeting?.data?.meetingName {
+              row.value = meetingName
+            }
+          }.cellUpdate { [weak self] cell, row in
               if !row.isValid {
                 cell.titleLabel?.textColor = .red
               } else {
                 // TODO: - When working on drafting feature, use this to update draft
                 guard let value = row.value else { return }
                 // Set the name of the meeting
-                self.meetingBuilder = self.meetingBuilder.add(key: "meeting_name", value: value)
+                guard let meetingbuilder = self?.meetingBuilder.add(key: "meeting_name", value: value) else { return }
+                self?.meetingBuilder = meetingbuilder
               }
             }
 
           +++ Section(header: "Where?", footer: "Use this optional field to provide a location for your in-person event.")
           <<< LabelRow() {
             $0.tag = "event_label"
-            $0.hidden = .function(["meeting_location"], { form -> Bool in
-              if let row = form.rowBy(tag: "meeting_location") as? LocationSearchRow {
-                if let labelRow = form.rowBy(tag: "event_label") as? LabelRow, let rowValue = row.value {
-                  self.selectedLocation = rowValue.rLocation?.toJSONString() ?? ""
-                  labelRow.title = rowValue.suggestionString 
-                  labelRow.updateCell()
-                }
-                return row.value == nil
-              } else {
-                return true
-              }
-            })
+            $0.title = "Location for Meeting"
+            $0.titleColor = .lightGray
+          }.cellSetup { [weak self] (cell, row) in
+            if let meetingLocation = self?.draftMeeting?.data?.meetingLocation {
+              row.title = meetingLocation.readableWhereString
+            }
           }
           <<< LocationSearchRow() {
             $0.tag = "meeting_location"
-            $0.title = "Set Address for In-Person Meeting"
-            }.onChange { row in
+            $0.title = "Search"
+          }.cellSetup { [weak self] (cell, row) in
+            if let meetingLocation = self?.draftMeeting?.data?.meetingLocation, let meetingLocationString = meetingLocation.toJSONString() {
+              self?.selectedLocation = meetingLocationString
+            }
+          }.onChange { [weak self] row in
               if let rLocation = row.value?.rLocation, let rLocationString = rLocation.toJSONString() {
-                self.selectedLocation = rLocationString
+                self?.selectedLocation = rLocationString
+
+                if let labelRow = self?.form.rowBy(tag: "event_label") as? LabelRow {
+                  labelRow.title = rLocation.readableWhereString
+                  labelRow.updateCell()
+                }
+
+                row.value = nil
+                row.updateCell()
+              }
+          }
+          <<< ButtonRow() {
+            $0.tag = "remove_location_button"
+            $0.title = "Remove Location"
+            $0.disabled = .function(["meeting_location"], { form -> Bool in
+              return self.selectedLocation == nil
+            })
+            }.cellSetup { [weak self] (cell, row) in
+              if let meetingLocation = self?.draftMeeting?.data?.meetingLocation, let _ = meetingLocation.toJSONString() {
+                row.disabled = false
+              }
+            }.cellUpdate { cell, row in
+              cell.textLabel?.textAlignment = .center
+              cell.textLabel?.textColor = .red
+            }.onCellSelection { [weak self] (cell, row) in
+              self?.selectedLocation = nil
+              if let labelRow = self?.form.rowBy(tag: "event_label") as? LabelRow {
+                labelRow.title = "Location for Meeting"
+                labelRow.updateCell()
+              }
+              if let locationSearchRow = self?.form.rowBy(tag: "meeting_location") as? LocationSearchRow {
+                locationSearchRow.value = nil
+                locationSearchRow.updateCell()
               }
           }
 
@@ -226,7 +293,15 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
           <<< PhoneRow() {
             $0.tag = "type_of_meeting_phone"
             $0.title = "Phone Call"
-        }
+          }.cellSetup { [weak self] (cell, row) in
+            if
+              let meetingType = self?.draftMeeting?.data?.meetingType?.first,
+              let typeOfMeeting = meetingType.typeOfMeeting,
+              typeOfMeeting == "type_of_meeting_phone",
+              let meetingMeta = meetingType.meetingMeta {
+              row.value = meetingMeta
+            }
+          }
           <<< URLRow() {
             $0.tag = "type_of_meeting_video"
             $0.title = "*Web Conference (URL)"
@@ -237,6 +312,11 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
           <<< ButtonRow() {
             $0.tag = "start_date"
             $0.title = "Start Date/Time"
+            }.cellSetup { [weak self] (cell, row) in
+              if let meetingDateString = self?.draftMeeting?.data?.meetingDate?.dateString {
+                row.value = meetingDateString
+                row.title = meetingDateString
+              }
             }.cellUpdate { cell, row in
               cell.textLabel?.textAlignment = .left
               cell.textLabel?.textColor = .darkText
@@ -373,6 +453,10 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
           +++ Section(header:"Description", footer: "Use this optional field to provide a description of your event. The circled text in the screen shot below is the event description.")
           <<< TextAreaRow("meeting_description") {
             $0.textAreaHeight = .dynamic(initialTextViewHeight: 75)
+        }.cellSetup { [weak self] (cell, row) in
+          if let meetingDescription = self?.draftMeeting?.data?.meetingDescription {
+            row.value = meetingDescription
+          }
         }
 
       +++ MultivaluedSection(multivaluedOptions: [.Reorder, .Insert, .Delete],
@@ -428,6 +512,19 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
       }
 
     +++ Section()
+
+    if let meetingAgendaItems = draftMeeting?.data?.agendaItems, var section = form.sectionBy(tag: "agenda_items") as? MultivaluedSection {
+      var count = 0
+      for agendaItem in meetingAgendaItems {
+        if let agendaItemName = agendaItem.itemName {
+          let row = NameRow(agendaItemName, { labelRow in
+            labelRow.value = agendaItemName
+          })
+          section.insert(row, at: count)
+          count += 1
+        }
+      }
+    }
   }
 
   // MARK: - Use Case: Start animating button
@@ -447,23 +544,21 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
   // MARK: - IBActions
   // MARK: - Use Case: When a user taps on the `sendToFriendsButton` we want to first save the event to local storage, then add it to the calendar, and then send it to the conversation
   @IBAction func sendToFriends(_ sender: UIButton) {
+    startAnimatingButton()
     BranchEvent.customEvent(withName: "user_started_save")
     checkMaximumMeetingsReached()
   }
 
-  private func generateMeetingFromInput() {
-    startAnimatingButton()
-
+  private func generateMeetingFromForm() -> Meeting? {
     // Check if start time exists
-    if let eventlength = eventLength?.length, let startdate = meetingBuilder.retrieve(forKey: "start_date") as? Date {
-      guard let value = startdate.add(minutes: eventlength) else { return }
-      self.meetingBuilder = self.meetingBuilder.add(key: "end_date", value: value)
-    }
-
-    if eventLength == nil, let startdate = meetingBuilder.retrieve(forKey: "start_date") as? Date {
-      // Default selection to 1 hour
-      guard let value = startdate.add(minutes: 60) else { return }
-      self.meetingBuilder = self.meetingBuilder.add(key: "end_date", value: value)
+    if let eventlength = eventLength?.length {
+      if let startdate = meetingBuilder.retrieve(forKey: "start_date") as? Date, let value = startdate.add(minutes: eventlength) {
+        self.meetingBuilder = self.meetingBuilder.add(key: "end_date", value: value)
+      }
+    } else {
+      if let startdate = meetingBuilder.retrieve(forKey: "start_date") as? Date, let value = startdate.add(minutes: 60) {
+        self.meetingBuilder = self.meetingBuilder.add(key: "end_date", value: value)
+      }
     }
 
     // Check timeZone
@@ -542,15 +637,21 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
       self.meetingBuilder = self.meetingBuilder.add(key: "is_invite_enabled_for_invitees", value: isMeetingPublic)
     }
 
-    guard let _ = meetingBuilder.retrieve(forKey: "meeting_name") as? String,
-      let _ = meetingBuilder.retrieve(forKey: "start_date") as? Date,
-      let _ = meetingBuilder.retrieve(forKey: "end_date") as? Date,
-      let meeting = meetingBuilder.generateMeeting().meeting else {
-
-        self.displayFailure(with: "Oops!", and: "Please fill out the entire form to create an invite.", afterAnimating: self.sendToFriendsButton)
-
-      return
+    guard let meeting = meetingBuilder.generateMeeting().meeting, let meetingName = meeting.meetingName, meetingName != "" else {
+      return nil
     }
+    return meeting
+  }
+
+  private func generateMeetingFromInput() {
+    guard let meeting = generateMeetingFromForm(), let _ = meeting.meetingDate?.startDate, let _ = meeting.meetingDate?.endDate else {
+      return self.displayFailure(with: "Oops!", and: "Please fill out the entire form to create an invite.", afterAnimating: self.sendToFriendsButton)
+    }
+
+    if let draftMeetingId = draftMeeting?.data?.id {
+      meeting.id = draftMeetingId
+    }
+
     addMeetingToCalendar(meeting: meeting)
   }
 
@@ -568,6 +669,8 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
   // MARK: - Use Case: Save meeting to datastore
   func saveMeeting(meeting: Meeting) {
+    isDeletingDraft = true
+
     var request = RootedContent.SaveMeeting.Request()
     request.meeting = meeting
     request.branchEventID = kBranchMeetingStartedSave
@@ -578,13 +681,48 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
 
   func onSuccessfulSave(viewModel: RootedContent.SaveMeeting.ViewModel) {
     guard let meeting = viewModel.meeting else { return }
-    sendResponse(to: meeting)
+    switch viewModel.contentDB {
+    case .remote:
+      self.sendResponse(to: meeting)
+    case .local:
+      print("Saved to draft. Wait for delegate to pass back core data object")
+    }
   }
 
   func handleError(viewModel: RootedContent.DisplayError.ViewModel) {
     displayFailure(with: viewModel.errorTitle, and: viewModel.errorMessage, afterAnimating: sendToFriendsButton)
     if let meeting = viewModel.meeting {
       removeFromCalendar(meeting)
+    }
+  }
+
+  // MARK: - Use Case: Save event drafts
+  func saveDraft() {
+    guard let meeting = generateMeetingFromForm() else {
+      RRLogger.log(message: "Couldn't create meeting to start a draft", owner: self)
+      return
+    }
+
+    if let draftMeetingId = draftMeeting?.data?.id {
+      meeting.id = draftMeetingId
+    }
+
+    guard isDeletingDraft == false else { return }
+    var request = RootedContent.SaveMeetingDraft.Request()
+    request.contentDB = .remote
+    request.meeting = meeting
+    request.saveType = .send
+    request.meetingManagerDelegate = self
+    interactor?.saveMeetingDraft(request: request)
+  }
+
+  func onSuccessfulDraftSave(viewModel: RootedContent.SaveMeetingDraft.ViewModel) {
+    guard let meeting = viewModel.meeting else { return }
+    switch viewModel.contentDB {
+    case .remote:
+      self.draftMeeting?.data = meeting
+    case .local:
+      print("Saved to draft. Wait for delegate to pass back core data object")
     }
   }
 
@@ -646,37 +784,30 @@ class CreateMeetingViewController: FormMessagesAppViewController, RootedContentD
     }
   }
 
-  //  Primary delegate functions
-  func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
-      switch result {
-      case .cancelled:
-        controller.dismiss(animated: true, completion: nil)
-        self.dismissView()
-      case .failed, .sent:
-        controller.dismiss(animated: true, completion: nil)
-        self.dismissView()
-      }
-  }
-
   // MARK: - Use Case: Notify user that message was copied to clipboard
 
   @IBAction func cancelAction(_ sender: UIButton) {
     dismissView()
   }
+}
 
-  var contactsForInvite = [EPContact]() {
-    didSet {
-      if self.contactsForInvite.count > 0 {
-        self.start()
-      } else {
-        if let invitePhoneRow = form.rowBy(tag: "meeting_invite_phone_numbers") as? TokenTableRow<EPContact> {
-          invitePhoneRow.value = Set<EPContact>()
-          invitePhoneRow.reload()
-        }
-      }
-    }
+// MARK: - MFMessageComposeViewControllerDelegate
+extension CreateMeetingViewController: MFMessageComposeViewControllerDelegate {
+  //  Primary delegate functions
+  func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+   switch result {
+   case .cancelled:
+     controller.dismiss(animated: true, completion: nil)
+     self.dismissView()
+   case .failed, .sent:
+     controller.dismiss(animated: true, completion: nil)
+     self.dismissView()
+   }
   }
+}
 
+// MARK: - EPPickerDelegate
+extension CreateMeetingViewController: EPPickerDelegate {
   func epContactPicker(_: EPContactsPicker, didContactFetchFailed error : NSError) { }
 
   func epContactPicker(_: EPContactsPicker, didCancel error : NSError) { }
@@ -797,7 +928,7 @@ extension CreateMeetingViewController: WWCalendarTimeSelectorProtocol {
   }
 }
 
-// Reusable components
+// MARK: - Reusable components
 extension CreateMeetingViewController {
   // MARK: - Use Case: Show ProgressHUD
   func showHUD() {

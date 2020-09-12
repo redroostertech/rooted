@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="86" id="KGk-i7-Jjw" customClass="EventDetailTimeCell" customModule="Rooted_MessagesExtension" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="86"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="86"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XWt-J4-egg">
+                        <rect key="frame" x="16" y="16" width="25" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="25" id="6eB-He-eEc"/>
+                            <constraint firstAttribute="height" constant="25" id="WNP-fg-FKx"/>
+                        </constraints>
+                        <state key="normal" image="event-weekly-calendar-symbol"/>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Today" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eLG-4c-k7d">
+                        <rect key="frame" x="49" y="16" width="255" height="24"/>
+                        <fontDescription key="fontDescription" name="Futura-Bold" family="Futura" pointSize="18"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time of event" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GYX-Ql-Baw">
+                        <rect key="frame" x="49" y="48" width="255" height="22"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="22" id="vP9-1l-UBC"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="12"/>
+                        <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="GYX-Ql-Baw" secondAttribute="bottom" constant="16" id="CJf-om-vcL"/>
+                    <constraint firstItem="XWt-J4-egg" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="LjG-Jb-Cvn"/>
+                    <constraint firstItem="XWt-J4-egg" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="XUR-j5-nd6"/>
+                    <constraint firstItem="eLG-4c-k7d" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="a05-kP-KHO"/>
+                    <constraint firstItem="GYX-Ql-Baw" firstAttribute="leading" secondItem="eLG-4c-k7d" secondAttribute="leading" id="ghu-44-RU3"/>
+                    <constraint firstItem="GYX-Ql-Baw" firstAttribute="trailing" secondItem="eLG-4c-k7d" secondAttribute="trailing" id="n0C-gC-KKX"/>
+                    <constraint firstAttribute="trailing" secondItem="eLG-4c-k7d" secondAttribute="trailing" constant="16" id="tGM-7w-aFw"/>
+                    <constraint firstItem="eLG-4c-k7d" firstAttribute="leading" secondItem="XWt-J4-egg" secondAttribute="trailing" constant="8" id="vC1-gA-BmX"/>
+                    <constraint firstItem="GYX-Ql-Baw" firstAttribute="top" secondItem="eLG-4c-k7d" secondAttribute="bottom" constant="8" id="yRi-sg-qmX"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="timeLabel" destination="GYX-Ql-Baw" id="EoT-K2-E9b"/>
+                <outlet property="whenLabel" destination="eLG-4c-k7d" id="l5D-JU-eiA"/>
+            </connections>
+            <point key="canvasLocation" x="128.98550724637681" y="119.86607142857142"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="event-weekly-calendar-symbol" width="512" height="512"/>
+    </resources>
+</document>

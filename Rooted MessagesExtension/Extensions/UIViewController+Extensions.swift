@@ -86,10 +86,10 @@ public extension UIViewController {
 
   }
 
-  func setBackNavigationButton(_ target: Any?, selector: Selector) {
+  func setBackNavigationButton(_ target: Any?, selector: Selector, textColor: UIColor = .darkText) {
     // TODO: - Create a configuration model for the ContentView of the UIButton component
     let navigationBarButtonImageViewModel = NavigationBarButtonImageViewModel(imageString: kBackText.lowercased(), edgeInsets: UIEdgeInsets(top: .zero, left: -7.0, bottom: .zero, right: -6.0))
-    let navigationBarButtonViewModel = NavigationBarButtonViewModel(title: kBackText, tintColor: .darkText, action: selector, image: navigationBarButtonImageViewModel, target: target, navigationBarAlignment: 1, origin: .zero, size: CGSize(width: 75, height: 32), hAlignment: .left)
+    let navigationBarButtonViewModel = NavigationBarButtonViewModel(title: kBackText, tintColor: textColor, action: selector, image: navigationBarButtonImageViewModel, target: target, navigationBarAlignment: 1, origin: .zero, size: CGSize(width: 75, height: 32), hAlignment: .left)
     let _ = setupNavigationBarButton(viewModel: navigationBarButtonViewModel)
   }
 
@@ -128,7 +128,8 @@ public extension UIViewController {
   }
 
   func setupNavigationBarButton(title: String, tintColor: UIColor, action: Selector?, image: String? = nil, target: Any?, side: Int = 0) -> UIBarButtonItem? {
-    let button = UIButton(frame: CGRect(x: 0.0, y: 0.0, width: 50, height: 32))
+    let button = UIButton(type: .system)
+    button.frame = CGRect(x: 0.0, y: 0.0, width: 50, height: 32)
     button.accessibilityIdentifier = title.lowercased()
 
     // TODO: - Add edge insets configuration here
@@ -150,10 +151,23 @@ public extension UIViewController {
     if let btn = button, (self.navigationController != nil) {
       let barButton = UIBarButtonItem(customView: btn)
       if side == 0 {
-        self.navigationItem.rightBarButtonItem = barButton
+        if
+          let rightBarButtonItems = self.navigationItem.rightBarButtonItems,
+          rightBarButtonItems.count > 0 {
+          self.navigationItem.rightBarButtonItems?.append(barButton)
+        } else {
+          self.navigationItem.rightBarButtonItem = barButton
+        }
       }
       if side == 1 {
         self.navigationItem.leftBarButtonItem = barButton
+        if
+          let leftBarButtonItems = self.navigationItem.leftBarButtonItems,
+          leftBarButtonItems.count > 0 {
+          self.navigationItem.leftBarButtonItems?.append(barButton)
+        } else {
+          self.navigationItem.leftBarButtonItem = barButton
+        }
       }
       return barButton
     }

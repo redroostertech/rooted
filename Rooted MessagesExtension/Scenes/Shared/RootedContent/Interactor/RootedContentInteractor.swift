@@ -37,6 +37,11 @@ protocol RootedContentBusinessLogic: class {
   func declineMeeting(request: RootedContent.DeclineMeeting.Request)
   func refreshSession(request: RootedContent.RefreshSession.Request)
   func goToViewCalendar(request: RootedContent.ViewCalendar.Request)
+  func editMeeting(request: RootedContent.EditMeeting.Request)
+  func retrieveMeetingDrafts(request: RootedContent.RetrieveDraftMeetings.Request)
+  func saveMeetingDraft(request: RootedContent.SaveMeetingDraft.Request)
+  func updateMeetingDraft(request: RootedContent.UpdateDraft.Request)
+  func deleteMeetingDraft(request: RootedContent.DeleteDraftMeeting.Request)
 }
 
 protocol RootedContentDataStore {
@@ -45,6 +50,7 @@ protocol RootedContentDataStore {
 }
 
 class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStore {
+
   // MARK: - Presenter
   var presenter: RootedContentPresentationLogic?
 
@@ -143,7 +149,8 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
       let path = PathBuilder.build(.Test, in: .Core, with: "eggman")
       let params: [String: String] = [
         "action": "retrieve_upcoming_meetings_for_user",
-        "uid": userId
+        "uid": userId,
+        "date": request.date == nil ? Date().toString() : request.date!.toString()
       ]
       let apiService = Api()
       apiService.performRequest(path: path,
@@ -289,7 +296,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
     case .remote:
       let path = PathBuilder.build(.Test, in: .Core, with: "eggman")
       let params: [String: String] = [
-        "action": "retrieve_meetings_for_user",
+        "action": "retrieve_sent_meetings_for_user",
         "uid": userId
       ]
       let apiService = Api()
@@ -360,7 +367,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
       return
     }
 
-    guard let meeting = request.meeting?.data, let meetingId = meeting.id, let ownerId = meeting.ownerId else {
+    guard let meeting = request.meeting?.data, let meetingId = meeting.id, let _ = meeting.ownerId else {
       var response = RootedContent.DisplayError.Response()
       response.errorMessage = "Something went wrong. Please try again."
       self.presenter?.handleError(response: response)
@@ -418,9 +425,9 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
                                   }
       }
     default:
-      guard let meeting = request.meeting?.managedObject else { return }
+      guard let managedObject = request.meeting?.managedObject else { return }
       meetingsManager.delegate = request.meetingManagerDelegate
-      meetingsManager.deleteMeeting(meeting)
+      meetingsManager.deleteMeeting(managedObject)
     }
   }
 
@@ -523,7 +530,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
     }
   }
 
-  // MARK: - Use Case: As a user, when I create a meeting, I want to do the following:
+  // MARK: - Use Case: As a user, when I create a meeting, I want to save it
   func saveMeeting(request: RootedContent.SaveMeeting.Request) {
     guard SessionManager.shared.sessionExists, let _ = SessionManager.shared.currentUser?.uid else {
       self.presenter?.onPresentPhoneLoginViewController()
@@ -591,10 +598,8 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
                                       if let _ = resultsDict["data"] as? [String: Any] {
                                         var response = RootedContent.SaveMeeting.Response()
                                         response.meeting = meeting
-
-                                        // Refresh removed meeting
+                                        response.contentDB = request.contentDB
                                         SessionManager.refreshSession()
-
                                         self.presenter?.onSuccessfulSave(response: response)
                                       } else {
                                         var error = RootedContent.DisplayError.Response()
@@ -613,6 +618,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
                                   }
       }
       default:
+      self.meetingsManager.delegate = request.meetingManagerDelegate
       self.meetingsManager.createInvite(meeting) { (success, error) in
         if let err = error {
           var response = RootedContent.DisplayError.Response()
@@ -622,6 +628,7 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
           if success {
             var response = RootedContent.SaveMeeting.Response()
             response.meeting = meeting
+            response.contentDB = request.contentDB
             self.presenter?.onSuccessfulSave(response: response)
           } else {
             var response = RootedContent.DisplayError.Response()
@@ -881,7 +888,307 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
     }
   }
 
-  // MARK: - Navigation
+  // MARK: - Use Case: As a user I want to edit a meeting
+  func editMeeting(request: RootedContent.EditMeeting.Request) {
+
+  }
+}
+
+// MARK: - Drafts
+extension RootedContentInteractor {
+  // MARK: - Use Case: Retrieve draft meetings created by user
+  func retrieveMeetingDrafts(request: RootedContent.RetrieveDraftMeetings.Request) {
+    guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
+    switch request.contentDB {
+    case .remote:
+      let path = PathBuilder.build(.Test, in: .Core, with: "eggman")
+      let params: [String: String] = [
+        "action": "retrieve_meeting_drafts_for_user",
+        "uid": userId
+      ]
+      let apiService = Api()
+      apiService.performRequest(path: path,
+                                method: .post,
+                                parameters: params) { (results, error) in
+
+                                  guard error == nil else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  guard let resultsDict = results as? [String: Any] else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                  if let success = resultsDict["success"] as? Bool {
+                                    if success {
+                                      if let data = resultsDict["data"] as? [String: Any] {
+                                        var response = RootedContent.RetrieveMeetings.Response()
+                                        response.meetings = (data["meetings"] as? [[String: Any]]).map({ dicts -> [MeetingContextWrapper] in
+                                          var array = [MeetingContextWrapper]()
+                                          for dict in dicts {
+                                            if let meeting = Meeting(JSON: dict) {
+                                              let meetingWrapper = MeetingContextWrapper(meeting: meeting, managedObject: nil)
+                                              array.append(meetingWrapper)
+                                            }
+                                          }
+
+                                          return array
+                                        }) ?? [MeetingContextWrapper]()
+
+                                        // Refresh removed meeting
+                                        SessionManager.refreshSession()
+
+                                        self.presenter?.onDidFinishLoading(response: response)
+                                      } else {
+                                        var error = RootedContent.DisplayError.Response()
+                                        error.errorMessage = "No data is available."
+                                        self.presenter?.handleError(response: error)
+                                      }
+                                    } else {
+                                      var error = RootedContent.DisplayError.Response()
+                                      error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
+                                      self.presenter?.handleError(response: error)
+                                    }
+                                  }
+      }
+    default:
+      self.meetingsManager.delegate = request.meetingManagerDelegate
+      self.meetingsManager.retrieveMeetings()
+    }
+  }
+
+  // MARK: - Use Case: As a user, I want to be able to delete a draft meeting
+  func deleteMeetingDraft(request: RootedContent.DeleteDraftMeeting.Request) {
+    guard SessionManager.shared.sessionExists, let userId = SessionManager.shared.currentUser?.uid else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
+    guard let meeting = request.meeting?.data, let meetingId = meeting.id, let _ = meeting.ownerId else {
+      var response = RootedContent.DisplayError.Response()
+      response.errorMessage = "Something went wrong. Please try again."
+      self.presenter?.handleError(response: response)
+      return
+    }
+
+    branchWorker.customEvent(withName: kBranchMeetingDeleteMeeting)
+    switch request.contentDB {
+    case .remote:
+      let path = PathBuilder.build(.Test, in: .Core, with: "eggman")
+      let params: [String: String] = [
+        "action": "delete_meeting",
+        "meeting_id": meetingId,
+        "owner_id": userId
+      ]
+      let apiService = Api()
+      apiService.performRequest(path: path,
+                                method: .post,
+                                parameters: params) { (results, error) in
+
+                                  guard error == nil else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  guard let resultsDict = results as? [String: Any] else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                  if let success = resultsDict["success"] as? Bool {
+                                    if success {
+
+                                      var response = RootedContent.DeleteMeeting.Response()
+                                      response.meeting = request.meeting
+
+                                      // Refresh removed meeting
+                                      SessionManager.refreshSession()
+
+                                      self.presenter?.onDidDeleteMeeting(response: response)
+
+                                    } else {
+                                      var error = RootedContent.DisplayError.Response()
+                                      error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
+                                      self.presenter?.handleError(response: error)
+                                    }
+                                  }
+      }
+    default:
+      guard let meetingContext = request.meetingContext, let managedObject = meetingContext.managedObject else {
+        var response = RootedContent.DisplayError.Response()
+        response.errorMessage = "Something went wrong. Please try again."
+        self.presenter?.handleError(response: response)
+        return
+      }
+
+      branchWorker.customEvent(withName: kBranchMeetingDeleteMeeting)
+      meetingsManager.delegate = request.meetingManagerDelegate
+      meetingsManager.deleteDraftMeeting(managedObject)
+    }
+  }
+
+  // MARK: - Use Case: As a user I want to edit a draft meeting
+  func updateMeetingDraft(request: RootedContent.UpdateDraft.Request) {
+    guard SessionManager.shared.sessionExists else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
+    guard let calendarAccessGranted = isCalendarPermissionGranted, calendarAccessGranted else {
+      let request = RootedContent.CheckCalendarPermissions.Request()
+      self.checkCalendarPermissions(request: request)
+      return
+    }
+
+    guard let managedObject = request.meeting?.managedObject, let meetingJson = request.meeting?.meeting?.toJSONString() else {
+      var response = RootedContent.DisplayError.Response()
+      response.errorMessage = "Something went wrong. Please try again."
+      self.presenter?.handleError(response: response)
+      return
+    }
+    meetingsManager.updateMeeting(managedObject, withValue: meetingJson, forKey: "object") { (success, error) in
+      RRLogger.log(message: "Updating meeting \(String(describing: managedObject.value(forKey: "object")))", owner: self)
+    }
+  }
+
+  // MARK: - Use Case: As a user, when I create a draft meeting, I want to save it
+  func saveMeetingDraft(request: RootedContent.SaveMeetingDraft.Request) {
+    guard SessionManager.shared.sessionExists, let _ = SessionManager.shared.currentUser?.uid else {
+      self.presenter?.onPresentPhoneLoginViewController()
+      return
+    }
+
+    guard let calendarAccessGranted = isCalendarPermissionGranted, calendarAccessGranted else {
+      let request = RootedContent.CheckCalendarPermissions.Request()
+      self.checkCalendarPermissions(request: request)
+      return
+    }
+
+    guard let meeting = request.meeting, let _ = meeting.id else {
+      var response = RootedContent.DisplayError.Response()
+      response.errorMessage = "Something went wrong. Please try again."
+      self.presenter?.handleError(response: response)
+      return
+    }
+
+    switch request.saveType {
+    case .receive:
+      meeting.dashboardSectionId = 0
+    case .send:
+      meeting.dashboardSectionId = 1
+    default:
+      meeting.dashboardSectionId = 2
+    }
+    branchWorker.customEvent(withName: request.branchEventID)
+    switch request.contentDB {
+    case .remote:
+      let path = PathBuilder.build(.Test, in: .Core, with: "eggman")
+      let params: [String: Any] = [
+        "action": "save_draft",
+        "data": meeting.toJSONString()!,
+      ]
+      let apiService = Api()
+      apiService.performRequest(path: path,
+                                method: .post,
+                                parameters: params) { (results, error) in
+
+                                  guard error == nil else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    error.errorTitle = "Oops!"
+                                    error.meeting = meeting
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  guard let resultsDict = results as? [String: Any] else {
+                                    RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                    var error = RootedContent.DisplayError.Response()
+                                    error.errorMessage = "Something went wrong. Please try again."
+                                    error.errorTitle = "Oops!"
+                                    error.meeting = meeting
+                                    self.presenter?.handleError(response: error)
+                                    return
+                                  }
+
+                                  RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                  if let success = resultsDict["success"] as? Bool {
+                                    if success {
+                                      if let _ = resultsDict["data"] as? [String: Any] {
+                                        var response = RootedContent.SaveMeetingDraft.Response()
+                                        response.meeting = meeting
+                                        response.contentDB = request.contentDB
+
+                                        // Refresh removed meeting
+                                        SessionManager.refreshSession()
+
+                                        self.presenter?.onSuccessfulDraftSave(response: response)
+                                      } else {
+                                        var error = RootedContent.DisplayError.Response()
+                                        error.errorMessage = "Something went wrong. Please try again."
+                                        error.errorTitle = "Oops!"
+                                        error.meeting = meeting
+                                        self.presenter?.handleError(response: error)
+                                      }
+                                    } else {
+                                      var error = RootedContent.DisplayError.Response()
+                                      error.errorMessage = resultsDict["error_message"] as? String ?? "Something went wrong. Please try again."
+                                      error.errorTitle = "Oops!"
+                                      error.meeting = meeting
+                                      self.presenter?.handleError(response: error)
+                                    }
+                                  }
+      }
+      default:
+      self.meetingsManager.delegate = request.meetingManagerDelegate
+      self.meetingsManager.createInvite(meeting) { (success, error) in
+        if let err = error {
+          var response = RootedContent.DisplayError.Response()
+          response.errorMessage = self.retrieveErrorMessage(err)
+          self.presenter?.handleError(response: response)
+        } else {
+          if success {
+            var response = RootedContent.SaveMeeting.Response()
+            response.meeting = meeting
+            response.contentDB = request.contentDB
+            self.presenter?.onSuccessfulSave(response: response)
+          } else {
+            var response = RootedContent.DisplayError.Response()
+            response.errorMessage = "Something went wrong. Please try again."
+            self.presenter?.handleError(response: response)
+          }
+        }
+      }
+    }
+  }
+}
+
+// MARK: - Navigation
+extension RootedContentInteractor {
   // MARK: - Use Case: Go to add an meeting view
   func goToCreateNewMeetingView(request: RootedContent.CreateNewMeeting.Request) {
     guard SessionManager.shared.sessionExists else {
@@ -895,7 +1202,8 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
       return
     }
 
-    let response = RootedContent.CreateNewMeeting.Response()
+    var response = RootedContent.CreateNewMeeting.Response()
+    response.draftMeeting = request.draftMeeting
     self.presenter?.presentCreateNewMeetingView(response: response)
   }
 

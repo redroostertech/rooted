@@ -26,4 +26,8 @@ public class RootedCellViewModel {
     configurableCellType = cellType
     internalCellConfiguration = configuration
   }
+
+  public var contextWrapper: MeetingContextWrapper {
+    return MeetingContextWrapper(meeting: data, managedObject: managedObject)
+  }
 }

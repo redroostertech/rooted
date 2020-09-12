@@ -123,13 +123,13 @@ class CoreDataManager: NSObject {
   }
 
   // MARK: - Use Case: Test this out
-  func retrieveMeetingWith(id: String, _ completion: CoreDataHandler) {
+  func retrieveMeetingWith(id: String, entityName: String, _ completion: CoreDataHandler) {
     let sectionSortDescriptor = NSSortDescriptor(key: "createdAt", ascending: true)
     let sortDescriptors = [sectionSortDescriptor]
 
     let predicate = NSPredicate(format: "id == %@", id)
 
-    let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: meetingEntity!.description)
+    let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: entityName)
     fetchRequest.predicate = predicate
     fetchRequest.sortDescriptors = sortDescriptors
     do {

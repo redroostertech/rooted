@@ -18,7 +18,10 @@ final class LocationSearchRow: OptionsRow<PushSelectorCell<MKLocalSearchCompleti
 
   public required init(tag: String?) {
     super.init(tag: tag)
-    presentationMode = .show(controllerProvider: ControllerProvider.callback { return LocationSearchVC(){ _ in } }, onDismiss: { vc in _ = vc.navigationController?.popViewController(animated: true) })
+    presentationMode = .show(controllerProvider: ControllerProvider.callback { return LocationSearchVC(){ _ in } }, onDismiss: { vc in _ =
+      vc.navigationController?.popViewController(animated: true)
+      vc.dismiss(animated: true, completion: nil)
+    })
   }
 
   /**
@@ -197,10 +200,7 @@ extension LocationSearchVC: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         let searchResult = searchResults[indexPath.row]
         row.value = searchResult
-//        rowValue = searchResult
-      DispatchQueue.main.async {
-        self.onDismissCallback?(self)
-      }
+        onDismissCallback?(self)
     }
 }
 

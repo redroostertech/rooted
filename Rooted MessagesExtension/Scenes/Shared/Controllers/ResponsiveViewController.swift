@@ -34,6 +34,11 @@ class ResponsiveViewController: BaseAppViewController {
     }
   }
 
+  public var enableTouch: Bool = true
+  public var sectionTitle: String = "Events"
+  public var emptyTitle: String = "No Events"
+  public var emptyDescription: String = "When you create or receive an event invite, it will show up here."
+
   func setup(collectionView: UICollectionView) {
     if mainCollectionViewController == nil {
       mainCollectionViewController = collectionView
@@ -108,6 +113,7 @@ class ResponsiveViewController: BaseAppViewController {
 
     case .list:
 
+      flowLayout.headerReferenceSize = CGSize(width: UIScreen.main.bounds.width, height: kListViewSectionSize + 10)
       flowLayout.minimumInteritemSpacing = 0
       flowLayout.minimumLineSpacing = 0
       flowLayout.itemSize = CGSize(width: self.view.bounds.width, height: 245)
@@ -115,8 +121,8 @@ class ResponsiveViewController: BaseAppViewController {
       flowLayout.scrollDirection = .vertical
 
       maincollectionviewcontroller.emptyDataSetView { view in
-        view.titleLabelString(NSAttributedString(string: "No Events"))
-        .detailLabelString(NSAttributedString(string: "When you create or receive an event invite, it will show up here."))
+        view.titleLabelString(NSAttributedString(string: self.emptyTitle))
+          .detailLabelString(NSAttributedString(string: self.emptyDescription))
           .image(UIImage(named: "empty"))
           .dataSetBackgroundColor(UIColor.white)
           .shouldDisplay(true)
@@ -223,6 +229,7 @@ extension ResponsiveViewController: UICollectionViewDataSource, UICollectionView
   }
 
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    guard enableTouch == true else { return }
     let listViewCells = cells[indexPath.section]
     let item = listViewCells.cells[indexPath.row]
     let destination = InviteDetailsViewController.setupViewController(meeting: item)

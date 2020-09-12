@@ -46,6 +46,8 @@ protocol RootedContentPresentationLogic {
   func didRefreshSession(response: RootedContent.RefreshSession.Response)
 
   func presentViewCalendar(response: RootedContent.ViewCalendar.Response)
+
+  func onSuccessfulDraftSave(response: RootedContent.SaveMeetingDraft.Response)
 }
 
 extension RootedContentPresentationLogic {
@@ -82,6 +84,8 @@ extension RootedContentPresentationLogic {
   func didRefreshSession(response: RootedContent.RefreshSession.Response) { }
 
   func presentViewCalendar(response: RootedContent.ViewCalendar.Response) { }
+
+  func onSuccessfulDraftSave(response: RootedContent.SaveMeetingDraft.Response) { }
 }
 
 class RootedContentPresenter: RootedContentPresentationLogic {
@@ -137,7 +141,8 @@ class RootedContentPresenter: RootedContentPresentationLogic {
 
   // MARK: - Use Case: Go to add an meeting view
   func presentCreateNewMeetingView(response: RootedContent.CreateNewMeeting.Response) {
-    let viewModel = RootedContent.CreateNewMeeting.ViewModel()
+    var viewModel = RootedContent.CreateNewMeeting.ViewModel()
+    viewModel.draftMeeting = response.draftMeeting
     viewController?.presentCreateNewMeetingView(viewModel: viewModel)
   }
 
@@ -159,7 +164,15 @@ class RootedContentPresenter: RootedContentPresentationLogic {
   func onSuccessfulSave(response: RootedContent.SaveMeeting.Response) {
     var viewModel = RootedContent.SaveMeeting.ViewModel()
     viewModel.meeting = response.meeting
+    viewModel.contentDB = response.contentDB
     viewController?.onSuccessfulSave(viewModel: viewModel)
+  }
+
+  func onSuccessfulDraftSave(response: RootedContent.SaveMeetingDraft.Response) {
+    var viewModel = RootedContent.SaveMeetingDraft.ViewModel()
+    viewModel.meeting = response.meeting
+    viewModel.contentDB = response.contentDB
+    viewController?.onSuccessfulDraftSave(viewModel: viewModel)
   }
 
   func onSuccessfulCalendarAdd(response: RootedContent.AddToCalendar.Response) {
@@ -221,7 +234,7 @@ class RootedContentPresenter: RootedContentPresentationLogic {
   }
 
   func presentViewCalendar(response: RootedContent.ViewCalendar.Response) {
-    var viewModel = RootedContent.ViewCalendar.ViewModel()
+    let viewModel = RootedContent.ViewCalendar.ViewModel()
     viewController?.presentViewCalendar(viewModel: viewModel)
   }
 }

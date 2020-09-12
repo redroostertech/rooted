@@ -159,8 +159,9 @@ public let kDeleteTitle = "Delete Invite"
 public let kDeleteMessage = "You are about to delete a meeting invite. Are you sure?"
 public let kCancelTitle = "Cancel Invite"
 public let kCancelMessage = "You are about to cancel this meeting. Are you sure?"
-public let kCaptionString = "ROOTED INVITATION: %@ on %@"
-public let kCaptionStringWithUrl = "ROOTED INVITATION: %@ on %@.\n\n%@"
+public let kCaptionTitle = "ROOTED EVENT: %@"
+public let kCaptionString = "\(kCaptionTitle) on %@"
+public let kCaptionStringWithUrl = "\(kCaptionString).\n\n%@"
 public let kBackText = "Back"
 
 // MARK: - NotificationCenter Methods

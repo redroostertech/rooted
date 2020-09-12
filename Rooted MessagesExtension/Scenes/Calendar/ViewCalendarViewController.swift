@@ -13,13 +13,43 @@
 import UIKit
 import CalendarKit
 import DateToolsSwift
+import SwiftDate
+import EachNavigationBar
 
 protocol ViewCalendarDisplayLogic: class { }
 
-class ViewCalendarViewController: DayViewController, ViewCalendarDisplayLogic {
+class ViewCalendarViewController: ResponsiveViewController, RootedContentDisplayLogic {
 
-  var interactor: ViewCalendarBusinessLogic?
-//  var router: (NSObjectProtocol & ViewCalendarRoutingLogic & ViewCalendarDataPassing)?
+  var interactor: RootedContentBusinessLogic?
+  private var startDatePicker = WWCalendarTimeSelector.instantiate()
+  private var navigationBar: EachNavigationBar?
+  private var navTitle = ""
+  private var navBarHeight: CGFloat = 60
+
+  public var dayView: DayView!
+  public var dataSource: EventDataSource? {
+    get {
+      return dayView.dataSource
+    }
+    set(value) {
+      dayView.dataSource = value
+    }
+  }
+
+  public var delegate: DayViewDelegate? {
+    get {
+      return dayView.delegate
+    }
+    set(value) {
+      dayView.delegate = value
+    }
+  }
+
+  public var calendar = Calendar.autoupdatingCurrent {
+    didSet {
+      dayView.calendar = calendar
+    }
+  }
 
   // MARK: - Lifecycle methods
   static func setupViewController() -> ViewCalendarViewController {
@@ -42,51 +72,311 @@ class ViewCalendarViewController: DayViewController, ViewCalendarDisplayLogic {
   // MARK: Setup
   private func setup() {
     let viewController = self
-    let interactor = ViewCalendarInteractor()
-    let presenter = ViewCalendarPresenter()
-//    let router = ViewCalendarRouter()
+    let interactor = RootedContentInteractor()
+    let presenter = RootedContentPresenter()
     viewController.interactor = interactor
-//    viewController.router = router
     interactor.presenter = presenter
     presenter.viewController = viewController
-//    router.viewController = viewController
-//    router.dataStore = interactor
   }
   
   // MARK: View lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    moveToDate = Date()
+    setupNavBar()
+    view.addSubview(navigationBar!)
+
+    startDatePicker.delegate = self
+    startDatePicker.optionIdentifier = "start_date"
+    startDatePicker.optionCurrentDate = Date()
+    startDatePicker.optionShowTopPanel = false
+    let style = WWCalendarTimeSelectorStyle()
+    style.showTime(false)
+    startDatePicker.optionStyles = style
+
+    edgesForExtendedLayout = []
+    view.tintColor = SystemColors.systemRed
+
+    dayView = DayView(frame: CGRect(x: .zero, y: navigationBar!.frame.maxY - 10, width: kWidthOfScreen, height: kHeightOfScreen - 160))
+    view.addSubview(dayView)
+
     dayView.autoScrollToFirstEvent = true
+    dataSource = self
+    delegate = self
+    dayView.reloadData()
+
+    let sizeClass = traitCollection.horizontalSizeClass
+    configureDayViewLayoutForHorizontalSizeClass(sizeClass)
+
+    checkCalendarPermissions()
   }
 
-  override func eventsForDate(_ date: Date) -> [EventDescriptor] {
-    var events = [Event]()
+  private func setupNavBar() {
+    let statusBarHeight: CGFloat = 0
 
-    let event = Event()
-    event.startDate = .today()
-    event.endDate = .tomorrow()
-    event.text = "Test event"
-    event.color = .cyan
-    event.textColor = .brown
+    let navbar = EachNavigationBar(viewController: self)
+    navbar.frame = CGRect(x: 0, y: statusBarHeight, width: UIScreen.main.bounds.width, height: navBarHeight)
+    navbar.barTintColor = .systemOrange
+    navbar.prefersLargeTitles = true
 
-    events.append(event)
+    let navitem = UINavigationItem()
 
-    return events
+    let backButton = UIBarButtonItem(image: UIImage(named: "left-arrow-line-symbol")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(dismiss(_:)))
+    backButton.tintColor = .white
+
+    let monthSelector = UIBarButtonItem(image: UIImage(named: "weekly-calendar-sm")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(showDatePicker(_:)))
+    monthSelector.tintColor = .white
+
+    let refreshButton = UIBarButtonItem(image: UIImage(named: "refresh-old")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(resetToCurrentMonth(_:)))
+    refreshButton.tintColor = .white
+
+    let deIncrementMonthButton = UIBarButtonItem(image: UIImage(named: "left-arrow-line-symbol")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(deIncrementMonth(_:)))
+    deIncrementMonthButton.tintColor = .white
+
+    let incrementMonthButton = UIBarButtonItem(image: UIImage(named: "right-arrow-angle")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(incrementMonth(_:)))
+    incrementMonthButton.tintColor = .white
+
+    navitem.leftBarButtonItems = [ backButton, refreshButton ]
+
+    navitem.rightBarButtonItems = [ monthSelector, incrementMonthButton, deIncrementMonthButton ]
+    navitem.largeTitleDisplayMode = .always
+
+    navbar.shadow = .none
+    navbar.items = [ navitem ]
+    navbar.tintColor = .white
+    navbar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+    navbar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+
+    navigationBar = navbar
   }
 
-  override func dayViewDidSelectEventView(_ eventView: EventView) {
+  open override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    dayView.scrollToFirstEventIfNeeded()
+  }
+
+  open override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.willTransition(to: newCollection, with: coordinator)
+    configureDayViewLayoutForHorizontalSizeClass(newCollection.horizontalSizeClass)
+  }
+
+  open func configureDayViewLayoutForHorizontalSizeClass(_ sizeClass: UIUserInterfaceSizeClass) {
+    dayView.transitionToHorizontalSizeClass(sizeClass)
+  }
+
+  var eventsForCalendar = [Event]()
+  func retrieveMeetings(forDate date: Date) {
+    showHUD()
+    var request = RootedContent.RetrieveMeetings.Request()
+    request.contentDB = .remote
+    request.date = date
+    interactor?.retrieveMeetings(request: request)
+  }
+
+  func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) {
+    dismissHUD()
+    guard let meetings = viewModel.meetings else { return }
+
+    eventsForCalendar.removeAll()
+
+    // Update table for meetings
+    let evts = meetings.map { contextWrapper -> Event in
+      let event = Event()
+      if let startDate = contextWrapper.meeting?.meetingDate?.startDate?.toDate()?.date {
+        event.startDate = startDate
+      }
+      if let endDate = contextWrapper.meeting?.meetingDate?.endDate?.toDate()?.date {
+        event.endDate = endDate
+
+        if Date.today().isGreaterThanDate(endDate) {
+          event.color = .lightGray
+          event.textColor = .darkText
+        } else {
+          event.color = .systemOrange
+          event.textColor = .darkText
+        }
+      }
+
+      if let meetingName = contextWrapper.meeting?.meetingName {
+        event.text = String(format: kCaptionTitle, arguments: [meetingName])
+      }
+
+      if let meeting = contextWrapper.meeting {
+        event.userInfo = meeting.toJSON()
+      }
+      return event
+    }
+    eventsForCalendar.append(contentsOf: evts)
+    dayView.reloadData()
+  }
+
+  @objc func dismiss(_ sender: Any) {
+    dismiss(animated: true, completion: nil)
+  }
+
+  fileprivate var moveToDate: Date = Date()
+  @objc func incrementMonth(_ sender: Any) {
+    guard let incrementMonth = moveToDate.add(months: 1) else { return }
+    moveToDate = incrementMonth
+    move(to: moveToDate)
+    dayView.scrollTo(hour24: Float(moveToDate.hour))
+  }
+
+  @objc func deIncrementMonth(_ sender: Any) {
+    guard let incrementMonth = moveToDate.add(months: -1) else { return }
+    moveToDate = incrementMonth
+    move(to: moveToDate)
+    dayView.scrollTo(hour24: Float(moveToDate.hour))
+  }
+
+  @objc func resetToCurrentMonth(_ sender: Any) {
+    moveToDate = Date()
+    move(to: moveToDate)
+    dayView.scrollTo(hour24: Float(moveToDate.hour))
+  }
+
+  @objc func showDatePicker(_ sender: Any) {
+    present(startDatePicker, animated: true, completion: nil)
+  }
+}
+
+// MARK: - EventDataSource + DayViewDelegate
+extension ViewCalendarViewController: EventDataSource, DayViewDelegate {
+  func eventsForDate(_ date: Date) -> [EventDescriptor] {
+    return eventsForCalendar
+  }
+
+  func dayViewDidSelectEventView(_ eventView: EventView) {
     print("Event has been selected, navigate to details")
+    if
+      let event = eventView.descriptor as? Event,
+      let selectedMeetingDict = event.userInfo as? [String: Any],
+      let selectedMeeting = Meeting(JSON: selectedMeetingDict) {
+
+      let viewModel = RootedCellViewModel(data: selectedMeeting, delegate: nil)
+      let destination = InviteDetailsViewController.setupViewController(meeting: viewModel)
+      self.present(destination, animated: true, completion: nil)
+    }
   }
 
-  override func dayViewDidLongPressEventView(_ eventView: EventView) {
+  func dayViewDidLongPressEventView(_ eventView: EventView) {
     print("Event has been long pressed")
   }
 
-  override func dayView(dayView: DayView, didMoveTo date: Date) {
-    print("DayView = \(dayView) did move to = \(date)")
+  func dayView(dayView: DayView, didTapTimelineAt date: Date) {
+    print("DayView = \(dayView) did tap timeline at = \(date)")
+    let destinationVC = CreateMeetingViewController.setupViewController(draftMeeting: nil)
+    present(destinationVC, animated: true, completion: nil)
   }
 
-  override func dayView(dayView: DayView, willMoveTo date: Date) {
+  func dayViewDidBeginDragging(dayView: DayView) {
+    // Do nothing
+  }
+
+  func dayView(dayView: DayView, willMoveTo date: Date) {
     print("DayVew = \(dayView) will move to = \(date)")
+  }
+
+  func dayView(dayView: DayView, didMoveTo date: Date) {
+    print("DayView = \(dayView) did move to = \(date)")
+    moveToDate = date
+    retrieveMeetings(forDate: moveToDate)
+  }
+
+  func dayView(dayView: DayView, didLongPressTimelineAt date: Date) {
+    print("DayView = \(dayView) did long press timeline at = \(date)")
+  }
+
+  func dayView(dayView: DayView, didUpdate event: EventDescriptor) {
+    // Do nothing
+  }
+}
+
+// MARK: - CalendarKit API
+extension ViewCalendarViewController {
+  func move(to date: Date) {
+    dayView.move(to: date)
+  }
+
+  func reloadData() {
+    dayView.reloadData()
+  }
+
+  func updateStyle(_ newStyle: CalendarStyle) {
+    dayView.updateStyle(newStyle)
+  }
+
+  func create(event: EventDescriptor, animated: Bool = false) {
+    dayView.create(event: event, animated: animated)
+  }
+
+  func beginEditing(event: EventDescriptor, animated: Bool = false) {
+    dayView.beginEditing(event: event, animated: animated)
+  }
+
+  func endEventEditing() {
+    dayView.endEventEditing()
+  }
+}
+
+// MARK: - Reusable UI+UX use cases
+extension ViewCalendarViewController {
+  // MARK: - Use Case: Show ProgressHUD
+  func showHUD() {
+    DispatchQueue.main.async {
+      self.progressHUD?.show()
+    }
+  }
+
+  // MARK: - Use Case: Dismiss ProgressHUD
+  func dismissHUD() {
+    DispatchQueue.main.async {
+      self.progressHUD?.dismiss()
+    }
+  }
+
+  // MARK: - Use Case: Check if app has access to calendar permissions
+  func checkCalendarPermissions() {
+    let request = RootedContent.CheckCalendarPermissions.Request()
+    interactor?.checkCalendarPermissions(request: request)
+  }
+
+  func handleCalendarPermissions(viewModel: RootedContent.CheckCalendarPermissions.ViewModel) {
+    RRLogger.log(message: "Calendar Permissions: \(viewModel.isGranted)", owner: self)
+    if viewModel.isGranted {
+      // Get meetings
+      self.retrieveMeetings(forDate: moveToDate)
+    } else {
+      self.showCalendarError()
+    }
+  }
+
+  private func showCalendarError() {
+     self.showError(title: kCalendarPermissions, message: kCalendarAccess)
+  }
+}
+
+// MARK: - WWCalendarTimeSelectorProtocol
+extension ViewCalendarViewController: MeetingsManagerDelegate {
+  func didFailToLoad(_ manager: Any?, error: Error) {
+    dismissHUD()
+    RRLogger.logError(message: "didFailToLoad with an error", owner: self, error: error)
+    showError(title: "Error", message: error.localizedDescription)
+  }
+
+  func didFinishLoading(_ manager: Any?, invites: [MeetingContextWrapper]) {
+    // Handle some additional business logic
+    dismissHUD()
+    // Filter invites by segment index
+  }
+}
+
+// MARK: - WWCalendarTimeSelectorProtocol
+extension ViewCalendarViewController: WWCalendarTimeSelectorProtocol {
+  func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, date: Date) {
+    moveToDate = date
+    move(to: moveToDate)
+    dayView.scrollTo(hour24: Float(moveToDate.hour))
   }
 }
