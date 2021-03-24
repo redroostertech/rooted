@@ -4,13 +4,14 @@ import SSSpinnerButton
 import Branch
 import SwiftDate
 import OnboardKit
+import Eureka
 
 enum ResponseType {
   case accept
   case decline
 }
 
-class InviteDetailsViewController: FormMessagesAppViewController, RootedContentDisplayLogic, MeetingsManagerDelegate, AuthenticationLogic {
+class InviteDetailsViewController: BaseFormMessagesViewController, RootedContentDisplayLogic, MeetingsManagerDelegate, AuthenticationLogic {
 
   // MARK: - IBOutlets
   @IBOutlet private weak var acceptInviteButton: SSSpinnerButton!

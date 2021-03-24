@@ -465,4 +465,31 @@ extension RootedContent {
     struct ViewModel { }
   }
 
+    // MARK: - Use Case: Fetch meetings from calendar for day
+    enum FetchCalendarMeetings {
+        struct Request {
+            var date: Date?
+            var shouldClearPrecedingEvents = true
+            var shouldShowFreeTime = true
+        }
+
+        struct Response {
+            var meetings: [CalendarKitEvent]?
+            var shouldClearPrecedingEvents = true
+        }
+
+        struct ViewModel {
+            var meetings: [CalendarKitEvent]?
+            var shouldClearPrecedingEvents = true
+        }
+    }
+    
+    // MARK: - Use Case: Sync Apple Calendar
+    enum SyncAppleCalendar {
+        struct Request { }
+
+        struct Response { }
+
+        struct ViewModel { }
+    }
 }

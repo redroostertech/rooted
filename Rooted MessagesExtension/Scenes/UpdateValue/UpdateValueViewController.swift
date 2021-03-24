@@ -12,6 +12,7 @@
 
 import UIKit
 import Messages
+import Eureka
 
 protocol UpdateValueDisplayLogic: class {
   func onUpdateProfile(viewModel: UpdateValue.Something.ViewModel)
@@ -19,7 +20,7 @@ protocol UpdateValueDisplayLogic: class {
   func handleError(viewModel: UpdateValue.HandleError.ViewModel)
 }
 
-class UpdateValueViewController: FormMessagesAppViewController, UpdateValueDisplayLogic {
+class UpdateValueViewController: BaseFormMessagesViewController, UpdateValueDisplayLogic {
 
   var interactor: UpdateValueBusinessLogic?
   var router: (NSObjectProtocol & UpdateValueRoutingLogic & UpdateValueDataPassing)?

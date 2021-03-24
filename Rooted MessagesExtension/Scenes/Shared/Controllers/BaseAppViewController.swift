@@ -10,7 +10,30 @@ import Foundation
 import Messages
 import SSSpinnerButton
 
-open class BaseAppViewController: MSMessagesAppViewController {
+protocol BaseAppMessagesViewController {
+    var appInitializer: AppInitializer { get }
+    var progressHUD: RProgressHUD? { get set }
+    var activeConvo: MSConversation? { get set }
+    var selectedMessage: MSMessage? { get set }
+    
+    func displayError(with title: String, and message: String, withCompletion completion: (()->Void)?)
+    func stopAnimating(_ spinnerButton: SSSpinnerButton, for completionType: CompletionType, completion: @escaping () -> Void)
+    func startAnimating(_ spinnerButton: SSSpinnerButton, completion: @escaping () -> Void)
+    func displayFailure(with title: String, and message: String, afterAnimating spinnerButton: SSSpinnerButton)
+    func displaySuccess(afterAnimating spinnerButton: SSSpinnerButton, completion: @escaping () -> Void)
+    func postNotification(withName name: String, andUserInfo userInfo: [String: Any], completion: @escaping () -> Void)
+    func log(presentationStyle: MSMessagesAppPresentationStyle)
+    func dismissView()
+    func openInMessagingURL(urlString: String)
+}
+
+extension BaseAppMessagesViewController {
+    var appInitializer: AppInitializer {
+        return AppInitializer.main
+    }
+}
+
+open class BaseAppViewController: MSMessagesAppViewController, BaseAppMessagesViewController {
   var appInitializer = AppInitializer.main
   var progressHUD: RProgressHUD?
 
@@ -39,7 +62,7 @@ open class BaseAppViewController: MSMessagesAppViewController {
     progressHUD = RProgressHUD(on: self.view)
   }
 
-  func displayError(with title: String, and message: String, withCompletion completion: (()->Void)? = nil) {
+  func displayError(with title: String, and message: String, withCompletion completion: (()->Void)? ) {
     HUDFactory.showError(with: title, and: message, on: self, withCompletion: completion)
   }
 
@@ -53,7 +76,7 @@ open class BaseAppViewController: MSMessagesAppViewController {
 
   func displayFailure(with title: String, and message: String, afterAnimating spinnerButton: SSSpinnerButton) {
     stopAnimating(spinnerButton, for: .fail) {
-      self.displayError(with: title, and: message)
+        self.displayError(with: title, and: message, withCompletion: nil)
     }
   }
 
@@ -61,7 +84,7 @@ open class BaseAppViewController: MSMessagesAppViewController {
     stopAnimating(spinnerButton, for: .success, completion: completion)
   }
 
-  func postNotification(withName name: String, andUserInfo userInfo: [String: Any]? = [:], completion: @escaping () -> Void) {
+  func postNotification(withName name: String, andUserInfo userInfo: [String : Any], completion: @escaping () -> Void) {
     NotificationCenter.default.post(name: Notification.Name(rawValue: name), object: nil, userInfo: userInfo)
     completion()
   }
@@ -81,7 +104,7 @@ open class BaseAppViewController: MSMessagesAppViewController {
   // MARK: - Use Case: Dismiss the view
   @objc
   func dismissView() {
-    postNotification(withName: kNotificationMyInvitesReload) {
+    postNotification(withName: kNotificationMyInvitesReload, andUserInfo: [:]) {
       self.dismiss(animated: true, completion: nil)
     }
   }

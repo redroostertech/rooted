@@ -12,6 +12,7 @@ import Aztec
 import WordPressEditor
 import EggRating
 import EachNavigationBar
+import Sheeeeeeeeet
 
 class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLogic, AuthenticationLogic {
 
@@ -375,9 +376,13 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
 
         // Check calendar permissions
         self.checkCalendarPermissions()
+        
+        self.openInMessagingURL(urlString: "rooted://?session_type=authorized&user_id=\(String(describing: currentUser.uid))")
+
       } else {
         RRLogger.log(message: "Session does not exist, start an anonymous one.", owner: self)
-        self.presentPhoneLoginViewController()
+        self.openInMessagingURL(urlString: "rooted://?session_type=anon")
+//        self.presentPhoneLoginViewController()
       }
     })
   }
@@ -526,7 +531,7 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
         let pasteboard = UIPasteboard.general
         pasteboard.string = String(format: kCaptionString, arguments: [meetingname, startdate.toString(.rooted)])
 
-        self.displayError(with: "Copied to Clipboard!", and: "Event invitation was copied to your clipboard.")
+        self.displayError(with: "Copied to Clipboard!", and: "Event invitation was copied to your clipboard.", withCompletion: nil)
       }
     }
   }
@@ -714,34 +719,54 @@ class MyInvitesViewController: ResponsiveViewController, RootedContentDisplayLog
   @objc
   func showFilterOptions() {
     // MARK: - Use Case: Show an alert for a user to perform more actions
-    let alert = UIAlertController(title: "Filter Meetings", message: "View all upcoming events, meeting invites you have sent, and meeting invite drafts.", preferredStyle: .actionSheet)
-
+    let headerView = MenuTitle(title: "Filter Meetings",
+                               subtitle: "View upcoming and sent events, and drafts")
+    
     // MARK: - Use Case: Show all meetings
-    let viewAll = UIAlertAction(title: "All Upcoming", style: .default, handler: { action in
-      self.retrieveMeetings()
-    })
-    alert.addAction(viewAll)
+    let allUpcoming = MenuItem(title: "All Upcoming",
+                               subtitle: nil,
+                               value: nil,
+                               image: nil,
+                               isEnabled: true,
+                               tapBehavior: .dismiss)
 
     // MARK: - Use Case: Show sent meeting
-    let viewSent = UIAlertAction(title: "Sent", style: .default, handler: { action in
-      self.retrieveSentMeetings()
-    })
-    alert.addAction(viewSent)
-
+    let viewSent = MenuItem(title: "Sent",
+                               subtitle: nil,
+                               value: nil,
+                               image: nil,
+                               isEnabled: true,
+                               tapBehavior: .dismiss)
+    
     // MARK: - Use Case: Show meeting drafts
-    let viewDrafts = UIAlertAction(title: "Drafts", style: .default, handler: { action in
-      self.retrieveDrafts()
-    })
-    alert.addAction(viewDrafts)
+    let viewDrafts = MenuItem(title: "Drats",
+                              subtitle: nil,
+                              value: nil,
+                              image: nil,
+                              isEnabled: true,
+                              tapBehavior: .dismiss)
 
     // MARK: - Use Case: Dismiss the action sheet if a desired function is not available
-    let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: { action in
-      // Do something on cancel
-    })
-    alert.addAction(cancel)
 
-    // Show the alert
-    self.present(alert, animated: true, completion: nil)
+    let okButton = OkButton(title: "Done")
+    let cancelButton = CancelButton(title: "Cancel")
+    
+    let menu = Menu(items: [headerView, allUpcoming, viewSent, viewDrafts, okButton, cancelButton])
+
+    let sheet = menu.toActionSheet { (sheet, menuItem) in
+        switch menuItem.title {
+        case "All Upcoming":
+            self.retrieveMeetings()
+        case "Sent":
+          self.retrieveSentMeetings()
+        case "Drats":
+          self.retrieveDrafts()
+        default:
+            break
+        }
+    }
+    
+    sheet.present(in: self, from: self.view)
   }
 
   // MARK: - Use Case: As a business, I want a user to be prompted to provide feedback on the app

@@ -15,6 +15,7 @@ import CoreLocation
 import WebKit
 import Messages
 import EggRating
+import Eureka
 
 protocol SettingsDisplayLogic: class {
   func onSuccessfullLogout(viewModel: Settings.LogoutUser.ViewModel)
@@ -22,7 +23,7 @@ protocol SettingsDisplayLogic: class {
   func handleError(viewModel: Settings.DisplayError.ViewModel)
 }
 
-class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogic {
+class SettingsViewController: BaseFormMessagesViewController, SettingsDisplayLogic {
 
   @IBOutlet private weak var actionsContainerView: UIView!
 
@@ -92,12 +93,7 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
           }), onDismiss: nil)
       }
 
-      +++ Section("Settings")
-      <<< LabelRow() {
-          $0.title = "Default Calendar"
-        $0.value = EventKitManager.defaultRootedCalendar
-      }
-
+      +++ Section("App Settings")
 //      <<< ButtonRow("Default Calendar") {
 //          $0.title = $0.tag
 //          $0.presentationMode = .show(controllerProvider: .callback(builder: {
@@ -112,27 +108,6 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
 //            return destinationVC
 //          }), onDismiss: nil)
 //      }
-
-      <<< SwitchRow() {
-        $0.tag = "calendarAccessRow"
-        $0.title = "Allow Calendar Access"
-        $0.value = EventKitManager.authStatus
-        $0.onChange { row in
-          let okAction = UIAlertAction(title: "OK", style: .cancel, handler: { action in
-          })
-          HUDFactory.displayAlert(with: "Calendar Permissions", message: "To update the your calendar permissions go to your settings app and allow access to your calendar.", and: [okAction], on: self)
-//          if row.value == true {
-//            EventKitManager().getCalendarPermissions { access in
-//              (form?.rowBy(tag: "calendarAccessRow") as! SwitchRow).value = access
-//            }
-//          } else {
-//
-//          }
-//          if let bundleId = Bundle.main.bundleIdentifier {
-//            self.openInMessagingURL(urlString: "\(UIApplication.openSettingsURLString)&path=LOCATION_SERVICES/\(bundleId)")
-//          }
-        }
-    }
 
       <<< SwitchRow() {
         $0.tag = "locationAccessRow"
@@ -175,6 +150,33 @@ class SettingsViewController: FormMessagesAppViewController, SettingsDisplayLogi
       //          }
               }
           }
+        
+        +++ Section("Calendar Settings")
+                <<< LabelRow() {
+                    $0.title = "Default Calendar"
+                  $0.value = EventKitManager.defaultRootedCalendar
+                }
+                
+              <<< SwitchRow() {
+                $0.tag = "calendarAccessRow"
+                $0.title = "Allow Calendar Access"
+                $0.value = EventKitManager.authStatus
+                $0.onChange { row in
+                  let okAction = UIAlertAction(title: "OK", style: .cancel, handler: { action in
+                  })
+                  HUDFactory.displayAlert(with: "Calendar Permissions", message: "To update the your calendar permissions go to your settings app and allow access to your calendar.", and: [okAction], on: self)
+        //          if row.value == true {
+        //            EventKitManager().getCalendarPermissions { access in
+        //              (form?.rowBy(tag: "calendarAccessRow") as! SwitchRow).value = access
+        //            }
+        //          } else {
+        //
+        //          }
+        //          if let bundleId = Bundle.main.bundleIdentifier {
+        //            self.openInMessagingURL(urlString: "\(UIApplication.openSettingsURLString)&path=LOCATION_SERVICES/\(bundleId)")
+        //          }
+                }
+            }
 
     +++ Section("General")
       <<< ButtonRow("About Rooted") {

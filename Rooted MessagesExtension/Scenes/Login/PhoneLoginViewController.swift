@@ -12,6 +12,7 @@
 
 import UIKit
 import OnboardKit
+import Eureka
 
 protocol AuthenticationLogic: class {
   func onSucessfulLogin(_ sender: PhoneLoginViewController, uid: String?)
@@ -43,7 +44,7 @@ let kButtonCancel = "Go back to Login"
 let kButtonCreateNewPassword = "Create New Password"
 let kButtonForgotPassword = kSubtitleForgotYourPassword
 
-class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplayLogic, UITextFieldDelegate {
+class PhoneLoginViewController: BaseFormMessagesViewController, PhoneLoginDisplayLogic, UITextFieldDelegate {
 
   @IBOutlet weak var loginButton: UIButton!
   @IBOutlet weak var forgotPasswordButton: UIButton!
@@ -231,7 +232,7 @@ class PhoneLoginViewController: FormMessagesAppViewController, PhoneLoginDisplay
 
   func onSuccessfulForgotPassword(viewModel: PhoneLogin.ForgotPassword.ViewModel) {
     dismissHUD()
-    displayError(with: "Forgot Password", and: "Successfully requested a new password.")
+    displayError(with: "Forgot Password", and: "Successfully requested a new password.", withCompletion: nil)
     isLogin = true
   }
 

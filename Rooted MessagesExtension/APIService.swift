@@ -13,7 +13,7 @@ public let localBaseURL = "https://localhost:3000/"
 public let testBaseURL = "https://rooted-test-web.herokuapp.com/"
 public let liveURL = "https://rootedapp.herokuapp.com/"
 
-enum Api_V2 {
+public enum Api_V2 {
   case Analytics
   case Auth
   case Core
@@ -29,7 +29,7 @@ enum Api_V2 {
   }
 }
 
-final class PathBuilder {
+final public class PathBuilder {
   public static func build(_ path: Api.Service, in service: Api_V2, with endpoint: String) -> String {
     if isDebug {
       RRLogger.log(message: "Using url: \(path.url)", owner: self)
@@ -41,8 +41,8 @@ final class PathBuilder {
   }
 }
 
-class Api {
-  enum Service {
+public class Api {
+  public enum Service {
     case Local
     case Test
     case Live

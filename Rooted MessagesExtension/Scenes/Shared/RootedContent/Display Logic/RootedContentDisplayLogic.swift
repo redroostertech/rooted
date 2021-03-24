@@ -47,6 +47,8 @@ protocol RootedContentDisplayLogic: class {
   func presentViewCalendar(viewModel: RootedContent.ViewCalendar.ViewModel)
 
   func onSuccessfulDraftSave(viewModel: RootedContent.SaveMeetingDraft.ViewModel)
+    
+     func onDidFinishFetching(viewModel: RootedContent.FetchCalendarMeetings.ViewModel)
 }
 
 extension RootedContentDisplayLogic {
@@ -87,4 +89,6 @@ extension RootedContentDisplayLogic {
   func presentViewCalendar(viewModel: RootedContent.ViewCalendar.ViewModel) { }
 
   func onSuccessfulDraftSave(viewModel: RootedContent.SaveMeetingDraft.ViewModel) { }
+    
+    func onDidFinishFetching(viewModel: RootedContent.FetchCalendarMeetings.ViewModel) { }
 }

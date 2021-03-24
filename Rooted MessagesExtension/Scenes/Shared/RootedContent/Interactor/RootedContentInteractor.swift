@@ -8,6 +8,8 @@
 
 import Foundation
 import EventKit
+import Messages
+import MessageUI
 
 enum RootedContentManagerType {
   case none
@@ -42,6 +44,7 @@ protocol RootedContentBusinessLogic: class {
   func saveMeetingDraft(request: RootedContent.SaveMeetingDraft.Request)
   func updateMeetingDraft(request: RootedContent.UpdateDraft.Request)
   func deleteMeetingDraft(request: RootedContent.DeleteDraftMeeting.Request)
+    func fetchMeetingsFromCalendar(request: RootedContent.FetchCalendarMeetings.Request)
 }
 
 protocol RootedContentDataStore {
@@ -892,6 +895,63 @@ class RootedContentInteractor: RootedContentBusinessLogic, RootedContentDataStor
   func editMeeting(request: RootedContent.EditMeeting.Request) {
 
   }
+    
+    // MARK: - Use Case: Sync Apple Calendar
+    func syncAppleCalendar(request: RootedContent.SyncAppleCalendar.Request) {
+        guard SessionManager.shared.sessionExists, let _ = SessionManager.shared.currentUser?.uid else {
+          self.presenter?.onPresentPhoneLoginViewController()
+          return
+        }
+
+        guard let calendarAccessGranted = isCalendarPermissionGranted, calendarAccessGranted else {
+          let request = RootedContent.CheckCalendarPermissions.Request()
+          self.checkCalendarPermissions(request: request)
+          return
+        }
+        
+        if let appleCalendarCheck = DefaultsManager.shared.retrieveBoolDefault(forKey: kLiveURL) {
+            
+        }
+    }
+    
+    // MARK: - Use Case: Fetch Meetings from calendar
+    func fetchMeetingsFromCalendar(request: RootedContent.FetchCalendarMeetings.Request) {
+        guard SessionManager.shared.sessionExists, let _ = SessionManager.shared.currentUser?.uid else {
+          self.presenter?.onPresentPhoneLoginViewController()
+          return
+        }
+
+        guard let calendarAccessGranted = isCalendarPermissionGranted, calendarAccessGranted else {
+          let request = RootedContent.CheckCalendarPermissions.Request()
+          self.checkCalendarPermissions(request: request)
+          return
+        }
+        
+        guard let startingDate = request.date, let endingDate = startingDate.add(days: 1) else {
+          var response = RootedContent.DisplayError.Response()
+          response.errorMessage = "Something went wrong. Please try again."
+          self.presenter?.handleError(response: response)
+          return
+        }
+        
+        let events = eventKitManager.getEventsFromCalenderWith(startDate: startingDate,
+                                                               endDate: endingDate,
+                                                               includeFreeTime: request.shouldShowFreeTime)
+        var response = RootedContent.FetchCalendarMeetings.Response()
+        response.shouldClearPrecedingEvents = request.shouldClearPrecedingEvents
+        response.meetings = events.map({ event -> CalendarKitEvent in
+          let calendarKitEvent = event.toCalendarKitEvent
+          if event.title.contains("Free") {
+            calendarKitEvent.color = AppColors.lightGreen
+            calendarKitEvent.textColor = .darkText
+            calendarKitEvent.userInfo = [
+              "identifier": "free_time_block"
+            ]
+          }
+          return calendarKitEvent
+        })
+        self.presenter?.onDidFinishFetching(response: response)
+       }
 }
 
 // MARK: - Drafts
@@ -1289,6 +1349,7 @@ extension RootedContentInteractor {
       availabilityManager.deleteAvailability(availabilityManagedObject )
     }
   }
+
 }
 
 extension Sequence {

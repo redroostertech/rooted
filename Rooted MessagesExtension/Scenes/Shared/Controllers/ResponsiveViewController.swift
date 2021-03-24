@@ -9,11 +9,6 @@
 import Foundation
 import UIKit
 
-enum LayoutOption {
-  case list
-  case horizontalList
-}
-
 class ResponsiveViewController: BaseAppViewController {
 
   private var mainCollectionViewController: UICollectionView?

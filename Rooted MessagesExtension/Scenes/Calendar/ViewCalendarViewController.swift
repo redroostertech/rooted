@@ -13,20 +13,25 @@
 import UIKit
 import CalendarKit
 import DateToolsSwift
-import SwiftDate
 import EachNavigationBar
+import Sheeeeeeeeet
 
 protocol ViewCalendarDisplayLogic: class { }
+
+protocol ViewCalendarDelegate: class {
+  func selectTimePeriod(_ sender: ViewCalendarViewController, period: CalendarKitEvent)
+}
 
 class ViewCalendarViewController: ResponsiveViewController, RootedContentDisplayLogic {
 
   var interactor: RootedContentBusinessLogic?
   private var startDatePicker = WWCalendarTimeSelector.instantiate()
-  private var navigationBar: EachNavigationBar?
   private var navTitle = ""
   private var navBarHeight: CGFloat = 60
 
-  public var dayView: DayView!
+  public lazy var dayView: DayView = DayView()
+  public lazy var navigationBar: EachNavigationBar = EachNavigationBar()
+
   public var dataSource: EventDataSource? {
     get {
       return dayView.dataSource
@@ -45,11 +50,8 @@ class ViewCalendarViewController: ResponsiveViewController, RootedContentDisplay
     }
   }
 
-  public var calendar = Calendar.autoupdatingCurrent {
-    didSet {
-      dayView.calendar = calendar
-    }
-  }
+  public var calendar = Calendar.autoupdatingCurrent
+  public weak var viewCalendarDelegate: ViewCalendarDelegate?
 
   // MARK: - Lifecycle methods
   static func setupViewController() -> ViewCalendarViewController {
@@ -80,66 +82,50 @@ class ViewCalendarViewController: ResponsiveViewController, RootedContentDisplay
   }
   
   // MARK: View lifecycle
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    moveToDate = Date()
-    setupNavBar()
-    view.addSubview(navigationBar!)
-
-    startDatePicker.delegate = self
-    startDatePicker.optionIdentifier = "start_date"
-    startDatePicker.optionCurrentDate = Date()
-    startDatePicker.optionShowTopPanel = false
-    let style = WWCalendarTimeSelectorStyle()
-    style.showTime(false)
-    startDatePicker.optionStyles = style
-
-    edgesForExtendedLayout = []
-    view.tintColor = SystemColors.systemRed
-
-    dayView = DayView(frame: CGRect(x: .zero, y: navigationBar!.frame.maxY - 10, width: kWidthOfScreen, height: kHeightOfScreen - 160))
-    view.addSubview(dayView)
-
-    dayView.autoScrollToFirstEvent = true
-    dataSource = self
-    delegate = self
-    dayView.reloadData()
-
-    let sizeClass = traitCollection.horizontalSizeClass
-    configureDayViewLayoutForHorizontalSizeClass(sizeClass)
-
-    checkCalendarPermissions()
-  }
-
-  private func setupNavBar() {
-    let statusBarHeight: CGFloat = 0
+  override func loadView() {
+    let containerView = UIView(frame: CGRect(x: .zero,
+                                             y: .zero,
+                                             width: kWidthOfScreen,
+                                             height: kHeightOfScreen))
+    let statusBarHeight: CGFloat = .zero
 
     let navbar = EachNavigationBar(viewController: self)
-    navbar.frame = CGRect(x: 0, y: statusBarHeight, width: UIScreen.main.bounds.width, height: navBarHeight)
+    navbar.frame = CGRect(x: .zero,
+                          y: statusBarHeight,
+                          width: UIScreen.main.bounds.width,
+                          height: navBarHeight)
     navbar.barTintColor = .systemOrange
     navbar.prefersLargeTitles = true
 
     let navitem = UINavigationItem()
 
-    let backButton = UIBarButtonItem(image: UIImage(named: "left-arrow-line-symbol")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(dismiss(_:)))
+    let backButton = UIBarButtonItem(image: UIImage(named: "left-arrow-line-symbol")!.maskWithColor(color: .white),
+                                     style: .plain,
+                                     target: self,
+                                     action: #selector(dismiss(_:)))
     backButton.tintColor = .white
 
-    let monthSelector = UIBarButtonItem(image: UIImage(named: "weekly-calendar-sm")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(showDatePicker(_:)))
+    let monthSelector = UIBarButtonItem(image: UIImage(named: "weekly-calendar-sm")!.maskWithColor(color: .white),
+                                        style: .plain,
+                                        target: self,
+                                        action: #selector(showDatePicker(_:)))
     monthSelector.tintColor = .white
 
-    let refreshButton = UIBarButtonItem(image: UIImage(named: "refresh-old")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(resetToCurrentMonth(_:)))
+    let refreshButton = UIBarButtonItem(image: UIImage(named: "refresh-old")!.maskWithColor(color: .white),
+                                        style: .plain,
+                                        target: self,
+                                        action: #selector(resetToCurrentMonth(_:)))
     refreshButton.tintColor = .white
-
-    let deIncrementMonthButton = UIBarButtonItem(image: UIImage(named: "left-arrow-line-symbol")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(deIncrementMonth(_:)))
-    deIncrementMonthButton.tintColor = .white
-
-    let incrementMonthButton = UIBarButtonItem(image: UIImage(named: "right-arrow-angle")!.maskWithColor(color: .white), style: .plain, target: self, action: #selector(incrementMonth(_:)))
-    incrementMonthButton.tintColor = .white
+    
+    let syncCalendarButton = UIBarButtonItem(image: UIImage(named: "download-from-internet-cloud")!.maskWithColor(color: .white),
+                                             style: .plain,
+                                             target: self,
+                                             action: #selector(syncCalendars(_:)))
+    syncCalendarButton.tintColor = .white
 
     navitem.leftBarButtonItems = [ backButton, refreshButton ]
 
-    navitem.rightBarButtonItems = [ monthSelector, incrementMonthButton, deIncrementMonthButton ]
+    navitem.rightBarButtonItems = [ monthSelector, syncCalendarButton ]
     navitem.largeTitleDisplayMode = .always
 
     navbar.shadow = .none
@@ -149,25 +135,59 @@ class ViewCalendarViewController: ResponsiveViewController, RootedContentDisplay
     navbar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
 
     navigationBar = navbar
+    
+    dayView = DayView(frame: CGRect(x: .zero,
+                                    y: navigationBar.frame.maxY - 10,
+                                    width: kWidthOfScreen,
+                                    height: kHeightOfScreen - 160))
+    dayView.calendar = calendar
+    containerView.addSubview(navigationBar)
+    containerView.addSubview(dayView)
+    view = containerView
   }
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    startDatePicker.delegate = self
+    startDatePicker.optionIdentifier = "start_date"
+    startDatePicker.optionCurrentDate = Date()
+    startDatePicker.optionShowTopPanel = false
+    
+    let style = WWCalendarTimeSelectorStyle()
+    style.showTime(false)
+    startDatePicker.optionStyles = style
 
-  open override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
+    edgesForExtendedLayout = []
+    view.tintColor = SystemColors.systemRed
+
+    dataSource = self
+    delegate = self
+
+    let sizeClass = traitCollection.horizontalSizeClass
+    configureDayViewLayoutForHorizontalSizeClass(sizeClass)
+
     dayView.scrollToFirstEventIfNeeded()
+    moveToDate = Date()
+
+    reloadData()
   }
 
-  open override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
-    super.willTransition(to: newCollection, with: coordinator)
-    configureDayViewLayoutForHorizontalSizeClass(newCollection.horizontalSizeClass)
-  }
-
+    open override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+      super.willTransition(to: newCollection, with: coordinator)
+      configureDayViewLayoutForHorizontalSizeClass(newCollection.horizontalSizeClass)
+    }
+    
   open func configureDayViewLayoutForHorizontalSizeClass(_ sizeClass: UIUserInterfaceSizeClass) {
     dayView.transitionToHorizontalSizeClass(sizeClass)
   }
 
-  var eventsForCalendar = [Event]()
+    var eventsForCalendar = [Event]() {
+        didSet {
+            reloadData()
+        }
+    }
   func retrieveMeetings(forDate date: Date) {
-    showHUD()
     var request = RootedContent.RetrieveMeetings.Request()
     request.contentDB = .remote
     request.date = date
@@ -177,9 +197,7 @@ class ViewCalendarViewController: ResponsiveViewController, RootedContentDisplay
   func onDidFinishLoading(viewModel: RootedContent.RetrieveMeetings.ViewModel) {
     dismissHUD()
     guard let meetings = viewModel.meetings else { return }
-
-    eventsForCalendar.removeAll()
-
+    
     // Update table for meetings
     let evts = meetings.map { contextWrapper -> Event in
       let event = Event()
@@ -208,36 +226,121 @@ class ViewCalendarViewController: ResponsiveViewController, RootedContentDisplay
       return event
     }
     eventsForCalendar.append(contentsOf: evts)
-    dayView.reloadData()
   }
+    
+    func fetchMeetingsFromCalendar(forDate date: Date, clearPrecedingEvents: Bool = false) {
+        var request = RootedContent.FetchCalendarMeetings.Request()
+        request.date = date
+        request.shouldClearPrecedingEvents = clearPrecedingEvents
+        request.shouldShowFreeTime = DefaultsManager.shared.retrieveBoolDefault(forKey: kShowFreeTimeOnCalendarView) ?? false
+        interactor?.fetchMeetingsFromCalendar(request: request)
+    }
+    
+    func onDidFinishFetching(viewModel: RootedContent.FetchCalendarMeetings.ViewModel) {
+        guard let meetings = viewModel.meetings else { return }
+        eventsForCalendar.append(contentsOf: meetings)
+    }
 
   @objc func dismiss(_ sender: Any) {
     dismiss(animated: true, completion: nil)
   }
 
-  fileprivate var moveToDate: Date = Date()
+  fileprivate var moveToDate: Date! {
+    didSet {
+      eventsForCalendar.removeAll()
+      move(to: moveToDate)
+      dayView.scrollTo(hour24: Float(moveToDate.hour))
+      checkCalendarPermissions()
+    }
+  }
+    
   @objc func incrementMonth(_ sender: Any) {
     guard let incrementMonth = moveToDate.add(months: 1) else { return }
     moveToDate = incrementMonth
-    move(to: moveToDate)
-    dayView.scrollTo(hour24: Float(moveToDate.hour))
   }
 
   @objc func deIncrementMonth(_ sender: Any) {
     guard let incrementMonth = moveToDate.add(months: -1) else { return }
     moveToDate = incrementMonth
-    move(to: moveToDate)
-    dayView.scrollTo(hour24: Float(moveToDate.hour))
   }
 
   @objc func resetToCurrentMonth(_ sender: Any) {
     moveToDate = Date()
-    move(to: moveToDate)
-    dayView.scrollTo(hour24: Float(moveToDate.hour))
   }
 
   @objc func showDatePicker(_ sender: Any) {
     present(startDatePicker, animated: true, completion: nil)
+  }
+    
+  @objc func syncCalendars(_ sender: Any) {
+    let headerView = MenuTitle(title: "Sync Calendars", subtitle: "Consolidate supported calendars into one calendar view.")
+    let calendarSection = SectionTitle(title: "Supported Integrations")
+    let appleCalendarButton = MultiSelectItem(title: "Apple Calendar",
+                                              subtitle: nil,
+                                              isSelected: DefaultsManager.shared.retrieveBoolDefault(forKey: kCalendarSyncAppleCalendar) ?? false,
+                                              group: "primary_calendars",
+                                              value: "apple_calendar",
+                                              image: nil)
+    
+    let optimzationSection = SectionTitle(title: "Optimizations")
+    let showFreeTimeSwitch = SelectItem(title: "Show Free Time",
+                                        subtitle: nil,
+                                        isSelected: DefaultsManager.shared.retrieveBoolDefault(forKey: kShowFreeTimeOnCalendarView) ?? false,
+                                        group: "show_free_time_on_calendar_view",
+                                        value: nil,
+                                        image: nil,
+                                        tapBehavior: .none)
+
+    let okButton = OkButton(title: "Sync")
+    let cancelButton = CancelButton(title: "Cancel")
+    let menu = Menu(items: [headerView, calendarSection , appleCalendarButton, optimzationSection, showFreeTimeSwitch, okButton, cancelButton])
+    
+    let sheet = menu.toActionSheet { (sheet, menuItem) in
+        switch menuItem.title {
+        case "Sync":
+            
+            for menuItem in sheet.items {
+                if let multiSelect = menuItem as? MultiSelectItem {
+                    switch multiSelect.group {
+                    case "primary_calendars":
+                        switch multiSelect.title {
+                        case "Apple Calendar":
+                            print("Selected apple calendar")
+                            DefaultsManager.shared.setDefault(withData: multiSelect.isSelected, forKey: kCalendarSyncAppleCalendar)
+                            self.eventsForCalendar.removeAll()
+                            self.reloadData()
+                            self.checkCalendarPermissions()
+                        default:
+                            break
+                        }
+                    default:
+                        break
+                    }
+                }
+              if let selectItem = menuItem as? SelectItem {
+                switch selectItem.group {
+                  case "show_free_time_on_calendar_view":
+                    switch selectItem.title {
+                    case "Show Free Time":
+                        DefaultsManager.shared.setDefault(withData: selectItem.isSelected, forKey: kShowFreeTimeOnCalendarView)
+                        self.eventsForCalendar.removeAll()
+                        self.reloadData()
+                        self.checkCalendarPermissions()
+                    default:
+                        break
+                    }
+                  default:
+                      break
+                  }
+              }
+            }
+
+        default:
+            break
+        }
+    }
+    
+    sheet.present(in: self, from: self.view)
   }
 }
 
@@ -251,12 +354,19 @@ extension ViewCalendarViewController: EventDataSource, DayViewDelegate {
     print("Event has been selected, navigate to details")
     if
       let event = eventView.descriptor as? Event,
-      let selectedMeetingDict = event.userInfo as? [String: Any],
-      let selectedMeeting = Meeting(JSON: selectedMeetingDict) {
+      let selectedMeetingDict = event.userInfo as? [String: Any] {
+      
+      if
+        let selectedFreeTimeBlockIdentifier = selectedMeetingDict["identifier"] as? String,
+        selectedFreeTimeBlockIdentifier == "free_time_block" {
+        self.viewCalendarDelegate?.selectTimePeriod(self, period: event)
+        self.dismiss(animated: true, completion: nil)
+      } else if let selectedMeeting = Meeting(JSON: selectedMeetingDict) {
 
-      let viewModel = RootedCellViewModel(data: selectedMeeting, delegate: nil)
-      let destination = InviteDetailsViewController.setupViewController(meeting: viewModel)
-      self.present(destination, animated: true, completion: nil)
+        let viewModel = RootedCellViewModel(data: selectedMeeting, delegate: nil)
+        let destination = InviteDetailsViewController.setupViewController(meeting: viewModel)
+        self.present(destination, animated: true, completion: nil)
+      }
     }
   }
 
@@ -265,7 +375,7 @@ extension ViewCalendarViewController: EventDataSource, DayViewDelegate {
   }
 
   func dayView(dayView: DayView, didTapTimelineAt date: Date) {
-    print("DayView = \(dayView) did tap timeline at = \(date)")
+    print("DayView = \(dayView) did tap timeline at = \(date.toString(.rooted))")
     let destinationVC = CreateMeetingViewController.setupViewController(draftMeeting: nil)
     present(destinationVC, animated: true, completion: nil)
   }
@@ -281,7 +391,6 @@ extension ViewCalendarViewController: EventDataSource, DayViewDelegate {
   func dayView(dayView: DayView, didMoveTo date: Date) {
     print("DayView = \(dayView) did move to = \(date)")
     moveToDate = date
-    retrieveMeetings(forDate: moveToDate)
   }
 
   func dayView(dayView: DayView, didLongPressTimelineAt date: Date) {
@@ -346,7 +455,10 @@ extension ViewCalendarViewController {
     RRLogger.log(message: "Calendar Permissions: \(viewModel.isGranted)", owner: self)
     if viewModel.isGranted {
       // Get meetings
-      self.retrieveMeetings(forDate: moveToDate)
+//      self.retrieveMeetings(forDate: moveToDate)
+        if let appCanSyncAppleCalendar = DefaultsManager.shared.retrieveBoolDefault(forKey: kCalendarSyncAppleCalendar), appCanSyncAppleCalendar {
+            self.fetchMeetingsFromCalendar(forDate: moveToDate)
+        }
     } else {
       self.showCalendarError()
     }
@@ -376,7 +488,5 @@ extension ViewCalendarViewController: MeetingsManagerDelegate {
 extension ViewCalendarViewController: WWCalendarTimeSelectorProtocol {
   func WWCalendarTimeSelectorDone(_ selector: WWCalendarTimeSelector, date: Date) {
     moveToDate = date
-    move(to: moveToDate)
-    dayView.scrollTo(hour24: Float(moveToDate.hour))
   }
 }

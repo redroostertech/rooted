@@ -27,9 +27,9 @@ extension String {
      - Parameter index: The index of the character to return
      - Returns: The Character at the specified index
      */
-    public subscript(index: Int) -> Character {
-        return self[self.index(of: index)]
-    }
+//    public subscript(index: Int) -> Character {
+//        return self[self.index(of: index)]
+//    }
 
     /**
      Returns a substring of the characters in the range

@@ -48,6 +48,8 @@ protocol RootedContentPresentationLogic {
   func presentViewCalendar(response: RootedContent.ViewCalendar.Response)
 
   func onSuccessfulDraftSave(response: RootedContent.SaveMeetingDraft.Response)
+    
+    func onDidFinishFetching(response: RootedContent.FetchCalendarMeetings.Response)
 }
 
 extension RootedContentPresentationLogic {
@@ -86,6 +88,8 @@ extension RootedContentPresentationLogic {
   func presentViewCalendar(response: RootedContent.ViewCalendar.Response) { }
 
   func onSuccessfulDraftSave(response: RootedContent.SaveMeetingDraft.Response) { }
+    
+    func onDidFinishFetching(response: RootedContent.FetchCalendarMeetings.Response) { }
 }
 
 class RootedContentPresenter: RootedContentPresentationLogic {
@@ -237,4 +241,11 @@ class RootedContentPresenter: RootedContentPresentationLogic {
     let viewModel = RootedContent.ViewCalendar.ViewModel()
     viewController?.presentViewCalendar(viewModel: viewModel)
   }
+    
+    func onDidFinishFetching(response: RootedContent.FetchCalendarMeetings.Response) {
+        var viewModel = RootedContent.FetchCalendarMeetings.ViewModel()
+        viewModel.meetings = response.meetings
+        viewModel.shouldClearPrecedingEvents = response.shouldClearPrecedingEvents
+        viewController?.onDidFinishFetching(viewModel: viewModel)
+    }
 }

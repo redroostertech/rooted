@@ -11,12 +11,12 @@ import Foundation
 import Messages
 
 final class NavigationCoordinator {
-  static func performExpandedNavigation(from: BaseAppViewController, _ completion: @escaping () -> Void) {
+  static func performExpandedNavigation(from: MSMessagesAppViewController, _ completion: @escaping () -> Void) {
     from.requestPresentationStyle(.expanded)
     completion()
   }
 
-  static func performCompactNavigation(from: BaseAppViewController, _ completion: @escaping () -> Void) {
+  static func performCompactNavigation(from: MSMessagesAppViewController, _ completion: @escaping () -> Void) {
     from.requestPresentationStyle(.compact)
     completion()
   }

@@ -12,6 +12,7 @@
 
 import UIKit
 import FormTextField
+import Eureka
 
 protocol RegistrationDisplayLogic: class {
   func onSuccessfulRegistration(viewModel: Registration.RegisterViaEmailAndPassword.ViewModel)
@@ -22,7 +23,7 @@ protocol RegistrationDisplayLogic: class {
   func handleError(viewModel: Registration.HandleError.ViewModel)
 }
 
-class RegistrationViewController: FormMessagesAppViewController, RegistrationDisplayLogic {
+class RegistrationViewController: BaseFormMessagesViewController, RegistrationDisplayLogic {
  
   @IBOutlet var createAccountButton: UIButton!
 

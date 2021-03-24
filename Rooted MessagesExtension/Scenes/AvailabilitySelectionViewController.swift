@@ -142,7 +142,7 @@ class AvailabilitySelectionViewController: BaseAppViewController {
   }
 
   @IBAction func cancelAction(_ sender: UIButton) {
-    postNotification(withName: kNotificationMyInvitesReload) {
+    postNotification(withName: kNotificationMyInvitesReload, andUserInfo: [:]) {
       self.dismiss(animated: true, completion: nil)
     }
   }

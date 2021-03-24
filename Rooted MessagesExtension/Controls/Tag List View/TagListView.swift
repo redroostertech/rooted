@@ -64,14 +64,14 @@ open class TagListView: UIView {
         }
     }
     
-    @IBInspectable open dynamic var cornerRadius: CGFloat = 0 {
+  @IBInspectable open dynamic override var cornerRadius: CGFloat {
         didSet {
             tagViews.forEach {
                 $0.cornerRadius = cornerRadius
             }
         }
     }
-    @IBInspectable open dynamic var borderWidth: CGFloat = 0 {
+  @IBInspectable open dynamic override var borderWidth: CGFloat {
         didSet {
             tagViews.forEach {
                 $0.borderWidth = borderWidth
@@ -79,7 +79,7 @@ open class TagListView: UIView {
         }
     }
     
-    @IBInspectable open dynamic var borderColor: UIColor? {
+  @IBInspectable open dynamic override var borderColor: UIColor? {
         didSet {
             tagViews.forEach {
                 $0.borderColor = borderColor
@@ -134,22 +134,23 @@ open class TagListView: UIView {
             rearrangeViews()
         }
     }
-    @IBInspectable open dynamic var shadowColor: UIColor = .white {
+  
+    @IBInspectable open dynamic override var shadowColor: UIColor? {
         didSet {
             rearrangeViews()
         }
     }
-    @IBInspectable open dynamic var shadowRadius: CGFloat = 0 {
+  @IBInspectable open dynamic override var shadowRadius: CGFloat {
         didSet {
             rearrangeViews()
         }
     }
-    @IBInspectable open dynamic var shadowOffset: CGSize = .zero {
+  @IBInspectable open dynamic override var shadowOffset: CGSize {
         didSet {
             rearrangeViews()
         }
     }
-    @IBInspectable open dynamic var shadowOpacity: Float = 0 {
+    @IBInspectable open dynamic override var shadowOpacity: Double {
         didSet {
             rearrangeViews()
         }
@@ -288,10 +289,10 @@ open class TagListView: UIView {
                 x: currentRowWidth,
                 y: 0)
             tagBackgroundView.frame.size = tagView.bounds.size
-            tagBackgroundView.layer.shadowColor = shadowColor.cgColor
+            tagBackgroundView.layer.shadowColor = shadowColor?.cgColor ?? UIColor.white.cgColor
             tagBackgroundView.layer.shadowPath = UIBezierPath(roundedRect: tagBackgroundView.bounds, cornerRadius: cornerRadius).cgPath
             tagBackgroundView.layer.shadowOffset = shadowOffset
-            tagBackgroundView.layer.shadowOpacity = shadowOpacity
+            tagBackgroundView.layer.shadowOpacity = Float(shadowOpacity)
             tagBackgroundView.layer.shadowRadius = shadowRadius
             tagBackgroundView.addSubview(tagView)
             currentRowView.addSubview(tagBackgroundView)

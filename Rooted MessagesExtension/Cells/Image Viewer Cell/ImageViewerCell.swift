@@ -9,6 +9,7 @@
 import UIKit
 import Foundation
 import SDWebImage
+import Eureka
 
 public protocol ImageViewerRowProtocol: class {
     var imageString: String? { get set }

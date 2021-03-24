@@ -11,10 +11,81 @@
 //
 
 import UIKit
+import SwiftyRSA
+import RNCryptor
 
 class RegistrationWorker
 {
-  func doSomeWork()
+  typealias User = UserProfileData
+  typealias RegistrationCompletion = (User?, Error?) -> Void
+  
+  func registerUsing(email: String,
+                     password: String,
+                     fullName: String,
+                     phoneNumber: String,
+                     completion: @escaping RegistrationCompletion)
   {
+    do {
+    let keyPair = try SwiftyRSA.generateRSAKeyPair(sizeInBits: 2048)
+
+    // Generate public key to be used for encryption of data to send to someone else
+    let publicKey = keyPair.publicKey
+    let publicKeyString = try publicKey.base64String()
+
+    // Generate private key to be used for decryption of data for you
+    let privateKey = keyPair.privateKey
+    let privateKeyString = try privateKey.base64String()
+
+    let privateData = Data(base64Encoded: privateKeyString)!
+
+    let encrypted = RNCryptor.encrypt(data: privateData, withPassword: password)
+    let encryptedString = encrypted.base64EncodedString()
+      
+    let path = PathBuilder.build(.Test, in: .Auth, with: "leo")
+        let params: [String: String] = [
+          "action": "email_registration",
+          "email": email,
+          "password": password,
+          "full_name": fullName,
+          "phone_number_string": phoneNumber,
+          "public_key_string": publicKeyString,
+          "private_key_encrypted_string": encryptedString
+        ]
+        let apiService = Api()
+        apiService.performRequest(path: path,
+                                  method: .post,
+                                  parameters: params) { (results, error) in
+
+                                    guard error == nil else {
+                                      RRLogger.logError(message: "There was an error with the JSON.",
+                                                        owner: self,
+                                                        rError: .generalError)
+                                      return completion(nil, error!)
+                                    }
+
+                                    guard let resultsDict = results as? [String: Any] else {
+                                      RRLogger.logError(message: "There was an error with the JSON.", owner: self, rError: .generalError)
+                                      return completion(nil, nil)
+                                    }
+
+                                    RRLogger.log(message: "Data was returned\n\nResults Dict: \(resultsDict)", owner: self)
+
+                                    if let success = resultsDict["success"] as? Bool {
+                                      if success {
+                                        if
+                                          let data = resultsDict["data"] as? [String: Any],
+                                          let userData = UserProfileData(JSON: (data["user"] as? [[String: Any]])?.first ?? [:]) {
+                                          completion(userData, nil)
+                                        } else {
+                                          completion(nil, nil)
+                                        }
+                                      } else {
+                                        completion(nil, nil)
+                                      }
+                                    }
+    }
+    } catch {
+      completion(nil, nil)
+    }
   }
 }

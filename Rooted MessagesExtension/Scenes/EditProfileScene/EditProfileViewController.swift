@@ -12,6 +12,7 @@
 
 import UIKit
 import Messages
+import Eureka
 
 protocol EditProfileDisplayLogic: class {
   func onSuccessfulForgotPassword(viewModel: EditProfile.ForgotPassword.ViewModel)
@@ -20,7 +21,7 @@ protocol EditProfileDisplayLogic: class {
   func handleError(viewModel: EditProfile.HandleError.ViewModel)
 }
 
-class EditProfileViewController: FormMessagesAppViewController, EditProfileDisplayLogic {
+class EditProfileViewController: BaseFormMessagesViewController, EditProfileDisplayLogic {
 
   @IBOutlet private weak var actionsContainerView: UIView!
   var interactor: EditProfileBusinessLogic?
@@ -199,7 +200,7 @@ class EditProfileViewController: FormMessagesAppViewController, EditProfileDispl
 
   func onSuccessfulForgotPassword(viewModel: EditProfile.ForgotPassword.ViewModel) {
     dismissHUD()
-    displayError(with: "Forgot Password", and: "Successfully requested a new password.")
+    displayError(with: "Forgot Password", and: "Successfully requested a new password.", withCompletion: nil)
   }
 
   @objc func doneAction() {

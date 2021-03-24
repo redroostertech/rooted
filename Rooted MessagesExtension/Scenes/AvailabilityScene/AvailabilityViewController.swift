@@ -13,8 +13,9 @@ import CoreData
 import FSCalendar
 import SwiftDate
 import Messages
+import Eureka
 
-class AvailabilityViewController: FormMessagesAppViewController, RootedContentDisplayLogic, AvailabilityManagerDelegate {
+class AvailabilityViewController: BaseFormMessagesViewController, RootedContentDisplayLogic, AvailabilityManagerDelegate {
 
   // MARK: - IBOutlets
   @IBOutlet private weak var calendar: FSCalendar!

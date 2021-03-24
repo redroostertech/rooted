@@ -8,6 +8,7 @@
 
 import Foundation
 import ObjectiveC
+import SwiftDate
 
 // MARK: - Calculation
 
@@ -84,9 +85,9 @@ extension Date {
         return (calendar as NSCalendar).components([.year, .month, .weekday, .day, .hour, .minute, .second], from: self)
     }
     
-    fileprivate var calendar: NSCalendar {
-        return (NSCalendar.autoupdatingCurrent as NSCalendar)
-    }
+//    fileprivate var calendar: NSCalendar {
+//        return (NSCalendar.autoupdatingCurrent as NSCalendar)
+//    }
     
     // MARK: - Initialize
     
@@ -138,18 +139,19 @@ extension Date {
     /**
      Initialize a date by changing the time zone of receiver.
      */
-    func change(timeZone: NSTimeZone) -> Date! {
-        let originalTimeZone = calendar.timeZone
-        calendar.timeZone = timeZone as TimeZone
-        
-        let newDate = calendar.date(from: components)!
-        newDate.calendar.timeZone = timeZone as TimeZone
-        objc_setAssociatedObject(newDate, &AssociatedKeys.TimeZone, timeZone, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        
-        calendar.timeZone = originalTimeZone
-        
-        return newDate
-    }
+  // TODO: - Update this
+//    func change(timeZone: NSTimeZone) -> Date! {
+//        let originalTimeZone = calendar.timeZone
+//        calendar.timeZone = timeZone as TimeZone
+//
+//        let newDate = calendar.date(from: components)!
+//        newDate.calendar.timeZone = timeZone as TimeZone
+//        objc_setAssociatedObject(newDate, &AssociatedKeys.TimeZone, timeZone, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+//
+//        calendar.timeZone = originalTimeZone
+//
+//        return newDate
+//    }
     
     // MARK: - Initialize a date at beginning/end of each units
     
@@ -210,8 +212,8 @@ extension Date {
     }
     
     // MARK: - Differences
-    
-    func differenceWith(_ date: Date, inUnit unit: NSCalendar.Unit) -> Int {
-        return (calendar.components(unit, from: self, to: date, options: []) as NSDateComponents).value(forComponent: unit)
-    }
+//    
+//    func differenceWith(_ date: Date, inUnit unit: NSCalendar.Unit) -> Int {
+//      return (calendar.dateComponents(unit, from: self, to: date, options: []) as NSDateComponents).value(forComponent: unit)
+//    }
 }

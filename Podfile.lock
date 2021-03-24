@@ -229,6 +229,7 @@ PODS:
   - EachNavigationBar (1.14.4)
   - EggRating (0.1.6):
     - RateView
+  - Eureka (5.2.0)
   - Firebase/Analytics (6.25.0):
     - Firebase/Core
   - Firebase/Auth (6.25.0):
@@ -377,6 +378,7 @@ PODS:
   - SDWebImage (5.8.0):
     - SDWebImage/Core (= 5.8.0)
   - SDWebImage/Core (5.8.0)
+  - Sheeeeeeeeet (3.1.4)
   - SSSpinnerButton (3.0.2)
   - SwiftDate (5.1.0)
   - SwiftyCodeView (0.3.6):
@@ -394,8 +396,10 @@ DEPENDENCIES:
   - Branch
   - CalendarKit
   - CLTokenInputView
+  - DateToolsSwift
   - EachNavigationBar (from `https://github.com/redroostertech/EachNavigationBar.git`, branch `iMessage_Port`)
   - EggRating (from `https://github.com/redroostertech/EGGRating.git`, commit `ad32b475b74ef1aae896d8d8a6f96d0851ffdffb`)
+  - Eureka (from `https://github.com/redroostertech/Eureka.git`, branch `iMessage_Port`)
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Core
@@ -411,6 +415,7 @@ DEPENDENCIES:
   - OnboardKit
   - PhoneNumberKit (~> 3.1)
   - RNCryptor (~> 5.0)
+  - Sheeeeeeeeet (from `https://github.com/redroostertech/Sheeeeeeeeet.git`, branch `iMessage_Port`)
   - SSSpinnerButton
   - SwiftDate (~> 5.0)
   - SwiftyCodeView
@@ -472,6 +477,12 @@ EXTERNAL SOURCES:
   EggRating:
     :commit: ad32b475b74ef1aae896d8d8a6f96d0851ffdffb
     :git: https://github.com/redroostertech/EGGRating.git
+  Eureka:
+    :branch: iMessage_Port
+    :git: https://github.com/redroostertech/Eureka.git
+  Sheeeeeeeeet:
+    :branch: iMessage_Port
+    :git: https://github.com/redroostertech/Sheeeeeeeeet.git
 
 CHECKOUT OPTIONS:
   EachNavigationBar:
@@ -480,6 +491,12 @@ CHECKOUT OPTIONS:
   EggRating:
     :commit: ad32b475b74ef1aae896d8d8a6f96d0851ffdffb
     :git: https://github.com/redroostertech/EGGRating.git
+  Eureka:
+    :commit: eb3a6eb477194b13c0901b52eba6c9be9a6c94d0
+    :git: https://github.com/redroostertech/Eureka.git
+  Sheeeeeeeeet:
+    :commit: b54b90e8020cb73f0d2a135ff785aecbb058bfaa
+    :git: https://github.com/redroostertech/Sheeeeeeeeet.git
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -491,6 +508,7 @@ SPEC CHECKSUMS:
   DateToolsSwift: 4207ada6ad615d8dc076323d27037c94916dbfa6
   EachNavigationBar: 9000bc381312c65a86ab1f6c31b526ea675411f6
   EggRating: 378f25f5ac0629e7edfb011f5c5177c63f135e6e
+  Eureka: 820a761c700f6eaab3b60758f138e0d9b99072b3
   Firebase: 5719b4f965f76643241a1bb8244483ff6117db39
   FirebaseAnalytics: 93565f3f0f0f50a5d8770850bfe6a82eaba5db27
   FirebaseAuth: 7047aec89c0b17ecd924a550c853f0c27ac6015e
@@ -523,6 +541,7 @@ SPEC CHECKSUMS:
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   RNCryptor: a369134686cd2ad391323cc856b62e591193ba79
   SDWebImage: 84000f962cbfa70c07f19d2234cbfcf5d779b5dc
+  Sheeeeeeeeet: d4808c23c1d0aca2ccba13353ec7fa17ada2f129
   SSSpinnerButton: ba9ec6858f2f6fa902a5131d3aec5282588241f8
   SwiftDate: 6329e58969a2de31cea7f1ee1143b247693196e7
   SwiftyCodeView: 0252e3520749a3fda1a9b141873401f8e6c570ad
@@ -530,6 +549,6 @@ SPEC CHECKSUMS:
   WordPress-Aztec-iOS: d01bf0c5e150ae6a046f06ba63b7cc2762061c0b
   WordPress-Editor-iOS: 5b726489e5ae07b7281a2862d69aba2d5c83f140
 
-PODFILE CHECKSUM: 512691a6d9c64d6a02116117b2c58972a6a19d13
+PODFILE CHECKSUM: 2ea5e27446d61f2ef1fa6d2ec0e4e657cfff3a44
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.9.3
